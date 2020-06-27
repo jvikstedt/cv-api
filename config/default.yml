@@ -1,0 +1,19 @@
+server:
+  port: 3000
+
+db:
+  type: 'postgres'
+  port: 5432
+  database: 'cv_db'
+
+redis:
+  port: 6379
+
+elasticsearch:
+  port: 9200
+
+jwt:
+  expiresIn: 43200
+
+queue:
+  cvReloadDelay: 10000

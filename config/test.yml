@@ -1,0 +1,21 @@
+server:
+  port: 3001
+
+db:
+  host: 'localhost'
+  port: 5433
+  username: 'cv_user'
+  password: 'cv_password'
+  synchronize: true
+
+redis:
+  port: 6380
+
+elasticsearch:
+  port: 9201
+
+jwt:
+  secret: 'reallyGreatSecret'
+
+queue:
+  cvReloadDelay: 0
