@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: postgres_test
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER=cv_user
+      - POSTGRES_PASSWORD=cv_password
+      - POSTGRES_DB=cv_db
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    container_name: elasticsearch_test
+    environment:
+      - ELASIC_PASSWORD=password
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms256m -Xmx256m
+    ports:
+      - 9201:9200
+  redis:
+    image: redis:6.0.4
+    container_name: redis_test
+    restart: always
+    ports:
+      - 6380:6379
