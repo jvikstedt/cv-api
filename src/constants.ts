@@ -31,6 +31,8 @@ export const QUEUE_NAME_SKILL_SUBJECTS = 'skillSubjects';
 export const QUEUE_NAME_SKILLS = 'skills';
 export const QUEUE_NAME_CV = 'cv';
 
+export const EXPORTER_PDF = 'pdf';
+
 export enum EventType {
   Insert = 'insert',
   Update = 'update',
