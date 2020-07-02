@@ -7,6 +7,7 @@ import { CreateCVDto } from './dto/create-cv.dto';
 import { UpdateCVDto } from './dto/update-cv.dto';
 import { Skill } from '../skills/skill.entity';
 import { PatchCVDto } from './dto/patch-cv.dto';
+import { SearchCVDto } from './dto/search-cv.dto';
 
 @ApiBearerAuth()
 @ApiTags('cv')
@@ -53,5 +54,11 @@ export class CVController {
   @Get('/:id/skills')
   getCVSkills(@Param('id', ParseIntPipe) id: number): Promise<Skill[]> {
     return this.cvService.getCVSkills(id);
+  }
+
+  @Post('/search')
+  @UsePipes(ValidationPipe)
+  search(@Body() searchCVDto: SearchCVDto): Promise<CV[]> {
+    return this.cvService.search(searchCVDto);
   }
 }
