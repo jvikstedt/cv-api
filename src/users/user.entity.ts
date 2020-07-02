@@ -1,7 +1,8 @@
 import * as bcrypt from 'bcrypt';
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, OneToOne, OneToMany } from 'typeorm';
+import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, OneToOne, OneToMany, JoinColumn } from 'typeorm';
 import { CV } from '../cv/cv.entity';
 import { Template } from '../templates/template.entity';
+import { File } from '../files/file.entity';
 
 @Entity()
 @Unique(['username'])
@@ -29,6 +30,13 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Template, template => template.user)
   templates: Template[];
+
+  @OneToOne(() => File)
+  @JoinColumn()
+  avatar: File;
+
+  @Column({ nullable: true })
+  avatarId: string;
 
   @CreateDateColumn()
   createdAt: Date;

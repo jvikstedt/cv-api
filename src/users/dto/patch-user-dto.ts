@@ -10,4 +10,9 @@ export class PatchUserDto {
   @IsString()
   @IsNotEmpty()
   lastName: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  avatarId?: string;
 }
