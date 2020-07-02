@@ -9,6 +9,7 @@ import { ExportersModule } from './exporters/exporters.module';
 import { UsersHttpModule } from './users/users-http.module';
 import { AuthModule } from './auth/auth.module';
 import { TemplatesHttpModule } from './templates/templates-http.module';
+import { FilesHttpModule } from './files/files-http.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { TemplatesHttpModule } from './templates/templates-http.module';
     UsersHttpModule,
     CVHttpModule,
     TemplatesHttpModule,
+    FilesHttpModule,
   ],
 })
 export class AppModule {}
