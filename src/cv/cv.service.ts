@@ -33,12 +33,11 @@ export class CVService {
   }
 
   async patchCV(cvId: number, patchCVDto: PatchCVDto): Promise<CV> {
-    await this.cvRepository.createQueryBuilder()
-      .update(patchCVDto)
-      .where("id = :id", { id: cvId })
-      .execute();
+    const oldCV = await this.findOne(cvId)
 
-    return this.findOne(cvId);
+    const newCV = R.merge(oldCV, patchCVDto);
+
+    return this.cvRepository.save(newCV);
   }
 
   async findAll(): Promise<CV[]> {

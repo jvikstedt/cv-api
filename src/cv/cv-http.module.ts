@@ -4,6 +4,7 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { BullModule } from '@nestjs/bull';
 import { CVService } from './cv.service';
 import { CVController } from './cv.controller';
+import { CVSubscriber } from './cv.subscriber';
 import { CVConsumer } from './cv.consumer';
 import { AuthModule } from '../auth/auth.module';
 import { ElasticsearchConfigService } from '../config/elasticsearch.config';
@@ -32,6 +33,6 @@ const redisConfig = config.get(CONFIG_REDIS);
     }),
   ],
   controllers: [CVController],
-  providers: [CVService, CVConsumer],
+  providers: [CVService, CVSubscriber, CVConsumer],
 })
 export class CVHttpModule {}

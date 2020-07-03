@@ -30,6 +30,7 @@ export const ELASTIC_INDEX_CV = 'cv';
 export const QUEUE_NAME_SKILL_SUBJECTS = 'skillSubjects';
 export const QUEUE_NAME_SKILLS = 'skills';
 export const QUEUE_NAME_CV = 'cv';
+export const QUEUE_NAME_USERS = 'users';
 
 export const EXPORTER_PDF = 'pdf';
 
