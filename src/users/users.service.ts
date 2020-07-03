@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRepository } from './user.repository';
@@ -12,7 +13,7 @@ export class UsersService {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async getUser(userId: number): Promise<User> {
+  async findOne(userId: number): Promise<User> {
     const entity = await this.userRepository.findOne(userId);
 
     if (!entity) {
@@ -23,12 +24,11 @@ export class UsersService {
   }
 
   async patchUser(userId: number, patchUserDto: PatchUserDto): Promise<User> {
-    await this.userRepository.createQueryBuilder()
-      .update(patchUserDto)
-      .where("id = :id", { id: userId })
-      .execute();
+    const oldUser = await this.findOne(userId)
 
-    return this.getUser(userId);
+    const newUser = R.merge(oldUser, patchUserDto);
+
+    return this.userRepository.save(newUser);
   }
 
   async getUserCV(userId: number): Promise<CV> {

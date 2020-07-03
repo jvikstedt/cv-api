@@ -1,11 +1,15 @@
+import * as config from 'config';
 import * as R from 'ramda';
 import { Job, Queue } from 'bull';
 import { Process, Processor, InjectQueue } from '@nestjs/bull';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Logger } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
-import { QUEUE_NAME_CV, EventType, ELASTIC_INDEX_CV } from '../constants';
+import { QUEUE_NAME_CV, EventType, ELASTIC_INDEX_CV, CONFIG_QUEUE, CONFIG_QUEUE_CV_RELOAD } from '../constants';
 import { CVRepository } from './cv.repository';
+
+const queueConfig = config.get(CONFIG_QUEUE);
+const cvReloadDelay = queueConfig[CONFIG_QUEUE_CV_RELOAD];
 
 @Processor(QUEUE_NAME_CV)
 export class CVConsumer {
@@ -95,5 +99,32 @@ export class CVConsumer {
       this.logger.error(err);
       throw err;
     }
+  }
+
+  @Process(EventType.Insert)
+  async insert(job: Job<any>) {
+    await this.cvQueue.add(EventType.Reload, {
+      id: job.data.id,
+    }, {
+      delay: cvReloadDelay,
+    });
+  }
+
+  @Process(EventType.Update)
+  async update(job: Job<any>) {
+    await this.cvQueue.add(EventType.Reload, {
+      id: job.data.new.id,
+    }, {
+      delay: cvReloadDelay,
+    });
+  }
+
+  @Process(EventType.Remove)
+  async remove(job: Job<any>) {
+    await this.cvQueue.add(EventType.Reload, {
+      id: job.data.id,
+    }, {
+      delay: cvReloadDelay,
+    });
   }
 }
