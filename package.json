@@ -18,7 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json --verbose --maxWorkers 1",
-    "repl": "NODE_OPTIONS=--experimental-repl-await ts-node src/repl.ts"
+    "repl": "NODE_OPTIONS=--experimental-repl-await ts-node src/repl.ts",
+    "seed": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^7.7.1",
