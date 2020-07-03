@@ -56,6 +56,16 @@ export class CVConsumer {
     } else {
       this.logger.log(`Index ${ELASTIC_INDEX_CV} already exists, skipping...`);
     }
+
+    const cvs = await this.cvRepository.find();
+
+    for (const cv of cvs) {
+      await this.cvQueue.add(EventType.Reload, {
+        id: cv.id,
+      }, {
+        delay: cvReloadDelay,
+      });
+    }
   }
 
   @Process(EventType.Reload)
@@ -76,6 +86,7 @@ export class CVConsumer {
           index: ELASTIC_INDEX_CV,
           id: job.data.id.toString(),
         })
+        return;
       }
 
       await this.elasticsearchService.index({

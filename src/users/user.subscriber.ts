@@ -23,8 +23,6 @@ export class UserSubscriber implements EntitySubscriberInterface {
   }
 
   async afterUpdate(event: UpdateEvent<User>) {
-    console.log('after update');
-    console.log(event);
     return this.usersQueue.add(EventType.Update, {
       old: event.databaseEntity,
       new: event.entity,
