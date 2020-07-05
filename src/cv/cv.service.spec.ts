@@ -1,11 +1,14 @@
 import { Test } from '@nestjs/testing';
 import { useSeeding, factory } from 'typeorm-seeding';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { CVService } from './cv.service';
 import { CVRepository } from './cv.repository';
 import { NotFoundException } from '@nestjs/common';
 import { CreateCVDto } from './dto/create-cv.dto';
 import { CV } from './cv.entity';
 import { UpdateCVDto } from './dto/update-cv.dto';
+import { SearchCVDto } from './dto/search-cv.dto';
+import { ELASTIC_INDEX_CV } from '../constants';
 
 const mockCVRepository = () => ({
   find: jest.fn(),
@@ -15,9 +18,14 @@ const mockCVRepository = () => ({
   save: jest.fn(),
 });
 
+const mockElasticSearch = () => ({
+  search: jest.fn(),
+});
+
 describe('CVService', () => {
   let cvService: any;
   let cvRepository: any;
+  let elasticsearch: any;
 
   beforeAll(async () => {
     await useSeeding();
@@ -28,11 +36,13 @@ describe('CVService', () => {
       providers: [
         CVService,
         { provide: CVRepository, useFactory: mockCVRepository },
+        { provide: ElasticsearchService, useFactory: mockElasticSearch },
       ],
     }).compile();
 
     cvService = module.get<CVService>(CVService);
     cvRepository = module.get<CVRepository>(CVRepository);
+    elasticsearch = module.get<ElasticsearchService>(ElasticsearchService);
   });
 
   describe('findAll', () => {
@@ -113,6 +123,37 @@ describe('CVService', () => {
       cvRepository.findOne.mockResolvedValue(null);
 
       await expect(cvService.update(1, updateCVDto)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('search', () => {
+    it('calls elasticsearchService(searchCVDto) and successfully retrieves cvs', async () => {
+      const searchCVDto: SearchCVDto = { name: 'john' };
+      elasticsearch.search.mockResolvedValue({
+        statusCode: 200,
+        body: {
+          hits: {
+            hits: [
+              { _source: { name: 'john' } }
+            ]
+          }
+        }
+      });
+
+      expect(elasticsearch.search).not.toHaveBeenCalled();
+      const result = await cvService.search(searchCVDto);
+      expect(result).toEqual([{ name: 'john' }]);
+      expect(elasticsearch.search).toHaveBeenCalledWith({
+        index: ELASTIC_INDEX_CV,
+        size: searchCVDto.limit,
+        body: {
+          query: {
+            match: {
+              fullName: searchCVDto.name,
+            }
+          }
+        },
+      });
     });
   });
 });

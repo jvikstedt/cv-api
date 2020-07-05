@@ -23,9 +23,10 @@ describe('SkillsController (e2e)', () => {
     .compile();
 
     app = module.createNestApplication();
+    await app.init();
+
     connection = module.get<Connection>(Connection);
 
-    await app.init();
     await useSeeding();
   });
 
@@ -33,8 +34,10 @@ describe('SkillsController (e2e)', () => {
     await connection.synchronize(true);
   });
 
-  afterAll(async () => {
+  afterAll(async (done) => {
+    await connection.synchronize(true);
     await app.close();
+    done();
   });
 
   it('/skills (GET)', async () => {

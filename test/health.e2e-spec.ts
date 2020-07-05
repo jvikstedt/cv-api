@@ -16,8 +16,9 @@ describe('HealthController (e2e)', () => {
     await app.init();
   });
 
-  afterAll(async () => {
+  afterAll(async (done) => {
     await app.close();
+    done();
   });
 
   it('/health (GET)', async () => {
