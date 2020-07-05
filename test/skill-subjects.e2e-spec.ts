@@ -31,11 +31,13 @@ describe('SkillSubjectsController (e2e)', () => {
     await connection.synchronize(true);
   });
 
-  afterAll(async () => {
+  afterAll(async (done) => {
+    await connection.synchronize(true);
     await app.close();
+    done();
   });
 
-  it('/skillSubjects (GET)', async () => {
+  it('/skill_subjects (GET)', async () => {
     const skillSubject = await factory(SkillSubject)().create();
     const response = await request(app.getHttpServer())
       .get('/skill_subjects')
@@ -50,7 +52,7 @@ describe('SkillSubjectsController (e2e)', () => {
     ]);
   });
 
-  it('/skillSubjects/:id (GET)', async () => {
+  it('/skill_subjects/:id (GET)', async () => {
     const skillSubject = await factory(SkillSubject)().create();
     const response = await request(app.getHttpServer())
       .get(`/skill_subjects/${skillSubject.id}`)
@@ -68,7 +70,7 @@ describe('SkillSubjectsController (e2e)', () => {
       .expect(404)
   });
 
-  it('/skillSubjects/:id (DELETE)', async () => {
+  it('/skill_subjects/:id (DELETE)', async () => {
     const skillSubject = await factory(SkillSubject)().create();
     const response = await request(app.getHttpServer())
       .delete(`/skill_subjects/${skillSubject.id}`)
@@ -81,7 +83,7 @@ describe('SkillSubjectsController (e2e)', () => {
       .expect(404)
   });
 
-  it('/skillSubjects (POST)', async () => {
+  it('/skill_subjects (POST)', async () => {
     let newSkillSubject = await factory(SkillSubject)().make();
 
     const response = await request(app.getHttpServer())
