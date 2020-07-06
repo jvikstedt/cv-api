@@ -1,9 +1,20 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsString, IsArray, IsBoolean } from 'class-validator';
+
+export class SkillSearch {
+  @IsBoolean()
+  required? = false;
+
+  @IsNumber()
+  skillSubjectId: number;
+}
 
 export class SearchCVDto {
   @IsString()
-  name: string;
+  fullName?: string = '';
 
   @IsNumber()
   limit?: number = 10;
+
+  @IsArray()
+  skills?: SkillSearch[] = [];
 }

@@ -57,7 +57,7 @@ export class CVController {
   }
 
   @Post('/search')
-  @UsePipes(ValidationPipe)
+  @UsePipes(new ValidationPipe({ transform: true }))
   search(@Body() searchCVDto: SearchCVDto): Promise<CV[]> {
     return this.cvService.search(searchCVDto);
   }
