@@ -23,16 +23,21 @@ export class UsersConsumer {
 
   @Process(EventType.Update)
   async update(job: Job<any>) {
-    const id = job.data.new.cvId;
+    try {
+      const id = job.data.new.cvId;
 
-    const user = await this.userRepository.findOne(id, {
-      relations: ['cv'],
-    });
+      const user = await this.userRepository.findOne(id, {
+        relations: ['cv'],
+      });
 
-    await this.cvQueue.add(EventType.Reload, {
-      id: user.cv.id,
-    }, {
-      delay: cvReloadDelay,
-    });
+      await this.cvQueue.add(EventType.Reload, {
+        id: user.cv.id,
+      }, {
+        delay: cvReloadDelay,
+      });
+    } catch(err) {
+      this.logger.error(err);
+      throw err;
+    }
   }
 }
