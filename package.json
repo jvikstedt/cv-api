@@ -54,6 +54,7 @@
     "class-transformer": "^0.2.3",
     "class-validator": "^0.12.2",
     "config": "^3.3.1",
+    "elastic-builder": "^2.7.0",
     "eslint": "^7.1.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.20.2",
