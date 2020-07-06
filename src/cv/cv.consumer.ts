@@ -114,28 +114,43 @@ export class CVConsumer {
 
   @Process(EventType.Insert)
   async insert(job: Job<any>) {
-    await this.cvQueue.add(EventType.Reload, {
-      id: job.data.id,
-    }, {
-      delay: cvReloadDelay,
-    });
+    try {
+      await this.cvQueue.add(EventType.Reload, {
+        id: job.data.id,
+      }, {
+        delay: cvReloadDelay,
+      });
+    } catch(err) {
+      this.logger.error(err);
+      throw err;
+    }
   }
 
   @Process(EventType.Update)
   async update(job: Job<any>) {
-    await this.cvQueue.add(EventType.Reload, {
-      id: job.data.new.id,
-    }, {
-      delay: cvReloadDelay,
-    });
+    try {
+      await this.cvQueue.add(EventType.Reload, {
+        id: job.data.new.id,
+      }, {
+        delay: cvReloadDelay,
+      });
+    } catch(err) {
+      this.logger.error(err);
+      throw err;
+    }
   }
 
   @Process(EventType.Remove)
   async remove(job: Job<any>) {
-    await this.cvQueue.add(EventType.Reload, {
-      id: job.data.id,
-    }, {
-      delay: cvReloadDelay,
-    });
+    try {
+      await this.cvQueue.add(EventType.Reload, {
+        id: job.data.id,
+      }, {
+        delay: cvReloadDelay,
+      });
+    } catch(err) {
+      this.logger.error(err);
+      throw err;
+    }
   }
 }
