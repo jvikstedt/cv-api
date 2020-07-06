@@ -8,7 +8,7 @@ import { Skill } from "../../src/skills/skill.entity";
 
 const SKILLS = [
   'Go',
-  'React',
+  'React.js',
   'Angular 2',
   'Angular 1',
   'Java',
@@ -18,21 +18,43 @@ const SKILLS = [
   'TDD',
   'Jenkins',
   'AWS',
+  'Vue.js',
+  'Typescript',
+  'Kubernetes',
+  'GCP',
+  'Node.js',
+  'Git',
+  'Ruby on Rails',
+  'Ruby',
+  'MySQL',
+  'PostgreSQL',
+  'C++',
+  'ElasticSearch',
+  'Linux',
+  'Vim',
+  'Apache Kafka',
+  'Robot Framework',
+  'Microservices'
 ];
 
 export default class Seed implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {
     await connection.synchronize(true);
 
-    const admin = await factory(User)().make({ firstName: 'John', lastName: 'Doe', username: 'admin' });
-    admin.password = await bcrypt.hash('Admin123', admin.salt);
-    await admin.save();
-    await factory(CV)().create({ userId: admin.id })
-
     const skillSubjects: SkillSubject[] = [];
     for (const name of SKILLS) {
       const skillSubject: SkillSubject = await factory(SkillSubject)().create({ name });
       skillSubjects.push(skillSubject);
+    };
+
+    // Create admin user
+    const admin = await factory(User)().make({ firstName: 'John', lastName: 'Doe', username: 'admin' });
+    admin.password = await bcrypt.hash('Admin123', admin.salt);
+    await admin.save();
+    const adminCV = await factory(CV)().create({ userId: admin.id })
+    let randomSkills: SkillSubject[] = skillSubjects.sort(() => 0.5 - Math.random()).slice(0, 6);
+    for (const skillSubject of randomSkills) {
+      await factory(Skill)().create({ cvId: adminCV.id, skillSubjectId: skillSubject.id });
     };
 
     const cvs: CV[] = await factory(CV)()
@@ -46,7 +68,7 @@ export default class Seed implements Seeder {
 
 
     for (const cv of cvs) {
-      const randomSkills: SkillSubject[] = skillSubjects.sort(() => 0.5 - Math.random()).slice(0, 6);
+      randomSkills = skillSubjects.sort(() => 0.5 - Math.random()).slice(0, 6);
 
       for (const skillSubject of randomSkills) {
         await factory(Skill)().create({ cvId: cv.id, skillSubjectId: skillSubject.id });
