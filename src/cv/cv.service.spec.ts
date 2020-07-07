@@ -8,7 +8,6 @@ import { CreateCVDto } from './dto/create-cv.dto';
 import { CV } from './cv.entity';
 import { UpdateCVDto } from './dto/update-cv.dto';
 import { SearchCVDto } from './dto/search-cv.dto';
-import { ELASTIC_INDEX_CV } from '../constants';
 
 const mockCVRepository = () => ({
   find: jest.fn(),
@@ -129,7 +128,7 @@ describe('CVService', () => {
   describe('search', () => {
     it('calls elasticsearchService(searchCVDto) and successfully retrieves cvs', async () => {
       const searchCVDto: SearchCVDto = new SearchCVDto();
-      searchCVDto.name = 'john';
+      searchCVDto.fullName = 'john';
 
       elasticsearch.search.mockResolvedValue({
         statusCode: 200,
