@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Put, Body, Delete, Param, UsePipes, ValidationPipe, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Delete, Param, UsePipes, ValidationPipe, ParseIntPipe, UseGuards, Patch } from '@nestjs/common';
 import { SkillsService } from './skills.service';
 import { Skill } from './skill.entity';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { PatchSkillDto } from './dto/patch-skill.dto';
 
 @ApiBearerAuth()
 @ApiTags('skills')
@@ -25,6 +26,12 @@ export class SkillsController {
   @UsePipes(ValidationPipe)
   update(@Param('id', ParseIntPipe) id: number, @Body() updateSkillDto: UpdateSkillDto): Promise<Skill> {
     return this.skillsService.update(id, updateSkillDto);
+  }
+
+  @Patch('/:id')
+  @UsePipes(ValidationPipe)
+  patchCV(@Param('id', ParseIntPipe) id: number, @Body() patchSkillDto: PatchSkillDto): Promise<Skill> {
+    return this.skillsService.patchSkill(id, patchSkillDto);
   }
 
   @Get()

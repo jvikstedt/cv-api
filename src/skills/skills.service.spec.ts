@@ -87,11 +87,14 @@ describe('SkillsService', () => {
       const createSkillDto: CreateSkillDto = { skillSubjectId: 2, cvId: 2, experienceInYears: 2 };
       const skill = await factory(Skill)().make(createSkillDto);
       skillRepository.createSkill.mockResolvedValue(skill);
+      skillRepository.findOne.mockResolvedValue(skill);
 
       expect(skillRepository.createSkill).not.toHaveBeenCalled();
+      expect(skillRepository.findOne).not.toHaveBeenCalled();
       const result = await skillsService.create(createSkillDto);
       expect(result).toEqual(skill);
       expect(skillRepository.createSkill).toHaveBeenCalledWith(createSkillDto);
+      expect(skillRepository.findOne).toHaveBeenCalledWith(skill.id, { relations: ['skillSubject'] });
     });
   });
 

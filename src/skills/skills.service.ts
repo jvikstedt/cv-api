@@ -1,9 +1,11 @@
+import * as R from 'ramda';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Skill } from './skill.entity';
 import { SkillRepository } from './skill.repository';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
+import { PatchSkillDto } from './dto/patch-skill.dto';
 
 @Injectable()
 export class SkillsService {
@@ -13,7 +15,8 @@ export class SkillsService {
   ) {}
 
   async create(createSkillDto: CreateSkillDto): Promise<Skill> {
-    return this.skillRepository.createSkill(createSkillDto);
+    const skill = await this.skillRepository.createSkill(createSkillDto);
+    return this.findOne(skill.id);
   }
 
   async update(id: number, updateSkillDto: UpdateSkillDto): Promise<Skill> {
@@ -22,6 +25,14 @@ export class SkillsService {
     skill.experienceInYears = updateSkillDto.experienceInYears;
 
     return this.skillRepository.save(skill);
+  }
+
+  async patchSkill(id: number, patchSkillDto: PatchSkillDto): Promise<Skill> {
+    const oldSkill = await this.findOne(id);
+
+    const newSkill = R.merge(oldSkill, patchSkillDto);
+
+    return this.skillRepository.save(newSkill);
   }
 
   async findAll(): Promise<Skill[]> {
