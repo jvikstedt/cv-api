@@ -1,9 +1,11 @@
+import * as R from 'ramda';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Template } from './template.entity';
 import { TemplateRepository } from './template.repository';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
+import {PatchTemplateDto} from './dto/patch-template.dto';
 
 @Injectable()
 export class TemplatesService {
@@ -25,6 +27,14 @@ export class TemplatesService {
     template.data = updateTemplateDto.data;
 
     return await this.templateRepository.save(template);
+  }
+
+  async patchTemplate(id: number, patchTemplateDto: PatchTemplateDto): Promise<Template> {
+    const oldTemplate = await this.findOne(id);
+
+    const newTemplate = R.merge(oldTemplate, patchTemplateDto);
+
+    return this.templateRepository.save(newTemplate);
   }
 
   async findAll(): Promise<Template[]> {

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Body, Delete, Param, UsePipes, ValidationPipe, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Delete, Param, UsePipes, ValidationPipe, ParseIntPipe, UseGuards, Patch } from '@nestjs/common';
 import { TemplatesService } from './templates.service';
 import { Template } from './template.entity';
 import { CreateTemplateRequestDto } from './dto/create-template-request.dto';
@@ -7,6 +7,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetUser } from '../auth/get-user.decorator';
 import { User } from '../users/user.entity';
+import { PatchTemplateDto } from './dto/patch-template.dto';
 
 @ApiBearerAuth()
 @ApiTags('templates')
@@ -27,6 +28,12 @@ export class TemplatesController {
   @UsePipes(ValidationPipe)
   update(@Param('id', ParseIntPipe) id: number, @Body() updateTemplateDto: UpdateTemplateDto): Promise<Template> {
     return this.templatesService.update(id, updateTemplateDto);
+  }
+
+  @Patch('/:id')
+  @UsePipes(ValidationPipe)
+  patchTemplate(@Param('id', ParseIntPipe) id: number, @Body() patchTemplateDto: PatchTemplateDto): Promise<Template> {
+    return this.templatesService.patchTemplate(id, patchTemplateDto);
   }
 
   @Get()

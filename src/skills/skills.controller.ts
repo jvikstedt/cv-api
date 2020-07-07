@@ -30,7 +30,7 @@ export class SkillsController {
 
   @Patch('/:id')
   @UsePipes(ValidationPipe)
-  patchCV(@Param('id', ParseIntPipe) id: number, @Body() patchSkillDto: PatchSkillDto): Promise<Skill> {
+  patchSkill(@Param('id', ParseIntPipe) id: number, @Body() patchSkillDto: PatchSkillDto): Promise<Skill> {
     return this.skillsService.patchSkill(id, patchSkillDto);
   }
 
