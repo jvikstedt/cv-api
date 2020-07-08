@@ -5,46 +5,60 @@ import { SkillSubject } from "../../src/skill_subjects/skill-subject.entity";
 import { User } from "../../src/users/user.entity";
 import { CV } from "../../src/cv/cv.entity";
 import { Skill } from "../../src/skills/skill.entity";
+import { SkillGroup } from '../../src/skill_groups/skill-group.entity';
 
-const SKILLS = [
-  'Go',
-  'React.js',
-  'Angular 2',
-  'Angular 1',
-  'Java',
-  'Ansible',
-  'Docker',
-  'Agile',
-  'TDD',
-  'Jenkins',
-  'AWS',
-  'Vue.js',
-  'Typescript',
-  'Kubernetes',
-  'GCP',
-  'Node.js',
-  'Git',
-  'Ruby on Rails',
-  'Ruby',
-  'MySQL',
-  'PostgreSQL',
-  'C++',
-  'ElasticSearch',
-  'Linux',
-  'Vim',
-  'Apache Kafka',
-  'Robot Framework',
-  'Microservices'
-];
+const SKILLS = {
+  ['Programming languages']: [
+    'Go',
+    'Java',
+    'Typescript',
+    'Javascript',
+    'Ruby',
+    'C++',
+  ],
+  ['Frameworks']: [
+    'Ruby on Rails',
+    'Vue.js',
+    'React.js',
+    'Angular 2',
+    'Angular 1',
+  ],
+  ['Other']: [
+    'ElasticSearch',
+    'Linux',
+    'Vim',
+    'Apache Kafka',
+    'Robot Framework',
+    'Microservices',
+    'MySQL',
+    'PostgreSQL',
+    'Git',
+    'Kubernetes',
+    'GCP',
+    'Ansible',
+    'Docker',
+    'Agile',
+    'TDD',
+    'Jenkins',
+    'AWS',
+  ],
+};
 
 export default class Seed implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {
     await connection.synchronize(true);
 
+    const skillGroups: SkillGroup[] = [];
     const skillSubjects: SkillSubject[] = [];
-    for (const name of SKILLS) {
-      const skillSubject: SkillSubject = await factory(SkillSubject)().create({ name });
-      skillSubjects.push(skillSubject);
+
+    for (const skillGroupName of Object.keys(SKILLS)) {
+      const skillGroup: SkillGroup = await factory(SkillGroup)().create({ name: skillGroupName });
+      skillGroups.push(skillGroup);
+
+      for (const name of SKILLS[skillGroupName]) {
+        const skillSubject: SkillSubject = await factory(SkillSubject)().create({ name, skillGroupId: skillGroup.id });
+        skillSubjects.push(skillSubject);
+      }
     };
 
     // Create admin user

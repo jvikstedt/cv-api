@@ -1,12 +1,12 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNumber } from 'class-validator';
 
 export class CreateSkillDto {
-  @IsNotEmpty()
+  @IsNumber()
   cvId: number;
 
-  @IsNotEmpty()
+  @IsNumber()
   skillSubjectId: number;
 
-  @IsNotEmpty()
+  @IsNumber()
   experienceInYears: number;
 }
