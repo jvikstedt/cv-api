@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SkillSubject } from './skill-subject.entity';
 import { SkillSubjectRepository } from './skill-subject.repository';
@@ -14,6 +14,16 @@ export class SkillSubjectsService {
   ) {}
 
   async create(createSkillSubjectDto: CreateSkillSubjectDto): Promise<SkillSubject> {
+    const skillSubjects = await this.skillSubjectRepository
+      .createQueryBuilder()
+      .where("LOWER(name) = LOWER(:name)", {
+        name: createSkillSubjectDto.name
+      }).getMany();
+
+    if (skillSubjects.length > 0) {
+      throw new UnprocessableEntityException();
+    }
+
     const skillSubject = await this.skillSubjectRepository.createSkillSubject(createSkillSubjectDto);
 
     return skillSubject;
@@ -28,11 +38,11 @@ export class SkillSubjectsService {
   }
 
   async findAll(): Promise<SkillSubject[]> {
-    return this.skillSubjectRepository.find();
+    return this.skillSubjectRepository.find({ relations: ['skillGroup'] });
   }
 
   async findOne(id: number): Promise<SkillSubject> {
-    const entity = await this.skillSubjectRepository.findOne(id);
+    const entity = await this.skillSubjectRepository.findOne(id, { relations: ['skillGroup'] });
     if (!entity) {
       throw new NotFoundException();
     }
@@ -49,8 +59,9 @@ export class SkillSubjectsService {
 
   async search(searchSkillSubjectDto: SearchSkillSubjectDto): Promise<SkillSubject[]> {
     return this.skillSubjectRepository
-      .createQueryBuilder()
-      .where("name ilike :name", { name: `%${searchSkillSubjectDto.name}%` })
+      .createQueryBuilder('skillSubject')
+      .where("skillSubject.name ilike :name", { name: `%${searchSkillSubjectDto.name}%` })
+      .leftJoinAndSelect("skillSubject.skillGroup", "skillGroup")
       .limit(searchSkillSubjectDto.limit)
       .getMany();
   }

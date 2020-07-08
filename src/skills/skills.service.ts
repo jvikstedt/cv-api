@@ -16,6 +16,7 @@ export class SkillsService {
 
   async create(createSkillDto: CreateSkillDto): Promise<Skill> {
     const skill = await this.skillRepository.createSkill(createSkillDto);
+
     return this.findOne(skill.id);
   }
 
@@ -36,11 +37,11 @@ export class SkillsService {
   }
 
   async findAll(): Promise<Skill[]> {
-    return this.skillRepository.find({ relations: ['skillSubject'] });
+    return this.skillRepository.find({ relations: ['skillSubject', 'skillSubject.skillGroup'] });
   }
 
   async findOne(id: number): Promise<Skill> {
-    const entity = await this.skillRepository.findOne(id, { relations: ['skillSubject'] });
+    const entity = await this.skillRepository.findOne(id, { relations: ['skillSubject', 'skillSubject.skillGroup'] });
     if (!entity) {
       throw new NotFoundException();
     }
