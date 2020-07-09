@@ -54,7 +54,7 @@ describe('SkillSubjectsService', () => {
       const result = await skillSubjectsService.findOne(1);
       expect(result).toEqual(skillSubject);
 
-      expect(skillSubjectRepository.findOne).toHaveBeenCalledWith(1);
+      expect(skillSubjectRepository.findOne).toHaveBeenCalledWith(1, { relations: ['skillGroup'] });
     });
 
     it('throws an error as skillSubject is not found', async () => {
@@ -81,10 +81,20 @@ describe('SkillSubjectsService', () => {
   });
 
   describe('create', () => {
+    const getMany = jest.fn();
+
+    beforeEach(async () => {
+      skillSubjectRepository.createQueryBuilder = jest.fn(() => ({
+        where: jest.fn().mockReturnThis(),
+        getMany,
+      }));
+    });
+
     it('calls skillSubjectRepository.createSkillSubject(createSkillSubjectDto) and successfully retrieves and return skillSubject', async () => {
-      const createSkillSubjectDto: CreateSkillSubjectDto = { name: 'Vue' };
+      const createSkillSubjectDto: CreateSkillSubjectDto = { name: 'Vue', skillGroupId: 1 };
       const skillSubject = await factory(SkillSubject)().make(createSkillSubjectDto);
       skillSubjectRepository.createSkillSubject.mockResolvedValue(skillSubject);
+      getMany.mockResolvedValue([]);
 
       expect(skillSubjectRepository.createSkillSubject).not.toHaveBeenCalled();
       const result = await skillSubjectsService.create(createSkillSubjectDto);
@@ -104,7 +114,7 @@ describe('SkillSubjectsService', () => {
       expect(skillSubjectRepository.save).not.toHaveBeenCalled();
       const result = await skillSubjectsService.update(1, updateSkillSubjectDto);
       expect(result).toEqual({ ...skillSubject, name: 'Vue' });
-      expect(skillSubjectRepository.findOne).toHaveBeenCalledWith(1);
+      expect(skillSubjectRepository.findOne).toHaveBeenCalledWith(1, { relations: ['skillGroup'] });
       expect(skillSubjectRepository.save).toHaveBeenCalledWith({ ...skillSubject, name: 'Vue' });
     });
 

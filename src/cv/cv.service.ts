@@ -64,7 +64,7 @@ export class CVService {
   }
 
   async getCVSkills(cvId: number): Promise<Skill[]> {
-    const entity = await this.cvRepository.findOne(cvId, { relations: ['skills', 'skills.skillSubject'] });
+    const entity = await this.cvRepository.findOne(cvId, { relations: ['skills', 'skills.skillSubject', 'skills.skillSubject.skillGroup'] });
     if (!entity) {
       throw new NotFoundException();
     }

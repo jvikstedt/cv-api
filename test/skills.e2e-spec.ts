@@ -7,6 +7,7 @@ import { Connection } from 'typeorm';
 import { Skill } from '../src/skills/skill.entity';
 import { User } from '../src/users/user.entity';
 import { SkillSubject } from '../src/skill_subjects/skill-subject.entity';
+import { SkillGroup } from '../src/skill_groups/skill-group.entity';
 import { CV } from '../src/cv/cv.entity';
 import { AppModule } from '../src/app.module';
 
@@ -42,7 +43,8 @@ describe('SkillsController (e2e)', () => {
 
   it('/skills (GET)', async () => {
     const user = await factory(User)().create();
-    const skillSubject = await factory(SkillSubject)().create();
+    const skillGroup = await factory(SkillGroup)().create();
+    const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
     const cv = await factory(CV)().create({ userId: user.id });
     const skill = await factory(Skill)().create({ cvId: cv.id, skillSubjectId: skillSubject.id });
 
@@ -61,7 +63,8 @@ describe('SkillsController (e2e)', () => {
 
   it('/skills/:id (GET)', async () => {
     const user = await factory(User)().create();
-    const skillSubject = await factory(SkillSubject)().create();
+    const skillGroup = await factory(SkillGroup)().create();
+    const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
     const cv = await factory(CV)().create({ userId: user.id });
     const skill = await factory(Skill)().create({ cvId: cv.id, skillSubjectId: skillSubject.id });
 
@@ -82,7 +85,8 @@ describe('SkillsController (e2e)', () => {
 
   it('/skills (POST)', async () => {
     const user = await factory(User)().create();
-    const skillSubject = await factory(SkillSubject)().create();
+    const skillGroup = await factory(SkillGroup)().create();
+    const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
     const cv = await factory(CV)().create({ userId: user.id });
 
     const response = await request(app.getHttpServer())
@@ -95,7 +99,8 @@ describe('SkillsController (e2e)', () => {
 
   it('/skills/:id (PUT)', async () => {
     const user = await factory(User)().create();
-    const skillSubject1 = await factory(SkillSubject)().create();
+    const skillGroup = await factory(SkillGroup)().create();
+    const skillSubject1 = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
     const cv = await factory(CV)().create({ userId: user.id });
     const skill = await factory(Skill)().create({ cvId: cv.id, skillSubjectId: skillSubject1.id, experienceInYears: 1 });
 
@@ -115,7 +120,8 @@ describe('SkillsController (e2e)', () => {
 
   it('/skills/:id (DELETE)', async () => {
     const user = await factory(User)().create();
-    const skillSubject = await factory(SkillSubject)().create();
+    const skillGroup = await factory(SkillGroup)().create();
+    const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
     const cv = await factory(CV)().create({ userId: user.id });
     const skill = await factory(Skill)().create({ cvId: cv.id, skillSubjectId: skillSubject.id });
 

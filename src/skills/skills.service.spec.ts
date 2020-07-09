@@ -54,7 +54,7 @@ describe('SkillsService', () => {
       const result = await skillsService.findOne(1);
       expect(result).toEqual(skill);
 
-      expect(skillRepository.findOne).toHaveBeenCalledWith(1, { relations: ['skillSubject'] });
+      expect(skillRepository.findOne).toHaveBeenCalledWith(1, { relations: ['skillSubject', 'skillSubject.skillGroup'] });
     });
 
     it('throws an error as skill is not found', async () => {
@@ -94,7 +94,7 @@ describe('SkillsService', () => {
       const result = await skillsService.create(createSkillDto);
       expect(result).toEqual(skill);
       expect(skillRepository.createSkill).toHaveBeenCalledWith(createSkillDto);
-      expect(skillRepository.findOne).toHaveBeenCalledWith(skill.id, { relations: ['skillSubject'] });
+      expect(skillRepository.findOne).toHaveBeenCalledWith(skill.id, { relations: ['skillSubject', 'skillSubject.skillGroup'] });
     });
   });
 
@@ -109,7 +109,7 @@ describe('SkillsService', () => {
       expect(skillRepository.save).not.toHaveBeenCalled();
       const result = await skillsService.update(1, updateSkillDto);
       expect(result).toEqual({ ...skill, ...updateSkillDto });
-      expect(skillRepository.findOne).toHaveBeenCalledWith(1, { relations: ['skillSubject'] });
+      expect(skillRepository.findOne).toHaveBeenCalledWith(1, { relations: ['skillSubject', 'skillSubject.skillGroup'] });
       expect(skillRepository.save).toHaveBeenCalledWith({ ...skill, ...updateSkillDto });
     });
 

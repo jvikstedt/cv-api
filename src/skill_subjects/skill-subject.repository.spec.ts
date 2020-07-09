@@ -30,7 +30,7 @@ describe('SkillSubjectRepository', () => {
     });
 
     it('returns created skillSubject', async () => {
-      const mockCreateSkillSubjectDto: CreateSkillSubjectDto = { name: 'Typescript' };
+      const mockCreateSkillSubjectDto: CreateSkillSubjectDto = { name: 'Typescript', skillGroupId: 1 };
       const skillSubject = await factory(SkillSubject)().make();
       save.mockResolvedValue(skillSubject);
 
