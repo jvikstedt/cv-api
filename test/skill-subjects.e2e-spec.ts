@@ -5,6 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { INestApplication } from '@nestjs/common';
 import { Connection } from 'typeorm';
 import { SkillSubject } from '../src/skill_subjects/skill-subject.entity';
+import { SkillGroup } from '../src/skill_groups/skill-group.entity';
 import { AppModule } from '../src/app.module';
 
 describe('SkillSubjectsController (e2e)', () => {
@@ -38,7 +39,8 @@ describe('SkillSubjectsController (e2e)', () => {
   });
 
   it('/skill_subjects (GET)', async () => {
-    const skillSubject = await factory(SkillSubject)().create();
+    const skillGroup = await factory(SkillGroup)().create();
+    const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
     const response = await request(app.getHttpServer())
       .get('/skill_subjects')
       .expect(200)
@@ -48,12 +50,18 @@ describe('SkillSubjectsController (e2e)', () => {
         ...skillSubject,
         createdAt: skillSubject.createdAt.toJSON(),
         updatedAt: skillSubject.updatedAt.toJSON(),
+        skillGroup: {
+          ...skillGroup,
+          createdAt: skillGroup.createdAt.toJSON(),
+          updatedAt: skillGroup.updatedAt.toJSON(),
+        }
       }
     ]);
   });
 
   it('/skill_subjects/:id (GET)', async () => {
-    const skillSubject = await factory(SkillSubject)().create();
+    const skillGroup = await factory(SkillGroup)().create();
+    const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
     const response = await request(app.getHttpServer())
       .get(`/skill_subjects/${skillSubject.id}`)
       .expect(200)
@@ -62,6 +70,11 @@ describe('SkillSubjectsController (e2e)', () => {
       ...skillSubject,
       createdAt: skillSubject.createdAt.toJSON(),
       updatedAt: skillSubject.updatedAt.toJSON(),
+      skillGroup: {
+        ...skillGroup,
+        createdAt: skillGroup.createdAt.toJSON(),
+        updatedAt: skillGroup.updatedAt.toJSON(),
+      }
     });
 
 
@@ -71,7 +84,8 @@ describe('SkillSubjectsController (e2e)', () => {
   });
 
   it('/skill_subjects/:id (DELETE)', async () => {
-    const skillSubject = await factory(SkillSubject)().create();
+    const skillGroup = await factory(SkillGroup)().create();
+    const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
     const response = await request(app.getHttpServer())
       .delete(`/skill_subjects/${skillSubject.id}`)
       .expect(200)
@@ -84,7 +98,8 @@ describe('SkillSubjectsController (e2e)', () => {
   });
 
   it('/skill_subjects (POST)', async () => {
-    let newSkillSubject = await factory(SkillSubject)().make();
+    const skillGroup = await factory(SkillGroup)().create();
+    let newSkillSubject = await factory(SkillSubject)().make({ skillGroupId: skillGroup.id });
 
     const response = await request(app.getHttpServer())
       .post('/skill_subjects')
@@ -101,7 +116,8 @@ describe('SkillSubjectsController (e2e)', () => {
   });
 
   it('/skill_subjects/:id (PUT)', async () => {
-    const skillSubject = await factory(SkillSubject)().create();
+    const skillGroup = await factory(SkillGroup)().create();
+    const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
 
     let changes = await factory(SkillSubject)().make({ name: 'Vue.js' });
     const response = await request(app.getHttpServer())
