@@ -24,7 +24,7 @@ export class UsersConsumer {
   @Process(EventType.Update)
   async update(job: Job<any>) {
     try {
-      const id = job.data.new.cvId;
+      const id = job.data.new.id;
 
       const user = await this.userRepository.findOne(id, {
         relations: ['cv'],
