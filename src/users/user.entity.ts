@@ -19,10 +19,10 @@ export class User extends BaseEntity {
   @Column()
   lastName: string;
 
-  @Column({ select: false })
+  @Column({ select: false, nullable: true })
   password: string;
 
-  @Column({ select: false })
+  @Column({ select: false, nullable: true })
   salt: string;
 
   @OneToOne(() => CV, cv => cv.user)

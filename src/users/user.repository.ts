@@ -32,7 +32,7 @@ export class UserRepository extends Repository<User> {
     }
   }
 
-  async validateUserPassword(authCredentialsDto: AuthCredentialsDto): Promise<string | null> {
+  async validateUserPassword(authCredentialsDto: AuthCredentialsDto): Promise<User | null> {
     const { username, password } = authCredentialsDto;
     const user = await this.createQueryBuilder('user')
       .where({ username })
@@ -41,7 +41,7 @@ export class UserRepository extends Repository<User> {
       .getOne();
 
     if (user && await user.validatePassword(password)) {
-      return user.username;
+      return user;
     }
 
     return null;
