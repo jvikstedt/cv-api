@@ -4,6 +4,9 @@ export const CONFIG_JWT = 'jwt';
 export const CONFIG_JWT_SECRET = 'secret';
 export const CONFIG_JWT_EXPIRES_IN = 'expiresIn';
 
+export const CONFIG_GOOGLE = 'google';
+export const CONFIG_GOOGLE_CLIENT_ID = 'clientID';
+
 export const CONFIG_SERVER = 'server';
 export const CONFIG_SERVER_PORT = 'port';
 

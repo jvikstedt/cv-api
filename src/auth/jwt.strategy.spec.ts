@@ -34,14 +34,28 @@ describe('JwtStrategy', () => {
       const user = await factory(User)().make();
 
       userRepository.findOne.mockResolvedValue(user);
-      const result = await jwtStrategy.validate({ username: 'john.doe@google.com' });
-      expect(userRepository.findOne).toHaveBeenCalledWith({ username: 'john.doe@google.com' });
+      const result = await jwtStrategy.validate({
+        userId: 1,
+        username: 'john.doe@gmail.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        cvIds: [1],
+        templateIds: [],
+      });
+      expect(userRepository.findOne).toHaveBeenCalledWith({ username: 'john.doe@gmail.com' });
       expect(result).toEqual(user);
     });
 
     it('throws an unauthorized exception as user cannot be found', async () => {
       userRepository.findOne.mockResolvedValue(null);
-      await expect(jwtStrategy.validate({ username: 'john.doe@google.com' })).rejects.toThrow(UnauthorizedException);
+      await expect(jwtStrategy.validate({
+        userId: 1,
+        username: 'john.doe@gmail.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        cvIds: [1],
+        templateIds: [],
+      })).rejects.toThrow(UnauthorizedException);
     });
   });
 });

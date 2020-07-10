@@ -67,7 +67,7 @@ describe('UserRepository', () => {
       user.validatePassword.mockResolvedValue(true);
 
       const result = await userRepository.validateUserPassword(mockCredentialsDto);
-      expect(result).toEqual(user.username);
+      expect(result.username).toEqual(user.username);
     });
 
     it('returns null as user cannot be found', async () => {

@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { UsersModule } from '../users/users.module';
+import { CVModule } from '../cv/cv.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import {
@@ -17,6 +18,7 @@ const jwtConfig = config.get(CONFIG_JWT);
 @Module({
   imports: [
     UsersModule,
+    CVModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: process.env.JWT_SECRET || jwtConfig[CONFIG_JWT_SECRET],

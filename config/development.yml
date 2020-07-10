@@ -1,8 +1,0 @@
-db:
-  host: 'localhost'
-  username: 'cv_user'
-  password: 'cv_password'
-  synchronize: true
-
-jwt:
-  secret: 'reallyGreatSecret'
