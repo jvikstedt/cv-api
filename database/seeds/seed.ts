@@ -71,6 +71,12 @@ export default class Seed implements Seeder {
       await factory(Skill)().create({ cvId: adminCV.id, skillSubjectId: skillSubject.id });
     };
 
+    // Create test automation user
+    const testAutomationUser = await factory(User)().make({ firstName: 'Bob', lastName: 'Test', username: 'bobtest' });
+    testAutomationUser.password = await bcrypt.hash('BobTest123', testAutomationUser.salt);
+    await testAutomationUser.save();
+    await factory(CV)().create({ userId: testAutomationUser.id })
+
     const cvs: CV[] = await factory(CV)()
       .map(async (cv: CV) => {
         const user: User = await factory(User)().create();
