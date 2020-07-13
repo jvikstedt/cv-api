@@ -65,7 +65,7 @@ export default class Seed implements Seeder {
     const admin = await factory(User)().make({ firstName: 'John', lastName: 'Doe', username: 'admin' });
     admin.password = await bcrypt.hash('Admin123', admin.salt);
     await admin.save();
-    const adminCV = await factory(CV)().create({ userId: admin.id })
+    const adminCV = await factory(CV)().create({ userId: admin.id, description: '' })
     let randomSkills: SkillSubject[] = skillSubjects.sort(() => 0.5 - Math.random()).slice(0, 6);
     for (const skillSubject of randomSkills) {
       await factory(Skill)().create({ cvId: adminCV.id, skillSubjectId: skillSubject.id });
