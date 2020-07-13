@@ -35,11 +35,13 @@ export class AuthService {
   }
 
   async signIn(authCredentialsDto: AuthCredentialsDto): Promise<{ accessToken: string }> {
-    const user = await this.userRepository.validateUserPassword(authCredentialsDto);
+    let user = await this.userRepository.validateUserPassword(authCredentialsDto);
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
+
+    user = await this.userRepository.findOne(user.id, { relations: ['cv', 'templates'] })
 
     const payload: JwtPayload = {
       userId: user.id,
@@ -75,6 +77,7 @@ export class AuthService {
         description: '',
       }).save();
       user.cv = cv;
+      user.templates = [];
     }
 
     const payload: JwtPayload = {

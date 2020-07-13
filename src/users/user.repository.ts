@@ -5,6 +5,7 @@ import { ConflictException, InternalServerErrorException, Logger } from '@nestjs
 import { User } from './user.entity';
 import { AuthCredentialsDto } from '../auth/dto/auth-credentials.dto';
 import { UNIQUENESS_VIOLATION } from '../constants';
+import { CV } from '../cv/cv.entity';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
@@ -22,6 +23,9 @@ export class UserRepository extends Repository<User> {
 
     try {
       await user.save();
+
+      const cv = await new CV({ userId: user.id, description: '' }).save();
+      user.cv = cv;
     } catch (error) {
       if (error.code === UNIQUENESS_VIOLATION) {
         throw new ConflictException('Username already exists');
