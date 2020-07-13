@@ -5,12 +5,11 @@ import { SkillRepository } from './skill.repository';
 import { NotFoundException } from '@nestjs/common';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { Skill } from './skill.entity';
-import { UpdateSkillDto } from './dto/update-skill.dto';
 
 const mockSkillRepository = () => ({
   find: jest.fn(),
   findOne: jest.fn(),
-  remove: jest.fn(),
+  delete: jest.fn(),
   createSkill: jest.fn(),
   save: jest.fn(),
 });
@@ -51,10 +50,10 @@ describe('SkillsService', () => {
       const skill = await factory(Skill)().make();
       skillRepository.findOne.mockResolvedValue(skill);
 
-      const result = await skillsService.findOne(1);
+      const result = await skillsService.findOne(2, 1);
       expect(result).toEqual(skill);
 
-      expect(skillRepository.findOne).toHaveBeenCalledWith(1, { relations: ['skillSubject', 'skillSubject.skillGroup'] });
+      expect(skillRepository.findOne).toHaveBeenCalledWith({ cvId: 2, id: 1 }, { relations: ['skillSubject', 'skillSubject.skillGroup'] });
     });
 
     it('throws an error as skill is not found', async () => {
@@ -68,56 +67,32 @@ describe('SkillsService', () => {
     it('calls skillRepository.delete(id) and deletes retrieves affected result', async () => {
       const skill = await factory(Skill)().make();
       skillRepository.findOne.mockResolvedValue(skill);
-      // skillRepository.delete.mockResolvedValue();
 
-      expect(skillRepository.remove).not.toHaveBeenCalled();
-      await skillsService.remove(1);
-      expect(skillRepository.remove).toHaveBeenCalledWith(skill);
+      expect(skillRepository.delete).not.toHaveBeenCalled();
+      await skillsService.remove(2, 1);
+      expect(skillRepository.delete).toHaveBeenCalledWith({ cvId: 2, id: 1 });
     });
 
     it('throws an error if affected result is 0', async () => {
-      skillRepository.remove.mockResolvedValue({ affected: 0 });
+      skillRepository.delete.mockResolvedValue({ affected: 0 });
 
-      await expect(skillsService.remove(1)).rejects.toThrow(NotFoundException);
+      await expect(skillsService.remove(2, 1)).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('create', () => {
     it('calls skillRepository.createSkill(createSkillDto) and successfully retrieves and return skill', async () => {
-      const createSkillDto: CreateSkillDto = { skillSubjectId: 2, cvId: 2, experienceInYears: 2 };
-      const skill = await factory(Skill)().make(createSkillDto);
+      const createSkillDto: CreateSkillDto = { skillSubjectId: 2, experienceInYears: 2 };
+      const skill = await factory(Skill)().make({ id: 1, ...createSkillDto });
       skillRepository.createSkill.mockResolvedValue(skill);
       skillRepository.findOne.mockResolvedValue(skill);
 
       expect(skillRepository.createSkill).not.toHaveBeenCalled();
       expect(skillRepository.findOne).not.toHaveBeenCalled();
-      const result = await skillsService.create(createSkillDto);
+      const result = await skillsService.create(2, createSkillDto);
       expect(result).toEqual(skill);
-      expect(skillRepository.createSkill).toHaveBeenCalledWith(createSkillDto);
-      expect(skillRepository.findOne).toHaveBeenCalledWith(skill.id, { relations: ['skillSubject', 'skillSubject.skillGroup'] });
-    });
-  });
-
-  describe('update', () => {
-    it('calls skillRepository.findOne(id) and skillRepository.save(skill) successfully retrieves and return skill', async () => {
-      const updateSkillDto: UpdateSkillDto = { experienceInYears: 2 };
-      const skill = await factory(Skill)().make();
-      skillRepository.findOne.mockResolvedValue(skill);
-      skillRepository.save.mockResolvedValue({ ...skill, ...updateSkillDto });
-
-      expect(skillRepository.findOne).not.toHaveBeenCalled();
-      expect(skillRepository.save).not.toHaveBeenCalled();
-      const result = await skillsService.update(1, updateSkillDto);
-      expect(result).toEqual({ ...skill, ...updateSkillDto });
-      expect(skillRepository.findOne).toHaveBeenCalledWith(1, { relations: ['skillSubject', 'skillSubject.skillGroup'] });
-      expect(skillRepository.save).toHaveBeenCalledWith({ ...skill, ...updateSkillDto });
-    });
-
-    it('throws an error as skill is not found', async () => {
-      const updateSkillDto: CreateSkillDto = { skillSubjectId: 2, cvId: 2, experienceInYears: 2 };
-      skillRepository.findOne.mockResolvedValue(null);
-
-      await expect(skillsService.update(1, updateSkillDto)).rejects.toThrow(NotFoundException);
+      expect(skillRepository.createSkill).toHaveBeenCalledWith(2, createSkillDto);
+      expect(skillRepository.findOne).toHaveBeenCalledWith({ cvId: 2, id: 1 }, { relations: ['skillSubject', 'skillSubject.skillGroup'] });
     });
   });
 });

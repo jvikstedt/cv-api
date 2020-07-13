@@ -1,15 +1,15 @@
-import { Controller, Get, Post, Put, Body, Delete, Param, UsePipes, ValidationPipe, ParseIntPipe, UseGuards, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, UsePipes, ValidationPipe, ParseIntPipe, UseGuards, Patch } from '@nestjs/common';
 import { SkillsService } from './skills.service';
 import { Skill } from './skill.entity';
 import { CreateSkillDto } from './dto/create-skill.dto';
-import { UpdateSkillDto } from './dto/update-skill.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PatchSkillDto } from './dto/patch-skill.dto';
+import { CVGuard } from '../cv/cv.guard';
 
 @ApiBearerAuth()
 @ApiTags('skills')
-@Controller('skills')
+@Controller('cv/:cvId/skills')
 @UseGuards(AuthGuard())
 export class SkillsController {
   constructor(
@@ -17,35 +17,42 @@ export class SkillsController {
   ) {}
 
   @Post()
+  @UseGuards(CVGuard)
   @UsePipes(ValidationPipe)
-  create(@Body() createSkillDto: CreateSkillDto): Promise<Skill> {
-    return this.skillsService.create(createSkillDto);
+  create(@Param('cvId', ParseIntPipe) cvId: number, @Body() createSkillDto: CreateSkillDto): Promise<Skill> {
+    return this.skillsService.create(cvId, createSkillDto);
   }
 
-  @Put('/:id')
+  @Patch('/:skillId')
+  @UseGuards(CVGuard)
   @UsePipes(ValidationPipe)
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateSkillDto: UpdateSkillDto): Promise<Skill> {
-    return this.skillsService.update(id, updateSkillDto);
-  }
-
-  @Patch('/:id')
-  @UsePipes(ValidationPipe)
-  patchSkill(@Param('id', ParseIntPipe) id: number, @Body() patchSkillDto: PatchSkillDto): Promise<Skill> {
-    return this.skillsService.patchSkill(id, patchSkillDto);
+  patchSkill(
+    @Param('cvId', ParseIntPipe) cvId: number,
+    @Param('skillId', ParseIntPipe) skillId: number,
+    @Body() patchSkillDto: PatchSkillDto
+  ): Promise<Skill> {
+    return this.skillsService.patchSkill(cvId, skillId, patchSkillDto);
   }
 
   @Get()
-  findAll(): Promise<Skill[]> {
-    return this.skillsService.findAll();
+  findAll(@Param('cvId', ParseIntPipe) cvId: number): Promise<Skill[]> {
+    return this.skillsService.findAll(cvId);
   }
 
-  @Get('/:id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Skill> {
-    return this.skillsService.findOne(id);
+  @Get('/:skillId')
+  findOne(
+    @Param('cvId', ParseIntPipe) cvId: number,
+    @Param('skillId', ParseIntPipe) skillId: number,
+  ): Promise<Skill> {
+    return this.skillsService.findOne(cvId, skillId);
   }
 
-  @Delete('/:id')
-  remove(@Param('id', ParseIntPipe) id: number): Promise<Skill> {
-    return this.skillsService.remove(id);
+  @Delete('/:skillId')
+  @UseGuards(CVGuard)
+  remove(
+    @Param('cvId', ParseIntPipe) cvId: number,
+    @Param('skillId', ParseIntPipe) skillId: number
+  ): Promise<Skill> {
+    return this.skillsService.remove(cvId, skillId);
   }
 }

@@ -6,7 +6,6 @@ import { CVRepository } from './cv.repository';
 import { NotFoundException } from '@nestjs/common';
 import { CreateCVDto } from './dto/create-cv.dto';
 import { CV } from './cv.entity';
-import { UpdateCVDto } from './dto/update-cv.dto';
 import { SearchCVDto } from './dto/search-cv.dto';
 
 const mockCVRepository = () => ({
@@ -99,29 +98,6 @@ describe('CVService', () => {
       const result = await cvService.create(createCVDto);
       expect(result).toEqual(cv);
       expect(cvRepository.createCV).toHaveBeenCalledWith(createCVDto);
-    });
-  });
-
-  describe('update', () => {
-    it('calls cvRepository.findOne(id) and cvRepository.save(cv) successfully retrieves and return cv', async () => {
-      const updateCVDto: UpdateCVDto = { description: '' };
-      const cv = await factory(CV)().make();
-      cvRepository.findOne.mockResolvedValue(cv);
-      cvRepository.save.mockResolvedValue({ ...cv, description: '' });
-
-      expect(cvRepository.findOne).not.toHaveBeenCalled();
-      expect(cvRepository.save).not.toHaveBeenCalled();
-      const result = await cvService.update(1, updateCVDto);
-      expect(result).toEqual({ ...cv, description: '' });
-      expect(cvRepository.findOne).toHaveBeenCalledWith(1, { relations: ['user'] });
-      expect(cvRepository.save).toHaveBeenCalledWith({ ...cv, description: '' });
-    });
-
-    it('throws an error as cv is not found', async () => {
-      const updateCVDto: UpdateCVDto = { description: '' };
-      cvRepository.findOne.mockResolvedValue(null);
-
-      await expect(cvService.update(1, updateCVDto)).rejects.toThrow(NotFoundException);
     });
   });
 
