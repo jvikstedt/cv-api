@@ -1,9 +1,10 @@
-import { IsNotEmpty, IsDefined } from 'class-validator';
+import { IsOptional, IsString, IsNumber } from 'class-validator';
 
 export class CreateCVDto {
-  @IsNotEmpty()
+  @IsNumber()
   userId: number;
 
-  @IsDefined()
-  description: string;
+  @IsOptional()
+  @IsString()
+  description?: string = "";
 }

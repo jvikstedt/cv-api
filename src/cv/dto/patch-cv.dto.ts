@@ -1,8 +1,7 @@
-import { IsOptional, IsString, IsNotEmpty } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class PatchCVDto {
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  description: string;
+  description?: string = "";
 }
