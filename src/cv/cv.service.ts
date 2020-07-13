@@ -6,8 +6,6 @@ import * as esb from 'elastic-builder';
 import { CV } from './cv.entity';
 import { CVRepository } from './cv.repository';
 import { CreateCVDto } from './dto/create-cv.dto';
-import { UpdateCVDto } from './dto/update-cv.dto';
-import { Skill } from '../skills/skill.entity';
 import { PatchCVDto } from './dto/patch-cv.dto';
 import { ELASTIC_INDEX_CV } from '../constants';
 import { SearchCVDto, SkillSearch } from './dto/search-cv.dto';
@@ -25,14 +23,6 @@ export class CVService {
     return this.cvRepository.createCV(createCVDto);
   }
 
-  async update(id: number, updateCVDto: UpdateCVDto): Promise<CV> {
-    const cv = await this.findOne(id);
-
-    cv.description = updateCVDto.description;
-
-    return this.cvRepository.save(cv);
-  }
-
   async patchCV(cvId: number, patchCVDto: PatchCVDto): Promise<CV> {
     const oldCV = await this.findOne(cvId)
 
@@ -45,8 +35,8 @@ export class CVService {
     return this.cvRepository.find({ relations: ['user'] });
   }
 
-  async findOne(id: number): Promise<CV> {
-    const entity = await this.cvRepository.findOne(id, {
+  async findOne(cvId: number): Promise<CV> {
+    const entity = await this.cvRepository.findOne(cvId, {
       relations: ['user'],
     });
     if (!entity) {
@@ -56,20 +46,11 @@ export class CVService {
     return entity;
   }
 
-  async delete(id: number): Promise<void> {
-    const result = await this.cvRepository.delete(id);
+  async delete(cvId: number): Promise<void> {
+    const result = await this.cvRepository.delete(cvId);
     if (result.affected === 0) {
       throw new NotFoundException();
     }
-  }
-
-  async getCVSkills(cvId: number): Promise<Skill[]> {
-    const entity = await this.cvRepository.findOne(cvId, { relations: ['skills', 'skills.skillSubject', 'skills.skillSubject.skillGroup'] });
-    if (!entity) {
-      throw new NotFoundException();
-    }
-
-    return entity.skills;
   }
 
   async search(searchCVDto: SearchCVDto): Promise<CV[]> {

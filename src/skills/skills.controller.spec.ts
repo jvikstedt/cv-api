@@ -5,7 +5,6 @@ import { SkillsService } from './skills.service';
 import { SkillsController } from './skills.controller';
 import { Skill } from './skill.entity';
 import { CreateSkillDto } from './dto/create-skill.dto';
-import { UpdateSkillDto } from './dto/update-skill.dto';
 
 const mockSkillsService = () => ({
   findAll: jest.fn(),
@@ -57,8 +56,8 @@ describe('SkillsController', () => {
       skillsService.findOne.mockResolvedValue(skill);
 
       expect(skillsService.findOne).not.toHaveBeenCalled();
-      const result = await skillsController.findOne(1);
-      expect(skillsService.findOne).toHaveBeenCalledWith(1);
+      const result = await skillsController.findOne(2, 1);
+      expect(skillsService.findOne).toHaveBeenCalledWith(2, 1);
       expect(result).toEqual(skill);
     });
   });
@@ -68,34 +67,21 @@ describe('SkillsController', () => {
       skillsService.remove.mockResolvedValue();
 
       expect(skillsService.remove).not.toHaveBeenCalled();
-      await skillsController.remove(1);
-      expect(skillsService.remove).toHaveBeenCalledWith(1);
+      await skillsController.remove(2, 1);
+      expect(skillsService.remove).toHaveBeenCalledWith(2, 1);
     });
   });
 
   describe('create', () => {
     it('calls service create with passed data', async () => {
-      const createSkillDto: CreateSkillDto = { cvId: 1, skillSubjectId: 1, experienceInYears: 2 };
+      const createSkillDto: CreateSkillDto = { skillSubjectId: 1, experienceInYears: 2 };
       const skill = await factory(Skill)().make(createSkillDto);
       skillsService.create.mockResolvedValue(skill);
 
       expect(skillsService.create).not.toHaveBeenCalled();
-      const result = await skillsController.create(createSkillDto);
-      expect(skillsService.create).toHaveBeenCalledWith(createSkillDto);
+      const result = await skillsController.create(2, createSkillDto);
+      expect(skillsService.create).toHaveBeenCalledWith(2, createSkillDto);
       expect(result).toEqual(skill);
-    });
-  });
-
-  describe('update', () => {
-    it('calls service update with id and passed data', async () => {
-      const updateSkillDto: UpdateSkillDto = { experienceInYears: 2 };
-      const skill = await factory(Skill)().make({ cvId: 1, skillSubjectId: 1 });
-      skillsService.update.mockResolvedValue({ ...skill, ...updateSkillDto });
-
-      expect(skillsService.update).not.toHaveBeenCalled();
-      const result = await skillsController.update(1, updateSkillDto);
-      expect(skillsService.update).toHaveBeenCalledWith(1, updateSkillDto);
-      expect(result).toEqual({ ...skill, ...updateSkillDto });
     });
   });
 });

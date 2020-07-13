@@ -34,7 +34,7 @@ describe('SkillRepository', () => {
       save.mockResolvedValue(skill);
 
       expect(save).not.toHaveBeenCalled();
-      const result = await skillRepository.createSkill(mockCreateSkillSubjectDto);
+      const result = await skillRepository.createSkill(2, mockCreateSkillSubjectDto);
       expect(save).toHaveBeenCalled();
       expect(result).toEqual(skill);
     });

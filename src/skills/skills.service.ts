@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Skill } from './skill.entity';
 import { SkillRepository } from './skill.repository';
 import { CreateSkillDto } from './dto/create-skill.dto';
-import { UpdateSkillDto } from './dto/update-skill.dto';
 import { PatchSkillDto } from './dto/patch-skill.dto';
 
 @Injectable()
@@ -14,34 +13,35 @@ export class SkillsService {
     private readonly skillRepository: SkillRepository,
   ) {}
 
-  async create(createSkillDto: CreateSkillDto): Promise<Skill> {
-    const skill = await this.skillRepository.createSkill(createSkillDto);
+  async create(cvId: number, createSkillDto: CreateSkillDto): Promise<Skill> {
+    const skill = await this.skillRepository.createSkill(cvId, createSkillDto);
 
-    return this.findOne(skill.id);
+    return this.findOne(cvId, skill.id);
   }
 
-  async update(id: number, updateSkillDto: UpdateSkillDto): Promise<Skill> {
-    const skill = await this.findOne(id);
+  async patchSkill(cvId: number, skillId: number, patchSkillDto: PatchSkillDto): Promise<Skill> {
+    const oldSkill = await this.findOne(cvId, skillId);
 
-    skill.experienceInYears = updateSkillDto.experienceInYears;
-
-    return this.skillRepository.save(skill);
-  }
-
-  async patchSkill(id: number, patchSkillDto: PatchSkillDto): Promise<Skill> {
-    const oldSkill = await this.findOne(id);
-
-    const newSkill = R.merge(oldSkill, patchSkillDto);
+    const newSkill = R.merge(oldSkill, {
+      experienceInYears: patchSkillDto.experienceInYears,
+    });
 
     return this.skillRepository.save(newSkill);
   }
 
-  async findAll(): Promise<Skill[]> {
-    return this.skillRepository.find({ relations: ['skillSubject', 'skillSubject.skillGroup'] });
+  async findAll(cvId: number): Promise<Skill[]> {
+    return this.skillRepository.find({
+      where: { cvId },
+      relations: ['skillSubject', 'skillSubject.skillGroup'],
+    });
   }
 
-  async findOne(id: number): Promise<Skill> {
-    const entity = await this.skillRepository.findOne(id, { relations: ['skillSubject', 'skillSubject.skillGroup'] });
+  async findOne(cvId: number, skillId: number): Promise<Skill> {
+    const entity = await this.skillRepository.findOne(
+      { cvId, id: skillId },
+      { relations: ['skillSubject', 'skillSubject.skillGroup'] },
+    );
+
     if (!entity) {
       throw new NotFoundException();
     }
@@ -49,10 +49,10 @@ export class SkillsService {
     return entity;
   }
 
-  async remove(id: number): Promise<Skill> {
-    const skill = await this.findOne(id);
+  async remove(cvId: number, skillId: number): Promise<Skill> {
+    const skill = await this.findOne(cvId, skillId);
 
-    await this.skillRepository.remove(skill);
+    await this.skillRepository.delete({ cvId, id: skillId });
 
     return skill;
   }
