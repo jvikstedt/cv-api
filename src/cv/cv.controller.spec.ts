@@ -4,13 +4,14 @@ import { PassportModule } from '@nestjs/passport';
 import { CVService } from './cv.service';
 import { CVController } from './cv.controller';
 import { CV } from './cv.entity';
+import { PatchCVDto } from './dto/patch-cv.dto';
+import { SearchCVDto } from './dto/search-cv.dto';
 
 const mockCVService = () => ({
   findAll: jest.fn(),
   findOne: jest.fn(),
-  delete: jest.fn(),
-  create: jest.fn(),
-  update: jest.fn(),
+  patch: jest.fn(),
+  search: jest.fn(),
 });
 
 describe('CVController', () => {
@@ -37,6 +38,22 @@ describe('CVController', () => {
     cvService = module.get<CVService>(CVService);
   });
 
+  describe('patch', () => {
+    it('calls service patch', async () => {
+      const cv = await factory(CV)().make({ id: 1, description: 'old text' });
+      const patchCVDto: PatchCVDto = {
+        description: 'new text',
+      };
+
+      cvService.patch.mockResolvedValue({ ...cv, ...patchCVDto });
+
+      expect(cvService.patch).not.toHaveBeenCalled();
+      const result = await cvController.patch(1, patchCVDto);
+      expect(cvService.patch).toHaveBeenCalledWith(1, patchCVDto);
+      expect(result).toEqual({ ...cv, ...patchCVDto });
+    });
+  });
+
   describe('findAll', () => {
     it('calls service findAll', async () => {
       const cv = await factory(CV)().make();
@@ -59,6 +76,22 @@ describe('CVController', () => {
       const result = await cvController.findOne(1);
       expect(cvService.findOne).toHaveBeenCalledWith(1);
       expect(result).toEqual(cv);
+    });
+  });
+
+  describe('search', () => {
+    it('calls service search with search params', async () => {
+      const cv = await factory(CV)().make();
+      cvService.search.mockResolvedValue([cv]);
+
+      const searchCVDto: SearchCVDto = {
+        fullName: 'john',
+      };
+
+      expect(cvService.search).not.toHaveBeenCalled();
+      const result = await cvController.search(searchCVDto);
+      expect(cvService.search).toHaveBeenCalledWith(searchCVDto);
+      expect(result).toEqual([cv]);
     });
   });
 });

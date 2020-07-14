@@ -4,15 +4,13 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { CVService } from './cv.service';
 import { CVRepository } from './cv.repository';
 import { NotFoundException } from '@nestjs/common';
-import { CreateCVDto } from './dto/create-cv.dto';
 import { CV } from './cv.entity';
 import { SearchCVDto } from './dto/search-cv.dto';
+import { PatchCVDto } from './dto/patch-cv.dto';
 
 const mockCVRepository = () => ({
   find: jest.fn(),
   findOne: jest.fn(),
-  delete: jest.fn(),
-  createCV: jest.fn(),
   save: jest.fn(),
 });
 
@@ -43,6 +41,23 @@ describe('CVService', () => {
     elasticsearch = module.get<ElasticsearchService>(ElasticsearchService);
   });
 
+  describe('patch', () => {
+    it('finds cv by id and updates it', async () => {
+      const cv = await factory(CV)().make({ id: 1 });
+      const patchCVDto: PatchCVDto = { description: 'new text' };
+
+      cvRepository.findOne.mockResolvedValue(cv);
+      cvRepository.save.mockResolvedValue({ ...cv, ...patchCVDto });
+
+      expect(cvRepository.findOne).not.toHaveBeenCalled();
+      expect(cvRepository.save).not.toHaveBeenCalled();
+      const result = await cvService.patch(1, patchCVDto);
+      expect(result).toEqual({ ...cv, ...patchCVDto });
+      expect(cvRepository.findOne).toHaveBeenCalledWith(1, { relations: ['user'] });
+      expect(cvRepository.save).toHaveBeenCalledWith({ ...cv, ...patchCVDto });
+    });
+  });
+
   describe('findAll', () => {
     it('gets all cv from the repository', async () => {
       cvRepository.find.mockResolvedValue([]);
@@ -69,35 +84,6 @@ describe('CVService', () => {
       cvRepository.findOne.mockResolvedValue(null);
 
       await expect(cvService.findOne(1)).rejects.toThrow(NotFoundException);
-    });
-  });
-
-  describe('delete', () => {
-    it('calls cvRepository.delete(id) and deletes retrieves affected result', async () => {
-      cvRepository.delete.mockResolvedValue({ affected: 1 });
-
-      expect(cvRepository.delete).not.toHaveBeenCalled();
-      await cvService.delete(1);
-      expect(cvRepository.delete).toHaveBeenCalledWith(1);
-    });
-
-    it('throws an error if affected result is 0', async () => {
-      cvRepository.delete.mockResolvedValue({ affected: 0 });
-
-      await expect(cvService.delete(1)).rejects.toThrow(NotFoundException);
-    });
-  });
-
-  describe('create', () => {
-    it('calls cvRepository.createCV(createCVDto) and successfully retrieves and return cv', async () => {
-      const createCVDto: CreateCVDto = { userId: 1, description: 'Hello this is my CV' };
-      const cv = await factory(CV)().make(createCVDto);
-      cvRepository.createCV.mockResolvedValue(cv);
-
-      expect(cvRepository.createCV).not.toHaveBeenCalled();
-      const result = await cvService.create(createCVDto);
-      expect(result).toEqual(cv);
-      expect(cvRepository.createCV).toHaveBeenCalledWith(createCVDto);
     });
   });
 

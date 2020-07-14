@@ -5,7 +5,6 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 import * as esb from 'elastic-builder';
 import { CV } from './cv.entity';
 import { CVRepository } from './cv.repository';
-import { CreateCVDto } from './dto/create-cv.dto';
 import { PatchCVDto } from './dto/patch-cv.dto';
 import { ELASTIC_INDEX_CV } from '../constants';
 import { SearchCVDto, SkillSearch } from './dto/search-cv.dto';
@@ -19,11 +18,7 @@ export class CVService {
     private readonly elasticsearchService: ElasticsearchService,
   ) {}
 
-  async create(createCVDto: CreateCVDto): Promise<CV> {
-    return this.cvRepository.createCV(createCVDto);
-  }
-
-  async patchCV(cvId: number, patchCVDto: PatchCVDto): Promise<CV> {
+  async patch(cvId: number, patchCVDto: PatchCVDto): Promise<CV> {
     const oldCV = await this.findOne(cvId)
 
     const newCV = R.merge(oldCV, patchCVDto);
@@ -44,13 +39,6 @@ export class CVService {
     }
 
     return entity;
-  }
-
-  async delete(cvId: number): Promise<void> {
-    const result = await this.cvRepository.delete(cvId);
-    if (result.affected === 0) {
-      throw new NotFoundException();
-    }
   }
 
   async search(searchCVDto: SearchCVDto): Promise<CV[]> {

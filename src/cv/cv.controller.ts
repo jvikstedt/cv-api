@@ -19,8 +19,8 @@ export class CVController {
   @Patch('/:cvId')
   @UseGuards(CVGuard)
   @UsePipes(ValidationPipe)
-  patchCV(@Param('cvId', ParseIntPipe) cvId: number, @Body() patchCVDto: PatchCVDto): Promise<CV> {
-    return this.cvService.patchCV(cvId, patchCVDto);
+  patch(@Param('cvId', ParseIntPipe) cvId: number, @Body() patchCVDto: PatchCVDto): Promise<CV> {
+    return this.cvService.patch(cvId, patchCVDto);
   }
 
   @Get()
