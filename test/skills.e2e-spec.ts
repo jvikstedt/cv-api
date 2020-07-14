@@ -1,4 +1,3 @@
-import * as R from 'ramda';
 import * as request from 'supertest';
 import { JwtService } from '@nestjs/jwt';
 import { factory, useSeeding } from 'typeorm-seeding';
@@ -11,24 +10,19 @@ import { SkillSubject } from '../src/skill_subjects/skill-subject.entity';
 import { SkillGroup } from '../src/skill_groups/skill-group.entity';
 import { CV } from '../src/cv/cv.entity';
 import { AppModule } from '../src/app.module';
-import { JwtPayload } from '../src/auth/jwt-payload.interface';
-
-const generateAccessToken = (jwtService: JwtService, user: User): string => {
-  const payload: JwtPayload = {
-    userId: user.id,
-    username: user.username,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    cvIds: [user.cv.id],
-    templateIds: R.map(t => t.id, user.templates),
-  };
-  return jwtService.sign(payload);
-}
+import { PatchSkillDto } from '../src/skills/dto/patch-skill.dto';
+import { generateAccessToken } from './test-helper';
 
 describe('SkillsController (e2e)', () => {
   let app: INestApplication;
   let connection: Connection;
   let jwtService: JwtService;
+
+  let user: User;
+  let cv: CV;
+  let skillGroup: SkillGroup;
+  let skillSubject: SkillSubject;
+  let accessToken: string;
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({
@@ -47,6 +41,15 @@ describe('SkillsController (e2e)', () => {
 
   beforeEach(async () => {
     await connection.synchronize(true);
+
+    user = await factory(User)().create();
+    skillGroup = await factory(SkillGroup)().create();
+    skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
+    cv = await factory(CV)().create({ userId: user.id });
+    user.cv = cv;
+    user.templates = [];
+
+    accessToken = generateAccessToken(jwtService, user);
   });
 
   afterAll(async (done) => {
@@ -55,99 +58,142 @@ describe('SkillsController (e2e)', () => {
     done();
   });
 
-  it('/cv/:cvId/skills (GET)', async () => {
-    const user = await factory(User)().create();
-    const skillGroup = await factory(SkillGroup)().create();
-    const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
-    const cv = await factory(CV)().create({ userId: user.id });
-    const skill = await factory(Skill)().create({ cvId: cv.id, skillSubjectId: skillSubject.id });
-    user.cv = cv;
-    user.templates = [];
+  describe('/cv/:cvId/skills (POST)', () => {
+    it('creates skill when adding to own cv', async () => {
+      const response = await request(app.getHttpServer())
+        .post(`/cv/${cv.id}/skills`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ skillSubjectId: skillSubject.id, experienceInYears: 2 })
+        .expect(201)
 
-    const accessToken = generateAccessToken(jwtService, user);
+      expect(response.body).toMatchObject({
+        id: 1,
+        cvId: cv.id,
+        skillSubjectId: skillSubject.id,
+        experienceInYears: 2,
+      });;
+    });
 
-    const response = await request(app.getHttpServer())
-      .get(`/cv/${cv.id}/skills`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .expect(200)
+    it('responds with forbidden (403) when trying to add skill to someone elses cv', async () => {
+      await request(app.getHttpServer())
+        .post('/cv/10/skills')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ skillSubjectId: skillSubject.id, experienceInYears: 2 })
+        .expect(403)
+    });
+  });
 
-    expect(response.body).toMatchObject([
-      {
+
+  describe('/cv/:cvId/skills/:skillId (PATCH)', () => {
+    let skill: Skill;
+    let patchSkillDto: PatchSkillDto;
+
+    beforeEach(async () => {
+      skill = await factory(Skill)().create({
+        cvId: cv.id,
+        skillSubjectId: skillSubject.id,
+        experienceInYears: 1,
+      });
+
+      patchSkillDto = {
+        experienceInYears: 6,
+      };
+    });
+
+    it('updates skill', async () => {
+      const response = await request(app.getHttpServer())
+        .patch(`/cv/${cv.id}/skills/${skill.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(patchSkillDto)
+        .expect(200)
+
+      expect(response.body).toMatchObject({
+        id: skill.id,
+        cvId: cv.id,
+        skillSubjectId: skillSubject.id,
+        experienceInYears: 6,
+      });;
+    });
+
+    it('responds with forbidden (403) when trying to modify skill to someone elses cv', async () => {
+      await request(app.getHttpServer())
+        .patch(`/cv/10/skills/${skill.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(patchSkillDto)
+        .expect(403)
+    });
+  });
+
+  describe('/cv/:cvId/skills (GET)', () => {
+    it('returns skills', async () => {
+      const skill = await factory(Skill)().create({ cvId: cv.id, skillSubjectId: skillSubject.id });
+
+      const response = await request(app.getHttpServer())
+        .get(`/cv/${cv.id}/skills`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200)
+
+      expect(response.body).toMatchObject([
+        {
+          ...skill,
+          createdAt: skill.createdAt.toJSON(),
+          updatedAt: skill.updatedAt.toJSON(),
+        }
+      ]);
+    });
+  });
+
+  describe('/cv/:cvId/skills/:skillId (GET)', () => {
+    it('returns skill', async () => {
+      const skill = await factory(Skill)().create({ cvId: cv.id, skillSubjectId: skillSubject.id });
+
+      const response = await request(app.getHttpServer())
+        .get(`/cv/${cv.id}/skills/${skill.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200)
+
+      expect(response.body).toMatchObject({
         ...skill,
         createdAt: skill.createdAt.toJSON(),
         updatedAt: skill.updatedAt.toJSON(),
-      }
-    ]);
+      });
+
+      await request(app.getHttpServer())
+        .get(`/cv/${cv.id}/skills/2`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(404)
+    });
   });
 
-  it('/cv/:cvId/skills/:skillId (GET)', async () => {
-    const user = await factory(User)().create();
-    const skillGroup = await factory(SkillGroup)().create();
-    const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
-    const cv = await factory(CV)().create({ userId: user.id });
-    const skill = await factory(Skill)().create({ cvId: cv.id, skillSubjectId: skillSubject.id });
-    user.cv = cv;
-    user.templates = [];
+  describe('/cv/:cvId/skills/:skillId (DELETE)', () => {
+    let skill: Skill;
 
-    const accessToken = generateAccessToken(jwtService, user);
-
-    const response = await request(app.getHttpServer())
-      .get(`/cv/${cv.id}/skills/${skill.id}`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .expect(200)
-
-    expect(response.body).toMatchObject({
-      ...skill,
-      createdAt: skill.createdAt.toJSON(),
-      updatedAt: skill.updatedAt.toJSON(),
+    beforeEach(async () => {
+      skill = await factory(Skill)().create({
+        cvId: cv.id,
+        skillSubjectId: skillSubject.id,
+      });
     });
 
-    await request(app.getHttpServer())
-      .get(`/cv/${cv.id}/skills/2`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .expect(404)
-  });
+    it('deletes skill', async () => {
+      const response = await request(app.getHttpServer())
+        .delete(`/cv/${cv.id}/skills/${skill.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200)
 
-  it('/cv/:cvId/skills (POST)', async () => {
-    const user = await factory(User)().create();
-    const skillGroup = await factory(SkillGroup)().create();
-    const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
-    const cv = await factory(CV)().create({ userId: user.id });
-    user.cv = cv;
-    user.templates = [];
+      expect(response.body).toMatchObject({ experienceInYears: skill.experienceInYears });;
 
-    const accessToken = generateAccessToken(jwtService, user);
+      await request(app.getHttpServer())
+        .get(`/cv/${cv.id}/skills/${skill.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(404)
+    });
 
-    const response = await request(app.getHttpServer())
-      .post(`/cv/${cv.id}/skills`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({ skillSubjectId: skillSubject.id, experienceInYears: 2 })
-      .expect(201)
-
-    expect(response.body).toMatchObject({ id: 1, cvId: cv.id, skillSubjectId: skillSubject.id, experienceInYears: 2 });;
-  });
-
-  it('/cv/:cvId/skills/:skillId (DELETE)', async () => {
-    const user = await factory(User)().create();
-    const skillGroup = await factory(SkillGroup)().create();
-    const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
-    const cv = await factory(CV)().create({ userId: user.id });
-    const skill = await factory(Skill)().create({ cvId: cv.id, skillSubjectId: skillSubject.id });
-    user.cv = cv;
-    user.templates = [];
-
-    const accessToken = generateAccessToken(jwtService, user);
-
-    const response = await request(app.getHttpServer())
-      .delete(`/cv/${cv.id}/skills/${skill.id}`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .expect(200)
-
-    expect(response.body).toMatchObject({ experienceInYears: skill.experienceInYears });;
-
-    await request(app.getHttpServer())
-      .get(`/cv/${cv.id}/skills/${skill.id}`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .expect(404)
+    it('responds with forbidden (403) when trying to delete skill from someone elses cv', async () => {
+      await request(app.getHttpServer())
+        .delete(`/cv/10/skills/${skill.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(403)
+    });
   });
 });
