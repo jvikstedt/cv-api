@@ -19,7 +19,7 @@ export class SkillsService {
     return this.findOne(cvId, skill.id);
   }
 
-  async patchSkill(cvId: number, skillId: number, patchSkillDto: PatchSkillDto): Promise<Skill> {
+  async patch(cvId: number, skillId: number, patchSkillDto: PatchSkillDto): Promise<Skill> {
     const oldSkill = await this.findOne(cvId, skillId);
 
     const newSkill = R.merge(oldSkill, {

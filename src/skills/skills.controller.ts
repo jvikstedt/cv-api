@@ -26,12 +26,12 @@ export class SkillsController {
   @Patch('/:skillId')
   @UseGuards(CVGuard)
   @UsePipes(ValidationPipe)
-  patchSkill(
+  patch(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('skillId', ParseIntPipe) skillId: number,
     @Body() patchSkillDto: PatchSkillDto
   ): Promise<Skill> {
-    return this.skillsService.patchSkill(cvId, skillId, patchSkillDto);
+    return this.skillsService.patch(cvId, skillId, patchSkillDto);
   }
 
   @Get()
