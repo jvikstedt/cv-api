@@ -31,7 +31,12 @@ export class AuthService {
   ) {}
 
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
-    return this.userRepository.signUp(authCredentialsDto);
+    const user = await this.userRepository.signUp(authCredentialsDto);
+
+    const cv = this.cvRepository.create();
+    cv.userId = user.id;
+    cv.description = '';
+    await cv.save();
   }
 
   async signIn(authCredentialsDto: AuthCredentialsDto): Promise<{ accessToken: string }> {

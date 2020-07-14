@@ -5,13 +5,12 @@ import { ConflictException, InternalServerErrorException, Logger } from '@nestjs
 import { User } from './user.entity';
 import { AuthCredentialsDto } from '../auth/dto/auth-credentials.dto';
 import { UNIQUENESS_VIOLATION } from '../constants';
-import { CV } from '../cv/cv.entity';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
   private readonly logger = new Logger(UserRepository.name);
 
-  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
+  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<User> {
     const { username, password } = authCredentialsDto;
 
     const user = this.create();
@@ -23,9 +22,7 @@ export class UserRepository extends Repository<User> {
 
     try {
       await user.save();
-
-      const cv = await new CV({ userId: user.id, description: '' }).save();
-      user.cv = cv;
+      return user;
     } catch (error) {
       if (error.code === UNIQUENESS_VIOLATION) {
         throw new ConflictException('Username already exists');
