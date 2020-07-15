@@ -12,9 +12,9 @@ define(Education, (faker: typeof Faker) => {
 
   education.endYear = education.startYear + 4;
 
-  education.degree = faker.lorem.text();
-  education.fieldOfStudy = faker.lorem.text();
-  education.description = faker.lorem.text();
+  education.degree = faker.lorem.words(2);
+  education.fieldOfStudy = faker.lorem.words(2);
+  education.description = faker.lorem.words(10);
 
   return education;
 })
