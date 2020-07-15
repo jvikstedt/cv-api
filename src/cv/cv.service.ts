@@ -1,4 +1,6 @@
 import * as R from 'ramda';
+import * as config from 'config';
+import { Queue } from 'bull';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
@@ -8,6 +10,11 @@ import { CVRepository } from './cv.repository';
 import { PatchCVDto } from './dto/patch-cv.dto';
 import { ELASTIC_INDEX_CV } from '../constants';
 import { SearchCVDto, SkillSearch } from './dto/search-cv.dto';
+import { QUEUE_NAME_CV, CONFIG_QUEUE, CONFIG_QUEUE_CV_RELOAD, EventType } from '../constants';
+import { InjectQueue } from '@nestjs/bull';
+
+const queueConfig = config.get(CONFIG_QUEUE);
+const cvReloadDelay = queueConfig[CONFIG_QUEUE_CV_RELOAD];
 
 @Injectable()
 export class CVService {
@@ -16,14 +23,25 @@ export class CVService {
     private readonly cvRepository: CVRepository,
 
     private readonly elasticsearchService: ElasticsearchService,
+
+    @InjectQueue(QUEUE_NAME_CV)
+    private cvQueue: Queue,
   ) {}
 
   async patch(cvId: number, patchCVDto: PatchCVDto): Promise<CV> {
     const oldCV = await this.findOne(cvId)
 
-    const newCV = R.merge(oldCV, patchCVDto);
+    const newCV = await this.cvRepository.save(
+      R.merge(oldCV, patchCVDto),
+    );
 
-    return this.cvRepository.save(newCV);
+    await this.cvQueue.add(EventType.Reload, {
+      id: cvId,
+    }, {
+      delay: cvReloadDelay,
+    });
+
+    return newCV;
   }
 
   async findAll(): Promise<CV[]> {
