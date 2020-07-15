@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Body, Delete, Param, UsePipes, ValidationPipe, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Delete, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { SkillGroupsService } from './skill-groups.service';
 import { SkillGroup } from './skill-group.entity';
 import { CreateSkillGroupDto } from './dto/create-skill-group.dto';
@@ -17,13 +17,11 @@ export class SkillGroupsController {
   ) {}
 
   @Post()
-  @UsePipes(ValidationPipe)
   create(@Body() createSkillGroupDto: CreateSkillGroupDto): Promise<SkillGroup> {
     return this.skillGroupsService.create(createSkillGroupDto);
   }
 
   @Put('/:id')
-  @UsePipes(ValidationPipe)
   update(@Param('id', ParseIntPipe) id: number, @Body() updateSkillGroupDto: UpdateSkillGroupDto): Promise<SkillGroup> {
     return this.skillGroupsService.update(id, updateSkillGroupDto);
   }
@@ -44,7 +42,6 @@ export class SkillGroupsController {
   }
 
   @Post('/search')
-  @UsePipes(ValidationPipe)
   search(@Body() searchSkillGroupDto: SearchSkillGroupDto): Promise<SkillGroup[]> {
     return this.skillGroupsService.search(searchSkillGroupDto);
   }

@@ -6,6 +6,8 @@ import { User } from "../../src/users/user.entity";
 import { CV } from "../../src/cv/cv.entity";
 import { Skill } from "../../src/skills/skill.entity";
 import { SkillGroup } from '../../src/skill_groups/skill-group.entity';
+import { School } from '../../src/schools/school.entity';
+import { Education } from '../../src/educations/education.entity';
 
 const SKILLS = {
   ['Programming languages']: [
@@ -51,6 +53,7 @@ export default class Seed implements Seeder {
     const skillGroups: SkillGroup[] = [];
     const skillSubjects: SkillSubject[] = [];
 
+    // Create skills and skill groups
     for (const skillGroupName of Object.keys(SKILLS)) {
       const skillGroup: SkillGroup = await factory(SkillGroup)().create({ name: skillGroupName });
       skillGroups.push(skillGroup);
@@ -60,6 +63,10 @@ export default class Seed implements Seeder {
         skillSubjects.push(skillSubject);
       }
     };
+
+    // Create schools
+    const schools = await factory(School)()
+      .createMany(10);
 
     // Create admin user
     const admin = await factory(User)().make({ firstName: 'John', lastName: 'Doe', username: 'admin' });
@@ -77,6 +84,7 @@ export default class Seed implements Seeder {
     await testAutomationUser.save();
     await factory(CV)().create({ userId: testAutomationUser.id })
 
+    // Create CVs
     const cvs: CV[] = await factory(CV)()
       .map(async (cv: CV) => {
         const user: User = await factory(User)().create();
@@ -87,11 +95,21 @@ export default class Seed implements Seeder {
       .createMany(10);
 
 
+    // Add skills
     for (const cv of cvs) {
       randomSkills = skillSubjects.sort(() => 0.5 - Math.random()).slice(0, 6);
 
       for (const skillSubject of randomSkills) {
         await factory(Skill)().create({ cvId: cv.id, skillSubjectId: skillSubject.id });
+      };
+    };
+
+    // Add educations
+    for (const cv of cvs) {
+      const randomSchools = schools.sort(() => 0.5 - Math.random()).slice(0, 2);
+
+      for (const school of randomSchools) {
+        await factory(Education)().create({ cvId: cv.id, schoolId: school.id });
       };
     };
   }

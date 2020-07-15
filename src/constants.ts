@@ -18,6 +18,7 @@ export const CONFIG_DB_USERNAME = 'username';
 export const CONFIG_DB_PASSWORD = 'password';
 export const CONFIG_DB_DATABASE = 'database';
 export const CONFIG_DB_SYNCHRONIZE = 'synchronize';
+export const CONFIG_DB_LOGGING = 'logging';
 
 export const CONFIG_ELASTICSEARCH = 'elasticsearch';
 export const CONFIG_ELASTICSEARCH_PORT = 'port';
@@ -32,6 +33,7 @@ export const ELASTIC_INDEX_CV = 'cv';
 
 export const QUEUE_NAME_SKILL_SUBJECTS = 'skillSubjects';
 export const QUEUE_NAME_SKILLS = 'skills';
+export const QUEUE_NAME_EDUCATIONS = 'educations';
 export const QUEUE_NAME_CV = 'cv';
 export const QUEUE_NAME_USERS = 'users';
 
