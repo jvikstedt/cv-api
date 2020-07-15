@@ -1,6 +1,7 @@
 import { Column, PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, OneToOne, OneToMany, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Skill } from '../skills/skill.entity';
+import { Education } from '../educations/education.entity';
 
 @Entity()
 export class CV extends BaseEntity {
@@ -16,6 +17,9 @@ export class CV extends BaseEntity {
 
   @OneToMany(() => Skill, skill => skill.cv)
   skills: Skill[];
+
+  @OneToMany(() => Education, education => education.cv)
+  educations: Education[];
 
   @Column()
   userId: number;

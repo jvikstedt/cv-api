@@ -18,7 +18,7 @@ describe('SkillSubjectsController', () => {
   let skillSubjectsService: any;
 
   beforeAll(async () => {
-    await useSeeding();
+    await useSeeding({ configName: 'src/config/typeorm.config.ts' });
   });
 
   beforeEach(async () => {

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Body, Delete, Param, UsePipes, ValidationPipe, ParseIntPipe, UseGuards, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Delete, Param, ParseIntPipe, UseGuards, Patch } from '@nestjs/common';
 import { TemplatesService } from './templates.service';
 import { Template } from './template.entity';
 import { CreateTemplateRequestDto } from './dto/create-template-request.dto';
@@ -19,19 +19,16 @@ export class TemplatesController {
   ) {}
 
   @Post()
-  @UsePipes(new ValidationPipe)
   create(@Body() createTemplateRequestDto: CreateTemplateRequestDto, @GetUser() user: User): Promise<Template> {
     return this.templatesService.create({ ...createTemplateRequestDto, userId: user.id });
   }
 
   @Put('/:id')
-  @UsePipes(ValidationPipe)
   update(@Param('id', ParseIntPipe) id: number, @Body() updateTemplateDto: UpdateTemplateDto): Promise<Template> {
     return this.templatesService.update(id, updateTemplateDto);
   }
 
   @Patch('/:id')
-  @UsePipes(ValidationPipe)
   patchTemplate(@Param('id', ParseIntPipe) id: number, @Body() patchTemplateDto: PatchTemplateDto): Promise<Template> {
     return this.templatesService.patchTemplate(id, patchTemplateDto);
   }

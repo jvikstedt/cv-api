@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Delete, Param, UsePipes, ValidationPipe, ParseIntPipe, UseGuards, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, ParseIntPipe, UseGuards, Patch } from '@nestjs/common';
 import { SkillsService } from './skills.service';
 import { Skill } from './skill.entity';
 import { CreateSkillDto } from './dto/create-skill.dto';
@@ -18,14 +18,12 @@ export class SkillsController {
 
   @Post()
   @UseGuards(CVGuard)
-  @UsePipes(ValidationPipe)
   create(@Param('cvId', ParseIntPipe) cvId: number, @Body() createSkillDto: CreateSkillDto): Promise<Skill> {
     return this.skillsService.create(cvId, createSkillDto);
   }
 
   @Patch('/:skillId')
   @UseGuards(CVGuard)
-  @UsePipes(ValidationPipe)
   patch(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('skillId', ParseIntPipe) skillId: number,

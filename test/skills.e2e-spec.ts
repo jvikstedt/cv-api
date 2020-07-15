@@ -1,22 +1,16 @@
 import * as request from 'supertest';
-import { JwtService } from '@nestjs/jwt';
-import { factory, useSeeding } from 'typeorm-seeding';
-import { Test } from '@nestjs/testing';
+import { factory } from 'typeorm-seeding';
 import { INestApplication } from '@nestjs/common';
-import { Connection } from 'typeorm';
 import { Skill } from '../src/skills/skill.entity';
 import { User } from '../src/users/user.entity';
 import { SkillSubject } from '../src/skill_subjects/skill-subject.entity';
 import { SkillGroup } from '../src/skill_groups/skill-group.entity';
 import { CV } from '../src/cv/cv.entity';
-import { AppModule } from '../src/app.module';
 import { PatchSkillDto } from '../src/skills/dto/patch-skill.dto';
-import { generateAccessToken } from './test-helper';
+import { TestHelper } from './test-helper';
 
 describe('SkillsController (e2e)', () => {
   let app: INestApplication;
-  let connection: Connection;
-  let jwtService: JwtService;
 
   let user: User;
   let cv: CV;
@@ -24,23 +18,15 @@ describe('SkillsController (e2e)', () => {
   let skillSubject: SkillSubject;
   let accessToken: string;
 
+  const testHelper: TestHelper = new TestHelper();
+
   beforeAll(async () => {
-    const module = await Test.createTestingModule({
-      imports: [AppModule],
-    })
-    .compile();
-
-    app = module.createNestApplication();
-    await app.init();
-
-    connection = module.get<Connection>(Connection);
-    jwtService = module.get<JwtService>(JwtService);
-
-    await useSeeding();
+    await testHelper.setup();
+    app = testHelper.app;
   });
 
   beforeEach(async () => {
-    await connection.synchronize(true);
+    await testHelper.resetDb();
 
     user = await factory(User)().create();
     skillGroup = await factory(SkillGroup)().create();
@@ -49,12 +35,12 @@ describe('SkillsController (e2e)', () => {
     user.cv = cv;
     user.templates = [];
 
-    accessToken = generateAccessToken(jwtService, user);
+    accessToken = testHelper.sign(user);
   });
 
   afterAll(async (done) => {
-    await connection.synchronize(true);
-    await app.close();
+    await testHelper.resetDb();
+    await testHelper.close();
     done();
   });
 

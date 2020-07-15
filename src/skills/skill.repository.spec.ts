@@ -2,12 +2,13 @@ import { Test } from '@nestjs/testing';
 import { useSeeding, factory } from 'typeorm-seeding';
 import { SkillRepository } from './skill.repository';
 import { Skill } from './skill.entity';
+import { CreateSkillDto } from './dto/create-skill.dto';
 
 describe('SkillRepository', () => {
   let skillRepository: any;
 
   beforeAll(async () => {
-    await useSeeding();
+    await useSeeding({ configName: 'src/config/typeorm.config.ts' });
   });
 
   beforeEach(async () => {
@@ -28,13 +29,14 @@ describe('SkillRepository', () => {
       skillRepository.create = jest.fn().mockReturnValue({ save });
     });
 
-    it('returns created skillSkill', async () => {
-      const mockCreateSkillSubjectDto = { skillSubjectId: 1, userId: 1 };
-      const skill = await factory(Skill)().make(mockCreateSkillSubjectDto);
+    it('returns created skill', async () => {
+      const cvId = 2;
+      const createSkillDto: CreateSkillDto = { skillSubjectId: 1, experienceInYears: 2 };
+      const skill = await factory(Skill)().make({ ...createSkillDto, cvId });
       save.mockResolvedValue(skill);
 
       expect(save).not.toHaveBeenCalled();
-      const result = await skillRepository.createSkill(2, mockCreateSkillSubjectDto);
+      const result = await skillRepository.createSkill(cvId, createSkillDto);
       expect(save).toHaveBeenCalled();
       expect(result).toEqual(skill);
     });

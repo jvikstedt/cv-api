@@ -1,23 +1,19 @@
 import * as request from 'supertest';
-import { Test } from '@nestjs/testing';
-import { AppModule } from './../src/app.module';
 import { INestApplication } from '@nestjs/common';
+import { TestHelper } from './test-helper';
 
 describe('HealthController (e2e)', () => {
+  const testHelper: TestHelper = new TestHelper();
   let app: INestApplication;
 
   beforeAll(async () => {
-    const module = await Test.createTestingModule({
-      imports: [AppModule],
-    })
-    .compile();
-
-    app = module.createNestApplication();
-    await app.init();
+    await testHelper.setup();
+    app = testHelper.app;
   });
 
   afterAll(async (done) => {
-    await app.close();
+    await testHelper.resetDb();
+    await testHelper.close();
     done();
   });
 

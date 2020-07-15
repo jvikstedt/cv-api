@@ -16,7 +16,7 @@ describe('UsersController', () => {
   let usersService: any;
 
   beforeAll(async () => {
-    await useSeeding();
+    await useSeeding({ configName: 'src/config/typeorm.config.ts' });
   });
 
   beforeEach(async () => {

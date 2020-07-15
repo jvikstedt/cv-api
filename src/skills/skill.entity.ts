@@ -3,7 +3,7 @@ import { CV } from '../cv/cv.entity';
 import { SkillSubject } from '../skill_subjects/skill-subject.entity';
 
 @Entity()
-@Unique('UQ_RELATION', ['skillSubject', 'cv'])
+@Unique('SKILL_UQ_RELATION', ['skillSubject', 'cv'])
 export class Skill extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;

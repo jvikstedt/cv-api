@@ -5,6 +5,7 @@ export class CreateSkillSubjectDto {
   @IsString()
   name: string;
 
+  @IsNotEmpty()
   @IsNumber()
   skillGroupId: number;
 }

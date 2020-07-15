@@ -1,40 +1,39 @@
 import * as request from 'supertest';
-import { useSeeding, factory } from 'typeorm-seeding';
-import { Test } from '@nestjs/testing';
-import { AuthGuard } from '@nestjs/passport';
+import { factory } from 'typeorm-seeding';
 import { INestApplication } from '@nestjs/common';
-import { Connection } from 'typeorm';
 import { SkillSubject } from '../src/skill_subjects/skill-subject.entity';
 import { SkillGroup } from '../src/skill_groups/skill-group.entity';
-import { AppModule } from '../src/app.module';
+import { TestHelper } from './test-helper';
+import { User } from '../src/users/user.entity';
+import { CV } from '../src/cv/cv.entity';
 
 describe('SkillSubjectsController (e2e)', () => {
+  const testHelper: TestHelper = new TestHelper();
   let app: INestApplication;
-  let connection: Connection;
+
+  let user: User;
+  let cv: CV;
+  let accessToken: string;
 
   beforeAll(async () => {
-    const module = await Test.createTestingModule({
-      imports: [AppModule],
-    })
-    .overrideGuard(AuthGuard())
-    .useValue({ canActivate: () => true })
-    .compile();
-
-    app = module.createNestApplication();
-    await app.init();
-
-    connection = module.get<Connection>(Connection);
-
-    await useSeeding();
+    await testHelper.setup();
+    app = testHelper.app;
   });
 
   beforeEach(async () => {
-    await connection.synchronize(true);
+    await testHelper.resetDb();
+
+    user = await factory(User)().create();
+    cv = await factory(CV)().create({ userId: user.id });
+    user.cv = cv;
+    user.templates = [];
+
+    accessToken = testHelper.sign(user);
   });
 
   afterAll(async (done) => {
-    await connection.synchronize(true);
-    await app.close();
+    await testHelper.resetDb();
+    await testHelper.close();
     done();
   });
 
@@ -43,6 +42,7 @@ describe('SkillSubjectsController (e2e)', () => {
     const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
     const response = await request(app.getHttpServer())
       .get('/skill_subjects')
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(200)
 
     expect(response.body).toStrictEqual([
@@ -64,6 +64,7 @@ describe('SkillSubjectsController (e2e)', () => {
     const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
     const response = await request(app.getHttpServer())
       .get(`/skill_subjects/${skillSubject.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(200)
 
     expect(response.body).toStrictEqual({
@@ -80,6 +81,7 @@ describe('SkillSubjectsController (e2e)', () => {
 
     await request(app.getHttpServer())
       .get('/skill_subjects/2')
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(404)
   });
 
@@ -88,12 +90,14 @@ describe('SkillSubjectsController (e2e)', () => {
     const skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
     const response = await request(app.getHttpServer())
       .delete(`/skill_subjects/${skillSubject.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(200)
 
     expect(response.body).toEqual({});
 
     await request(app.getHttpServer())
       .get('/skill_subjects/2')
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(404)
   });
 
@@ -103,6 +107,7 @@ describe('SkillSubjectsController (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .post('/skill_subjects')
+      .set('Authorization', `Bearer ${accessToken}`)
       .send(newSkillSubject)
       .expect(201)
 
@@ -111,6 +116,7 @@ describe('SkillSubjectsController (e2e)', () => {
     newSkillSubject = await factory(SkillSubject)().make({ name: '' });
     await request(app.getHttpServer())
       .post('/skill_subjects')
+      .set('Authorization', `Bearer ${accessToken}`)
       .send(newSkillSubject)
       .expect(400)
   });
@@ -122,6 +128,7 @@ describe('SkillSubjectsController (e2e)', () => {
     let changes = await factory(SkillSubject)().make({ name: 'Vue.js' });
     const response = await request(app.getHttpServer())
       .put(`/skill_subjects/${skillSubject.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send(changes)
       .expect(200)
 
@@ -129,12 +136,14 @@ describe('SkillSubjectsController (e2e)', () => {
 
     await request(app.getHttpServer())
       .post('/skill_subjects/2')
+      .set('Authorization', `Bearer ${accessToken}`)
       .send(changes)
       .expect(404)
 
     changes = await factory(SkillSubject)().make({ name: '' });
     await request(app.getHttpServer())
       .put(`/skill_subjects/${skillSubject.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send(changes)
       .expect(400)
   });

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UsePipes, ValidationPipe, ParseIntPipe, UseGuards, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseIntPipe, UseGuards, Patch } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CVService } from './cv.service';
@@ -18,7 +18,6 @@ export class CVController {
 
   @Patch('/:cvId')
   @UseGuards(CVGuard)
-  @UsePipes(ValidationPipe)
   patch(@Param('cvId', ParseIntPipe) cvId: number, @Body() patchCVDto: PatchCVDto): Promise<CV> {
     return this.cvService.patch(cvId, patchCVDto);
   }
@@ -34,7 +33,6 @@ export class CVController {
   }
 
   @Post('/search')
-  @UsePipes(new ValidationPipe({ transform: true }))
   search(@Body() searchCVDto: SearchCVDto): Promise<CV[]> {
     return this.cvService.search(searchCVDto);
   }

@@ -19,7 +19,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json --verbose --maxWorkers 1 --detectOpenHandles --forceExit",
     "repl": "NODE_OPTIONS=--experimental-repl-await ts-node src/repl.ts",
-    "seed": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed"
+    "seed": "ts-node -r tsconfig-paths/register ./node_modules/typeorm-seeding/dist/cli.js --configName src/config/typeorm.config.ts seed",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config src/config/typeorm.config.ts"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^7.7.1",
