@@ -1,4 +1,5 @@
 import { Test } from '@nestjs/testing';
+import { getQueueToken } from '@nestjs/bull';
 import { useSeeding, factory } from 'typeorm-seeding';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { CVService } from './cv.service';
@@ -7,6 +8,7 @@ import { NotFoundException } from '@nestjs/common';
 import { CV } from './cv.entity';
 import { SearchCVDto } from './dto/search-cv.dto';
 import { PatchCVDto } from './dto/patch-cv.dto';
+import { QUEUE_NAME_CV } from '../constants';
 
 const mockCVRepository = () => ({
   find: jest.fn(),
@@ -16,6 +18,10 @@ const mockCVRepository = () => ({
 
 const mockElasticSearch = () => ({
   search: jest.fn(),
+});
+
+const mockQueue = () => ({
+  add: jest.fn(),
 });
 
 describe('CVService', () => {
@@ -33,6 +39,7 @@ describe('CVService', () => {
         CVService,
         { provide: CVRepository, useFactory: mockCVRepository },
         { provide: ElasticsearchService, useFactory: mockElasticSearch },
+        { provide: getQueueToken(QUEUE_NAME_CV), useFactory: mockQueue },
       ],
     }).compile();
 

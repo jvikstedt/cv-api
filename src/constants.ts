@@ -28,14 +28,9 @@ export const CONFIG_REDIS_PORT = 'port';
 
 export const CONFIG_QUEUE = 'queue';
 export const CONFIG_QUEUE_CV_RELOAD = 'cvReloadDelay';
+export const QUEUE_NAME_CV = 'cv';
 
 export const ELASTIC_INDEX_CV = 'cv';
-
-export const QUEUE_NAME_SKILL_SUBJECTS = 'skillSubjects';
-export const QUEUE_NAME_SKILLS = 'skills';
-export const QUEUE_NAME_EDUCATIONS = 'educations';
-export const QUEUE_NAME_CV = 'cv';
-export const QUEUE_NAME_USERS = 'users';
 
 export const EXPORTER_PDF = 'pdf';
 

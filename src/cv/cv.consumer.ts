@@ -49,6 +49,19 @@ export class CVConsumer {
                 skillSubjectId: { type: 'integer' },
                 name: { type: 'text' },
               }
+            },
+
+            educations: {
+              type: 'nested',
+              properties: {
+                schoolId: { type: 'integer' },
+                schoolName: { type: 'text' },
+                startYear: { type: 'integer' },
+                endYear: { type: 'integer' },
+                degree: { type: 'text' },
+                fieldOfStudy: { type: 'text' },
+                description: { type: 'text' },
+              }
             }
           }
         }
@@ -80,7 +93,15 @@ export class CVConsumer {
         return;
       }
 
-      const cv = await this.cvRepository.findOne(job.data.id, { relations: ['user', 'skills', 'skills.skillSubject'] });
+      const cv = await this.cvRepository.findOne(job.data.id, {
+        relations: [
+          'user',
+          'skills',
+          'skills.skillSubject',
+          'educations',
+          'educations.school'
+        ]
+      });
       if (!cv) {
         await this.elasticsearchService.delete({
           index: ELASTIC_INDEX_CV,
@@ -104,6 +125,15 @@ export class CVConsumer {
             skillSubjectId: skill.skillSubject.id,
             name: skill.skillSubject.name,
           }), cv.skills),
+          educations: R.map(education => ({
+            schoolId: education.school.id,
+            schoolName: education.school.name,
+            startYear: education.startYear,
+            endYear: education.endYear,
+            degree: education.degree,
+            fieldOfStudy: education.fieldOfStudy,
+            description: education.description,
+          }), cv.educations),
         },
       });
     } catch(err) {
