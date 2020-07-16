@@ -42,6 +42,10 @@ export class CVConsumer {
             username: { type: 'keyword' },
             avatarId: { type: 'keyword' },
             fullName: { type: 'text' },
+            jobTitle: { type: 'text' },
+            phone: { type: 'text' },
+            location: { type: 'text' },
+            email: { type: 'keyword' },
 
             skills: {
               type: 'nested',
@@ -143,6 +147,10 @@ export class CVConsumer {
           username: cv.user.username,
           avatarId: cv.user.avatarId,
           fullName: `${cv.user.firstName} ${cv.user.lastName}`,
+          jobTitle: cv.user.jobTitle,
+          phone: cv.user.phone,
+          location: cv.user.location,
+          email: cv.user.email,
           skills: R.map(skill => ({
             experienceInYears: skill.experienceInYears,
             skillSubjectId: skill.skillSubject.id,

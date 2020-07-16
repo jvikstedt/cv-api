@@ -19,6 +19,18 @@ export class User extends BaseEntity {
   @Column()
   lastName: string;
 
+  @Column()
+  jobTitle: string;
+
+  @Column()
+  phone: string;
+
+  @Column()
+  location: string;
+
+  @Column()
+  email: string;
+
   @Column({ select: false, nullable: true })
   password: string;
 

@@ -94,6 +94,10 @@ export class AuthService {
         username: email,
         firstName,
         lastName,
+        jobTitle: '',
+        phone: '',
+        location: '',
+        email,
       });
       await user.save();
 
