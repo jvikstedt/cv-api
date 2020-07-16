@@ -10,6 +10,8 @@ import { School } from '../../src/schools/school.entity';
 import { Education } from '../../src/educations/education.entity';
 import { Company } from '../../src/company/company.entity';
 import { WorkExperience } from '../../src/work_experience/work-experience.entity';
+import { Project } from '../../src/project/project.entity';
+import { ProjectMembership } from '../../src/project_membership/project-membership.entity';
 
 const SKILLS = {
   ['Programming languages']: [
@@ -74,6 +76,10 @@ export default class Seed implements Seeder {
     const companies = await factory(Company)()
       .createMany(10);
 
+    // Create projects
+    const projects = await factory(Project)()
+      .createMany(10);
+
     // Create admin user
     const admin = await factory(User)().make({ firstName: 'John', lastName: 'Doe', username: 'admin' });
     admin.password = await bcrypt.hash('Admin123', admin.salt);
@@ -125,6 +131,15 @@ export default class Seed implements Seeder {
 
       for (const company of randomCompanies) {
         await factory(WorkExperience)().create({ cvId: cv.id, companyId: company.id });
+      };
+    };
+
+    // Add project memberships
+    for (const cv of cvs) {
+      const randomProjects = projects.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+      for (const project of randomProjects) {
+        await factory(ProjectMembership)().create({ cvId: cv.id, projectId: project.id });
       };
     };
   }
