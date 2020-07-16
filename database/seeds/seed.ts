@@ -8,6 +8,8 @@ import { Skill } from "../../src/skills/skill.entity";
 import { SkillGroup } from '../../src/skill_groups/skill-group.entity';
 import { School } from '../../src/schools/school.entity';
 import { Education } from '../../src/educations/education.entity';
+import { Company } from '../../src/company/company.entity';
+import { WorkExperience } from '../../src/work_experience/work-experience.entity';
 
 const SKILLS = {
   ['Programming languages']: [
@@ -68,6 +70,10 @@ export default class Seed implements Seeder {
     const schools = await factory(School)()
       .createMany(10);
 
+    // Create companies
+    const companies = await factory(Company)()
+      .createMany(10);
+
     // Create admin user
     const admin = await factory(User)().make({ firstName: 'John', lastName: 'Doe', username: 'admin' });
     admin.password = await bcrypt.hash('Admin123', admin.salt);
@@ -97,7 +103,7 @@ export default class Seed implements Seeder {
 
     // Add skills
     for (const cv of cvs) {
-      randomSkills = skillSubjects.sort(() => 0.5 - Math.random()).slice(0, 6);
+      randomSkills = skillSubjects.sort(() => 0.5 - Math.random()).slice(0, 12);
 
       for (const skillSubject of randomSkills) {
         await factory(Skill)().create({ cvId: cv.id, skillSubjectId: skillSubject.id });
@@ -106,10 +112,19 @@ export default class Seed implements Seeder {
 
     // Add educations
     for (const cv of cvs) {
-      const randomSchools = schools.sort(() => 0.5 - Math.random()).slice(0, 2);
+      const randomSchools = schools.sort(() => 0.5 - Math.random()).slice(0, 3);
 
       for (const school of randomSchools) {
         await factory(Education)().create({ cvId: cv.id, schoolId: school.id });
+      };
+    };
+
+    // Add work experiences
+    for (const cv of cvs) {
+      const randomCompanies = companies.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+      for (const company of randomCompanies) {
+        await factory(WorkExperience)().create({ cvId: cv.id, companyId: company.id });
       };
     };
   }
