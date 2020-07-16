@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, Header, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Res, Header, UseGuards, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -16,6 +16,11 @@ export class ExportersController {
 
   @Post('/pdf/export')
   @Header('Content-Type', 'application/pdf')
+  @UsePipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    exceptionFactory: (errors) => new BadRequestException(errors)
+  }))
   exportPdf(@Res() res: Response, @Body() exportPdfDto: ExportPdfDto) {
     this.exportersService.exportPdf(exportPdfDto)
       .then(response => {

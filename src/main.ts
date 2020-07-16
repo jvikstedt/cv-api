@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { Logger, BadRequestException, ValidationPipe } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as config from 'config';
@@ -24,12 +24,6 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.enableShutdownHooks();
-
-  app.useGlobalPipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors),
-  }));
 
   const port = process.env.PORT || serverConfig[CONFIG_SERVER_PORT];
   await app.listen(port);
