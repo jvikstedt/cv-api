@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Delete, Param, ParseIntPipe, UseGuards, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, ParseIntPipe, UseGuards, Patch, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
 import { SchoolsService } from './schools.service';
 import { School } from './school.entity';
 import { CreateSchoolDto } from './dto/create-school.dto';
@@ -17,11 +17,21 @@ export class SchoolsController {
   ) {}
 
   @Post()
+  @UsePipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    exceptionFactory: (errors) => new BadRequestException(errors)
+  }))
   create(@Body() createSchoolDto: CreateSchoolDto): Promise<School> {
     return this.schoolsService.create(createSchoolDto);
   }
 
   @Patch('/:schoolId')
+  @UsePipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    exceptionFactory: (errors) => new BadRequestException(errors)
+  }))
   patch(@Param('schoolId', ParseIntPipe) schoolId: number, @Body() patchSchoolDto: PatchSchoolDto): Promise<School> {
     return this.schoolsService.patch(schoolId, patchSchoolDto);
   }
@@ -42,6 +52,11 @@ export class SchoolsController {
   }
 
   @Post('/search')
+  @UsePipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    exceptionFactory: (errors) => new BadRequestException(errors)
+  }))
   search(@Body() searchSchoolDto: SearchSchoolDto): Promise<School[]> {
     return this.schoolsService.search(searchSchoolDto);
   }

@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 import { useSeeding } from 'typeorm-seeding';
 import { Connection } from 'typeorm';
-import { INestApplication, ValidationPipe, BadRequestException } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { JwtService } from "@nestjs/jwt";
 import { User } from "../src/users/user.entity";
@@ -23,11 +23,6 @@ export class TestHelper {
     .compile();
 
     this.app = module.createNestApplication();
-    this.app.useGlobalPipes(new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      exceptionFactory: (errors) => new BadRequestException(errors),
-    }));
     await this.app.init();
 
     this.connection = module.get<Connection>(Connection);

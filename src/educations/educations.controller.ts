@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Delete, Param, ParseIntPipe, UseGuards, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, ParseIntPipe, UseGuards, Patch, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
 import { EducationsService } from './educations.service';
 import { Education } from './education.entity';
 import { CreateEducationDto } from './dto/create-education.dto';
@@ -18,12 +18,22 @@ export class EducationsController {
 
   @Post()
   @UseGuards(CVGuard)
+  @UsePipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    exceptionFactory: (errors) => new BadRequestException(errors)
+  }))
   create(@Param('cvId', ParseIntPipe) cvId: number, @Body() createEducationDto: CreateEducationDto): Promise<Education> {
     return this.educationsService.create(cvId, createEducationDto);
   }
 
   @Patch('/:educationId')
   @UseGuards(CVGuard)
+  @UsePipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    exceptionFactory: (errors) => new BadRequestException(errors)
+  }))
   patch(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('educationId', ParseIntPipe) educationId: number,
