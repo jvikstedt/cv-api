@@ -1,7 +1,9 @@
 import * as R from 'ramda';
 import * as config from 'config';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Queue } from 'bull';
 import { InjectRepository } from '@nestjs/typeorm';
+import { InjectQueue } from '@nestjs/bull';
 import { UserRepository } from '../users/user.repository';
 import { CVRepository } from '../cv/cv.repository';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
@@ -13,11 +15,18 @@ import { OAuth2Client } from 'google-auth-library';
 import {
   CONFIG_GOOGLE,
   CONFIG_GOOGLE_CLIENT_ID,
+  QUEUE_NAME_CV,
+  CONFIG_QUEUE,
+  CONFIG_QUEUE_CV_RELOAD,
+  EventType,
 } from '../constants';
 
 const googleConfig = config.get(CONFIG_GOOGLE);
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID || googleConfig[CONFIG_GOOGLE_CLIENT_ID];
+
+const queueConfig = config.get(CONFIG_QUEUE);
+const cvReloadDelay = queueConfig[CONFIG_QUEUE_CV_RELOAD];
 
 const client = new OAuth2Client(CLIENT_ID);
 
@@ -28,6 +37,9 @@ export class AuthService {
     private readonly userRepository: UserRepository,
     private readonly cvRepository: CVRepository,
     private readonly jwtService: JwtService,
+
+    @InjectQueue(QUEUE_NAME_CV)
+    private cvQueue: Queue,
   ) {}
 
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
@@ -36,6 +48,14 @@ export class AuthService {
     const cv = this.cvRepository.create();
     cv.userId = user.id;
     cv.description = '';
+
+    await this.cvQueue.add(EventType.Reload, {
+      id: cv.id,
+      updateTimestamp: true,
+    }, {
+      delay: cvReloadDelay,
+    });
+
     await cv.save();
   }
 
@@ -83,6 +103,13 @@ export class AuthService {
       }).save();
       user.cv = cv;
       user.templates = [];
+
+      await this.cvQueue.add(EventType.Reload, {
+        id: cv.id,
+        updateTimestamp: true,
+      }, {
+        delay: cvReloadDelay,
+      });
     }
 
     const payload: JwtPayload = {

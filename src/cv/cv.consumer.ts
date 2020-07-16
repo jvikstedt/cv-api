@@ -36,6 +36,7 @@ export class CVConsumer {
           properties: {
             id: { type: 'integer' },
             description: { type: 'text' },
+            updatedAt: { type: 'date' },
 
             userId: { type: 'integer' },
             username: { type: 'keyword' },
@@ -93,7 +94,7 @@ export class CVConsumer {
         return;
       }
 
-      const cv = await this.cvRepository.findOne(job.data.id, {
+      let cv = await this.cvRepository.findOne(job.data.id, {
         relations: [
           'user',
           'skills',
@@ -108,6 +109,11 @@ export class CVConsumer {
           id: job.data.id.toString(),
         })
         return;
+      } else {
+        if (job.data.updateTimestamp) {
+          cv.updatedAt = new Date();
+          cv = await cv.save();
+        }
       }
 
       await this.elasticsearchService.index({
@@ -116,6 +122,7 @@ export class CVConsumer {
         body: {
           id: cv.id,
           description: cv.description,
+          updatedAt: cv.updatedAt,
           userId: cv.userId,
           username: cv.user.username,
           avatarId: cv.user.avatarId,

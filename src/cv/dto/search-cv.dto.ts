@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsArray, IsBoolean } from 'class-validator';
+import { IsNumber, IsString, IsArray, IsBoolean, IsOptional } from 'class-validator';
 
 export class SkillSearch {
   @IsBoolean()
@@ -6,6 +6,14 @@ export class SkillSearch {
 
   @IsNumber()
   skillSubjectId: number;
+}
+
+export class Sort {
+  @IsString()
+  field: string;
+
+  @IsString()
+  order?: string = 'asc';
 }
 
 export class SearchCVDto {
@@ -17,4 +25,8 @@ export class SearchCVDto {
 
   @IsArray()
   skills?: SkillSearch[] = [];
+
+  @IsOptional()
+  @IsArray()
+  sorts: Sort[];
 }

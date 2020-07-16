@@ -45,6 +45,7 @@ export class UsersService {
     if (oldUser.cv) {
       await this.cvQueue.add(EventType.Reload, {
         id: oldUser.cv.id,
+        updateTimestamp: true,
       }, {
         delay: cvReloadDelay,
       });
