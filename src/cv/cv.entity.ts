@@ -2,6 +2,7 @@ import { Column, PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, U
 import { User } from '../users/user.entity';
 import { Skill } from '../skills/skill.entity';
 import { Education } from '../educations/education.entity';
+import { WorkExperience } from '../work_experience/work-experience.entity';
 
 @Entity()
 export class CV extends BaseEntity {
@@ -20,6 +21,9 @@ export class CV extends BaseEntity {
 
   @OneToMany(() => Education, education => education.cv)
   educations: Education[];
+
+  @OneToMany(() => WorkExperience, workExperience => workExperience.cv)
+  workExperiences: WorkExperience[];
 
   @Column()
   userId: number;

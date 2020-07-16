@@ -63,6 +63,20 @@ export class CVConsumer {
                 fieldOfStudy: { type: 'text' },
                 description: { type: 'text' },
               }
+            },
+
+            workExperiences: {
+              type: 'nested',
+              properties: {
+                companyId: { type: 'integer' },
+                companyName: { type: 'text' },
+                startYear: { type: 'integer' },
+                startMonth: { type: 'integer' },
+                endYear: { type: 'integer' },
+                endMonth: { type: 'integer' },
+                description: { type: 'text' },
+                jobTitle: { type: 'text' },
+              }
             }
           }
         }
@@ -100,7 +114,9 @@ export class CVConsumer {
           'skills',
           'skills.skillSubject',
           'educations',
-          'educations.school'
+          'educations.school',
+          'workExperiences',
+          'workExperiences.company',
         ]
       });
       if (!cv) {
@@ -141,6 +157,16 @@ export class CVConsumer {
             fieldOfStudy: education.fieldOfStudy,
             description: education.description,
           }), cv.educations),
+          workExperiences: R.map(workExperience => ({
+            companyId: workExperience.company.id,
+            companyName: workExperience.company.name,
+            startYear: workExperience.startYear,
+            startMonth: workExperience.startMonth,
+            endYear: workExperience.endYear,
+            endMonth: workExperience.endMonth,
+            description: workExperience.description,
+            jobTitle: workExperience.jobTitle,
+          }), cv.workExperiences),
         },
       });
     } catch(err) {
