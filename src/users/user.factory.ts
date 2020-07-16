@@ -8,6 +8,10 @@ define(User, (faker: typeof Faker) => {
   user.username = faker.internet.email();
   user.firstName = faker.name.firstName();
   user.lastName = faker.name.lastName();
+  user.jobTitle = faker.name.jobTitle();
+  user.phone = faker.phone.phoneNumber();
+  user.location = `${faker.address.county()}, ${faker.address.city()}`;
+  user.email = user.username;
   user.password = faker.internet.password(10, false);
   user.salt = bcrypt.genSaltSync();
   return user

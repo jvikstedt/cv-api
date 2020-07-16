@@ -3,13 +3,29 @@ import { IsOptional, IsString } from 'class-validator';
 export class PatchUserDto {
   @IsOptional()
   @IsString()
-  firstName?: string = '';
+  firstName?: string;
 
   @IsOptional()
   @IsString()
-  lastName?: string = '';
+  lastName?: string;
 
   @IsOptional()
   @IsString()
   avatarId?: string;
+
+  @IsOptional()
+  @IsString()
+  jobTitle?: string;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
 }
