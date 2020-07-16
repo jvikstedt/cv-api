@@ -37,6 +37,7 @@ export class CVService {
 
     await this.cvQueue.add(EventType.Reload, {
       id: cvId,
+      updateTimestamp: true,
     }, {
       delay: cvReloadDelay,
     });
@@ -60,7 +61,7 @@ export class CVService {
   }
 
   async search(searchCVDto: SearchCVDto): Promise<CV[]> {
-    const body = esb.requestBodySearch().query(
+    let body = esb.requestBodySearch().query(
       esb.boolQuery()
         .must([
           R.isEmpty(searchCVDto.fullName) ? esb.matchAllQuery() : esb.matchQuery('fullName', searchCVDto.fullName),
@@ -78,6 +79,10 @@ export class CVService {
             R.reject(skill => skill.required, searchCVDto.skills))
         )
     );
+
+    if (searchCVDto.sorts) {
+      body = body.sorts(R.map(sort => new esb.Sort(sort.field, sort.order) as esb.Sort, searchCVDto.sorts))
+    }
 
     const res = await this.elasticsearchService.search({
       index: ELASTIC_INDEX_CV,

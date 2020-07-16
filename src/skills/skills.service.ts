@@ -28,6 +28,7 @@ export class SkillsService {
 
     await this.cvQueue.add(EventType.Reload, {
       id: cvId,
+      updateTimestamp: true,
     }, {
       delay: cvReloadDelay,
     });
@@ -46,6 +47,7 @@ export class SkillsService {
 
     await this.cvQueue.add(EventType.Reload, {
       id: cvId,
+      updateTimestamp: true,
     }, {
       delay: cvReloadDelay,
     });
@@ -80,6 +82,7 @@ export class SkillsService {
 
     await this.cvQueue.add(EventType.Reload, {
       id: cvId,
+      updateTimestamp: true,
     }, {
       delay: cvReloadDelay,
     });
