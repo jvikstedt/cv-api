@@ -4,15 +4,19 @@ import { Connection } from 'typeorm';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { JwtService } from "@nestjs/jwt";
+import { Queue } from 'bull';
+import { getQueueToken } from '@nestjs/bull';
 import { User } from "../src/users/user.entity";
 import { JwtPayload } from "../src/auth/jwt-payload.interface";
 import { AppModule } from '../src/app.module';
+import { QUEUE_NAME_CV } from '../src/constants';
 
 export class TestHelper {
   public accessToken = '';
   public app: INestApplication;
   public connection: Connection;
   public jwtService: JwtService;
+  public cvQueue: Queue;
 
   public async setup() {
     this.accessToken = '';
@@ -27,6 +31,7 @@ export class TestHelper {
 
     this.connection = module.get<Connection>(Connection);
     this.jwtService = module.get<JwtService>(JwtService);
+    this.cvQueue = module.get<Queue>(getQueueToken(QUEUE_NAME_CV));
 
     await useSeeding({ configName: 'src/config/typeorm.config.ts' });
   }
@@ -49,6 +54,7 @@ export class TestHelper {
   }
 
   public async close(): Promise<void> {
+    await this.cvQueue.removeJobs('*');
     await this.app.close();
   }
 }
