@@ -33,9 +33,12 @@ describe('WorkExperienceRepository', () => {
       const cvId = 2;
       const createWorkExperienceDto: CreateWorkExperienceDto = {
         companyId: 1,
+        jobTitle: 'Developer',
         description: '',
         startYear: 2000,
-        endYear: 2004
+        startMonth: 1,
+        endYear: 2004,
+        endMonth: 12,
       };
       const workExperience = await factory(WorkExperience)().make({ ...createWorkExperienceDto, cvId });
       save.mockResolvedValue(workExperience);

@@ -3,6 +3,7 @@ import { User } from '../users/user.entity';
 import { Skill } from '../skills/skill.entity';
 import { Education } from '../educations/education.entity';
 import { WorkExperience } from '../work_experience/work-experience.entity';
+import { ProjectMembership } from '../project_membership/project-membership.entity';
 
 @Entity()
 export class CV extends BaseEntity {
@@ -24,6 +25,9 @@ export class CV extends BaseEntity {
 
   @OneToMany(() => WorkExperience, workExperience => workExperience.cv)
   workExperiences: WorkExperience[];
+
+  @OneToMany(() => ProjectMembership, projectMembership => projectMembership.cv)
+  projectMemberships: ProjectMembership[];
 
   @Column()
   userId: number;

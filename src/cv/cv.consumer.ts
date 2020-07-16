@@ -81,6 +81,19 @@ export class CVConsumer {
                 description: { type: 'text' },
                 jobTitle: { type: 'text' },
               }
+            },
+
+            projectMemberships: {
+              type: 'nested',
+              properties: {
+                projectId: { type: 'integer' },
+                projectName: { type: 'text' },
+                startYear: { type: 'integer' },
+                startMonth: { type: 'integer' },
+                endYear: { type: 'integer' },
+                endMonth: { type: 'integer' },
+                description: { type: 'text' },
+              }
             }
           }
         }
@@ -121,6 +134,8 @@ export class CVConsumer {
           'educations.school',
           'workExperiences',
           'workExperiences.company',
+          'projectMemberships',
+          'projectMemberships.project',
         ]
       });
       if (!cv) {
@@ -175,49 +190,16 @@ export class CVConsumer {
             description: workExperience.description,
             jobTitle: workExperience.jobTitle,
           }), cv.workExperiences),
+          projectMemberships: R.map(projectMembership => ({
+            projectId: projectMembership.project.id,
+            projectName: projectMembership.project.name,
+            startYear: projectMembership.startYear,
+            startMonth: projectMembership.startMonth,
+            endYear: projectMembership.endYear,
+            endMonth: projectMembership.endMonth,
+            description: projectMembership.description,
+          }), cv.projectMemberships),
         },
-      });
-    } catch(err) {
-      this.logger.error(err);
-      throw err;
-    }
-  }
-
-  @Process(EventType.Insert)
-  async insert(job: Job<any>) {
-    try {
-      await this.cvQueue.add(EventType.Reload, {
-        id: job.data.id,
-      }, {
-        delay: cvReloadDelay,
-      });
-    } catch(err) {
-      this.logger.error(err);
-      throw err;
-    }
-  }
-
-  @Process(EventType.Update)
-  async update(job: Job<any>) {
-    try {
-      await this.cvQueue.add(EventType.Reload, {
-        id: job.data.new.id,
-      }, {
-        delay: cvReloadDelay,
-      });
-    } catch(err) {
-      this.logger.error(err);
-      throw err;
-    }
-  }
-
-  @Process(EventType.Remove)
-  async remove(job: Job<any>) {
-    try {
-      await this.cvQueue.add(EventType.Reload, {
-        id: job.data.id,
-      }, {
-        delay: cvReloadDelay,
       });
     } catch(err) {
       this.logger.error(err);
