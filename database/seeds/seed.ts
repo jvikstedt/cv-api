@@ -77,7 +77,13 @@ export default class Seed implements Seeder {
       .createMany(10);
 
     // Create projects
-    const projects = await factory(Project)()
+    const projects: Project[] = await factory(Project)()
+      .map(async (project: Project) => {
+        const company: Company = companies.sort(() => 0.5 - Math.random()).slice(0, 1)[0];
+        project.company = company;
+
+        return project;
+      })
       .createMany(10);
 
     // Create admin user

@@ -39,11 +39,11 @@ export class ProjectService {
   }
 
   async findAll(): Promise<Project[]> {
-    return this.projectRepository.find();
+    return this.projectRepository.find({ relations: ['company'] });
   }
 
   async findOne(projectId: number): Promise<Project> {
-    const entity = await this.projectRepository.findOne(projectId);
+    const entity = await this.projectRepository.findOne(projectId, { relations: ['company'] });
     if (!entity) {
       throw new NotFoundException();
     }
@@ -62,6 +62,7 @@ export class ProjectService {
     return this.projectRepository
       .createQueryBuilder('project')
       .where("project.name ilike :name", { name: `%${searchProjectDto.name}%` })
+      .leftJoinAndSelect("project.company", "company")
       .limit(searchProjectDto.limit)
       .getMany();
   }

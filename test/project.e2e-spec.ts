@@ -6,6 +6,7 @@ import { PatchProjectDto } from '../src/project/dto/patch-project.dto';
 import { TestHelper } from './test-helper';
 import { User } from '../src/users/user.entity';
 import { CV } from '../src/cv/cv.entity';
+import { Company } from '../src/company/company.entity';
 
 describe('ProjectController (e2e)', () => {
   const testHelper: TestHelper = new TestHelper();
@@ -39,7 +40,8 @@ describe('ProjectController (e2e)', () => {
 
   describe('/project (GET)', () => {
     it('successfully retrieves all companies', async () => {
-      const project = await factory(Project)().create();
+      const company = await factory(Company)().create();
+      const project = await factory(Project)().create({ companyId: company.id });
       const response = await request(app.getHttpServer())
         .get('/project')
         .set('Authorization', `Bearer ${accessToken}`)
@@ -50,6 +52,11 @@ describe('ProjectController (e2e)', () => {
           ...project,
           createdAt: project.createdAt.toJSON(),
           updatedAt: project.updatedAt.toJSON(),
+          company: {
+            ...company,
+            createdAt: company.createdAt.toJSON(),
+            updatedAt: company.updatedAt.toJSON(),
+          }
         }
       ]);
     });
@@ -63,7 +70,8 @@ describe('ProjectController (e2e)', () => {
 
   describe('/project/:id (GET)', () => {
     it('successfully responds requested project', async () => {
-      const project = await factory(Project)().create();
+      const company = await factory(Company)().create();
+      const project = await factory(Project)().create({ companyId: company.id });
       const response = await request(app.getHttpServer())
         .get(`/project/${project.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
@@ -73,6 +81,11 @@ describe('ProjectController (e2e)', () => {
         ...project,
         createdAt: project.createdAt.toJSON(),
         updatedAt: project.updatedAt.toJSON(),
+        company: {
+          ...company,
+          createdAt: company.createdAt.toJSON(),
+          updatedAt: company.updatedAt.toJSON(),
+        }
       });
     });
 
@@ -86,7 +99,8 @@ describe('ProjectController (e2e)', () => {
 
   describe('/project/:id (DELETE)', () => {
     it('deletes project', async () => {
-      const project = await factory(Project)().create();
+      const company = await factory(Company)().create();
+      const project = await factory(Project)().create({ companyId: company.id });
       const response = await request(app.getHttpServer())
         .delete(`/project/${project.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
@@ -105,7 +119,8 @@ describe('ProjectController (e2e)', () => {
 
   describe('/project (POST)', () => {
     it('successfully creates new project', async () => {
-      const newProject = await factory(Project)().make();
+      const company = await factory(Company)().create();
+      const newProject = await factory(Project)().make({ companyId: company.id });
 
       const response = await request(app.getHttpServer())
         .post('/project')
@@ -128,7 +143,8 @@ describe('ProjectController (e2e)', () => {
 
   describe('/project/:projectId (PATCH)', () => {
     it('updates project', async () => {
-      const project = await factory(Project)().create();
+      const company = await factory(Company)().create();
+      const project = await factory(Project)().create({ companyId: company.id });
 
       const patchProjectDto: PatchProjectDto = {
         name: 'Project A',

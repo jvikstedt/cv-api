@@ -56,14 +56,14 @@ export class ProjectMembershipService {
   async findAll(cvId: number): Promise<ProjectMembership[]> {
     return this.projectMembershipRepository.find({
       where: { cvId },
-      relations: ['project'],
+      relations: ['project', 'project.company'],
     });
   }
 
   async findOne(cvId: number, projectMembershipId: number): Promise<ProjectMembership> {
     const entity = await this.projectMembershipRepository.findOne(
       { cvId, id: projectMembershipId },
-      { relations: ['project'] },
+      { relations: ['project', 'project.company'] },
     );
 
     if (!entity) {

@@ -7,6 +7,7 @@ import { Project } from '../src/project/project.entity';
 import { CV } from '../src/cv/cv.entity';
 import { PatchProjectMembershipDto } from '../src/project_membership/dto/patch-project-membership.dto';
 import { TestHelper } from './test-helper';
+import { Company } from '../src/company/company.entity';
 
 describe('ProjectMembershipController (e2e)', () => {
   const testHelper: TestHelper = new TestHelper();
@@ -14,6 +15,7 @@ describe('ProjectMembershipController (e2e)', () => {
 
   let user: User;
   let cv: CV;
+  let company: Company;
   let project: Project;
   let accessToken: string;
 
@@ -26,7 +28,8 @@ describe('ProjectMembershipController (e2e)', () => {
     await testHelper.resetDb();
 
     user = await factory(User)().create();
-    project = await factory(Project)().create();
+    company = await factory(Company)().create();
+    project = await factory(Project)().create({ companyId: company.id });
     cv = await factory(CV)().create({ userId: user.id });
     user.cv = cv;
     user.templates = [];

@@ -1,5 +1,6 @@
 import { Column, PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, Unique, OneToMany } from 'typeorm';
 import { WorkExperience } from '../work_experience/work-experience.entity';
+import { Project } from '../project/project.entity';
 
 @Entity()
 @Unique(['name'])
@@ -12,6 +13,9 @@ export class Company extends BaseEntity {
 
   @OneToMany(() => WorkExperience, workExperience => workExperience.company)
   workExperiences: WorkExperience[];
+
+  @OneToMany(() => Project, project => project.company)
+  projects: Project[];
 
   @CreateDateColumn()
   createdAt: Date;
