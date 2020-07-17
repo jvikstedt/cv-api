@@ -54,7 +54,7 @@ describe('ProjectService', () => {
       const result = await projectService.findOne(1);
       expect(result).toEqual(project);
 
-      expect(projectRepository.findOne).toHaveBeenCalledWith(1);
+      expect(projectRepository.findOne).toHaveBeenCalledWith(1, { relations: ['company'] });
     });
 
     it('throws an error as project is not found', async () => {
@@ -91,7 +91,7 @@ describe('ProjectService', () => {
     });
 
     it('calls projectRepository.createProject(createProjectDto) and successfully retrieves and return project', async () => {
-      const createProjectDto: CreateProjectDto = { name: 'Metropolia' };
+      const createProjectDto: CreateProjectDto = { companyId: 1, name: 'Metropolia' };
       const project = await factory(Project)().make(createProjectDto);
       projectRepository.createProject.mockResolvedValue(project);
       getMany.mockResolvedValue([]);
@@ -115,7 +115,7 @@ describe('ProjectService', () => {
       expect(projectRepository.save).not.toHaveBeenCalled();
       const result = await projectService.patch(1, patchProjectDto);
       expect(result).toEqual({ ...project, ...patchProjectDto });
-      expect(projectRepository.findOne).toHaveBeenCalledWith(1);
+      expect(projectRepository.findOne).toHaveBeenCalledWith(1, { relations: ['company'] });
       expect(projectRepository.save).toHaveBeenCalledWith({ ...project, ...patchProjectDto });
     });
 

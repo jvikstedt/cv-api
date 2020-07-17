@@ -28,5 +28,5 @@ export class SearchCVDto {
 
   @IsOptional()
   @IsArray()
-  sorts: Sort[];
+  sorts?: Sort[];
 }

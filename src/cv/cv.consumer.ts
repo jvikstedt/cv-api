@@ -88,6 +88,8 @@ export class CVConsumer {
               properties: {
                 projectId: { type: 'integer' },
                 projectName: { type: 'text' },
+                companyId: { type: 'integer' },
+                companyName: { type: 'text' },
                 startYear: { type: 'integer' },
                 startMonth: { type: 'integer' },
                 endYear: { type: 'integer' },
@@ -136,6 +138,7 @@ export class CVConsumer {
           'workExperiences.company',
           'projectMemberships',
           'projectMemberships.project',
+          'projectMemberships.project.company',
         ]
       });
       if (!cv) {
@@ -193,6 +196,8 @@ export class CVConsumer {
           projectMemberships: R.map(projectMembership => ({
             projectId: projectMembership.project.id,
             projectName: projectMembership.project.name,
+            companyId: projectMembership.project.company.id,
+            companyName: projectMembership.project.company.name,
             startYear: projectMembership.startYear,
             startMonth: projectMembership.startMonth,
             endYear: projectMembership.endYear,

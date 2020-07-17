@@ -63,7 +63,7 @@ describe('ProjectMembershipService', () => {
       const result = await projectMembershipsService.create(cvId, createProjectMembershipDto);
       expect(result).toEqual(projectMembership);
       expect(projectMembershipRepository.createProjectMembership).toHaveBeenCalledWith(cvId, createProjectMembershipDto);
-      expect(projectMembershipRepository.findOne).toHaveBeenCalledWith({ cvId, id: projectMembershipId }, { relations: ['project'] });
+      expect(projectMembershipRepository.findOne).toHaveBeenCalledWith({ cvId, id: projectMembershipId }, { relations: ['project', 'project.company'] });
     });
   });
 
@@ -81,7 +81,7 @@ describe('ProjectMembershipService', () => {
       expect(projectMembershipRepository.save).not.toHaveBeenCalled();
       const result = await projectMembershipsService.patch(cvId, projectMembershipId, patchProjectMembershipDto);
       expect(result).toEqual({ ...projectMembership, ...patchProjectMembershipDto });
-      expect(projectMembershipRepository.findOne).toHaveBeenCalledWith({ cvId, id: projectMembershipId }, { relations: ['project'] });
+      expect(projectMembershipRepository.findOne).toHaveBeenCalledWith({ cvId, id: projectMembershipId }, { relations: ['project', 'project.company'] });
       expect(projectMembershipRepository.save).toHaveBeenCalledWith({ ...projectMembership, ...patchProjectMembershipDto });
     });
   });
@@ -107,7 +107,7 @@ describe('ProjectMembershipService', () => {
       const result = await projectMembershipsService.findOne(cvId, projectMembershipId);
       expect(result).toEqual(projectMembership);
 
-      expect(projectMembershipRepository.findOne).toHaveBeenCalledWith({ cvId, id: projectMembershipId }, { relations: ['project'] });
+      expect(projectMembershipRepository.findOne).toHaveBeenCalledWith({ cvId, id: projectMembershipId }, { relations: ['project', 'project.company'] });
     });
 
     it('throws an error as projectMembership is not found', async () => {
