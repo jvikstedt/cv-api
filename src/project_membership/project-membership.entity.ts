@@ -1,9 +1,8 @@
-import { PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, ManyToOne, Column, Unique } from 'typeorm';
+import { PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, ManyToOne, Column } from 'typeorm';
 import { CV } from '../cv/cv.entity';
 import { Project } from '../project/project.entity';
 
 @Entity()
-@Unique('PROJECT_MEMBERSHIP_UQ_RELATION', ['project', 'cv'])
 export class ProjectMembership extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;

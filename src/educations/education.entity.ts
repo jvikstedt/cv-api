@@ -1,9 +1,8 @@
-import { PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, ManyToOne, Column, Unique } from 'typeorm';
+import { PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, ManyToOne, Column } from 'typeorm';
 import { CV } from '../cv/cv.entity';
 import { School } from '../schools/school.entity';
 
 @Entity()
-@Unique('EDUCATION_UQ_RELATION', ['school', 'cv'])
 export class Education extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
