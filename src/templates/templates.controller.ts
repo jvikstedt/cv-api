@@ -1,13 +1,12 @@
-import { Controller, Get, Post, Put, Body, Delete, Param, ParseIntPipe, UseGuards, Patch, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, ParseIntPipe, UseGuards, Patch, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
 import { TemplatesService } from './templates.service';
 import { Template } from './template.entity';
-import { CreateTemplateRequestDto } from './dto/create-template-request.dto';
-import { UpdateTemplateDto } from './dto/update-template.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetUser } from '../auth/get-user.decorator';
-import { User } from '../users/user.entity';
 import { PatchTemplateDto } from './dto/patch-template.dto';
+import { CreateTemplateDto } from './dto/create-template.dto';
+import { JwtPayload } from '../auth/jwt-payload.interface';
 
 @ApiBearerAuth()
 @ApiTags('templates')
@@ -24,18 +23,8 @@ export class TemplatesController {
     whitelist: true,
     exceptionFactory: (errors) => new BadRequestException(errors)
   }))
-  create(@Body() createTemplateRequestDto: CreateTemplateRequestDto, @GetUser() user: User): Promise<Template> {
-    return this.templatesService.create({ ...createTemplateRequestDto, userId: user.id });
-  }
-
-  @Put('/:id')
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateTemplateDto: UpdateTemplateDto): Promise<Template> {
-    return this.templatesService.update(id, updateTemplateDto);
+  create(@GetUser() user: JwtPayload, @Body() createTemplateDto: CreateTemplateDto): Promise<Template> {
+    return this.templatesService.create(user.userId, createTemplateDto);
   }
 
   @Patch('/:id')

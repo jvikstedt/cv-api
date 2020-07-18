@@ -1,7 +1,14 @@
-import { IsNotEmpty } from 'class-validator';
-import { CreateTemplateRequestDto } from './create-template-request.dto';
+import { IsNotEmpty, IsIn, IsString } from 'class-validator';
 
-export class CreateTemplateDto extends CreateTemplateRequestDto {
+export class CreateTemplateDto {
   @IsNotEmpty()
-  userId: number;
+  @IsString()
+  name: string;
+
+  @IsNotEmpty()
+  @IsIn(['pdf'])
+  exporter: "pdf";
+
+  @IsNotEmpty()
+  data: any;
 }
