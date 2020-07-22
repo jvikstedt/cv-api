@@ -71,13 +71,28 @@ export class CVService {
               .query(esb.termQuery('skills.skillSubjectId', skill.skillSubjectId)),
             R.filter(skill => skill.required, searchCVDto.skills))
         ])
-        .should(
-          R.map((skill: SkillSearch) =>
+        .should([
+          ...R.isEmpty(searchCVDto.text) ? [] : [
+            esb.nestedQuery()
+              .path('workExperiences')
+              .query(esb.matchQuery('workExperiences.companyName', searchCVDto.text)),
+          ],
+          ...R.isEmpty(searchCVDto.text) ? [] : [
+            esb.nestedQuery()
+              .path('educations')
+              .query(esb.multiMatchQuery(['educations.schoolName', 'educations.degree', 'educations.fieldOfStudy'], searchCVDto.text)),
+          ],
+          ...R.isEmpty(searchCVDto.text) ? [] : [
+            esb.nestedQuery()
+              .path('projectMemberships')
+              .query(esb.multiMatchQuery(['projectMemberships.projectName', 'projectMemberships.companyName'], searchCVDto.text)),
+          ],
+          ...R.map((skill: SkillSearch) =>
             esb.nestedQuery()
               .path('skills')
               .query(esb.termQuery('skills.skillSubjectId', skill.skillSubjectId)),
             R.reject(skill => skill.required, searchCVDto.skills))
-        )
+        ])
     );
 
     if (searchCVDto.sorts) {

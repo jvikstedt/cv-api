@@ -20,6 +20,9 @@ export class SearchCVDto {
   @IsString()
   fullName?: string = '';
 
+  @IsString()
+  text?: string = '';
+
   @IsNumber()
   limit?: number = 10;
 
