@@ -11,6 +11,9 @@ export class Skill extends BaseEntity {
   @Column({ type: 'real' })
   experienceInYears: number;
 
+  @Column({ default: false })
+  highlight: boolean;
+
   @ManyToOne(() => CV, cv => cv.skills, {
     nullable: false,
   })

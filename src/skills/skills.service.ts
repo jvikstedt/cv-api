@@ -40,9 +40,7 @@ export class SkillsService {
     const oldSkill = await this.findOne(cvId, skillId);
 
     const newSkill = await this.skillRepository.save(
-      R.merge(oldSkill, {
-        experienceInYears: patchSkillDto.experienceInYears,
-      }),
+      R.merge(oldSkill, patchSkillDto),
     );
 
     await this.cvQueue.add(EventType.Reload, {

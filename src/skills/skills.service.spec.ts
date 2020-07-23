@@ -44,7 +44,11 @@ describe('SkillsService', () => {
 
   describe('create', () => {
     it('calls skillRepository.createSkill(createSkillDto) and successfully retrieves and return skill', async () => {
-      const createSkillDto: CreateSkillDto = { skillSubjectId: 2, experienceInYears: 2 };
+      const createSkillDto: CreateSkillDto = {
+        skillSubjectId: 2,
+        experienceInYears: 2,
+        highlight: false
+      };
       const skill = await factory(Skill)().make({ id: 1, ...createSkillDto });
       skillRepository.createSkill.mockResolvedValue(skill);
       skillRepository.findOne.mockResolvedValue(skill);

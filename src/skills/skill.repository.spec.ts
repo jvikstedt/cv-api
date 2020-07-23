@@ -31,7 +31,11 @@ describe('SkillRepository', () => {
 
     it('returns created skill', async () => {
       const cvId = 2;
-      const createSkillDto: CreateSkillDto = { skillSubjectId: 1, experienceInYears: 2 };
+      const createSkillDto: CreateSkillDto = {
+        skillSubjectId: 1,
+        experienceInYears: 2,
+        highlight: false
+      };
       const skill = await factory(Skill)().make({ ...createSkillDto, cvId });
       save.mockResolvedValue(skill);
 
