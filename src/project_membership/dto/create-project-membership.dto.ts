@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsOptional } from 'class-validator';
+import { IsNumber, IsString, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateProjectMembershipDto {
   @IsNumber()
@@ -20,4 +20,7 @@ export class CreateProjectMembershipDto {
   @IsOptional()
   @IsNumber()
   endMonth: number;
+
+  @IsBoolean()
+  highlight: boolean;
 }

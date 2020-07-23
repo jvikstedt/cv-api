@@ -22,6 +22,9 @@ export class ProjectMembership extends BaseEntity {
   @Column({ type: 'smallint', nullable: true })
   endMonth: number;
 
+  @Column({ default: false })
+  highlight: boolean;
+
   @ManyToOne(() => CV, cv => cv.projectMemberships, {
     nullable: false,
   })

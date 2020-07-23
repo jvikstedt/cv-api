@@ -1,4 +1,4 @@
-import { IsOptional, IsNumber, IsString } from 'class-validator';
+import { IsOptional, IsNumber, IsString, IsBoolean } from 'class-validator';
 
 export class PatchProjectMembershipDto {
   @IsOptional()
@@ -20,4 +20,8 @@ export class PatchProjectMembershipDto {
   @IsOptional()
   @IsNumber()
   endMonth?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  highlight?: boolean;
 }

@@ -22,6 +22,9 @@ export class Education extends BaseEntity {
   @Column({ type: 'smallint', nullable: true })
   endYear: number;
 
+  @Column({ default: false })
+  highlight: boolean;
+
   @ManyToOne(() => CV, cv => cv.educations, {
     nullable: false,
   })
