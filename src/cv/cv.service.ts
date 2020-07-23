@@ -73,16 +73,13 @@ export class CVService {
         ])
         .should([
           ...R.isEmpty(searchCVDto.text) ? [] : [
+            esb.multiMatchQuery(['location', 'jobTitle', 'fullName', 'email'], searchCVDto.text),
             esb.nestedQuery()
               .path('workExperiences')
               .query(esb.matchQuery('workExperiences.companyName', searchCVDto.text)),
-          ],
-          ...R.isEmpty(searchCVDto.text) ? [] : [
             esb.nestedQuery()
               .path('educations')
               .query(esb.multiMatchQuery(['educations.schoolName', 'educations.degree', 'educations.fieldOfStudy'], searchCVDto.text)),
-          ],
-          ...R.isEmpty(searchCVDto.text) ? [] : [
             esb.nestedQuery()
               .path('projectMemberships')
               .query(esb.multiMatchQuery(['projectMemberships.projectName', 'projectMemberships.companyName'], searchCVDto.text)),
