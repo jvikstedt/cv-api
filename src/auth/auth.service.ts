@@ -97,6 +97,7 @@ export class AuthService {
         jobTitle: '',
         phone: '',
         location: '',
+        workExperienceInYears: 1,
         email,
       });
       await user.save();
