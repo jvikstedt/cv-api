@@ -49,7 +49,11 @@ describe('SkillsController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post(`/cv/${cv.id}/skills`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ skillSubjectId: skillSubject.id, experienceInYears: 2 })
+        .send({
+          skillSubjectId: skillSubject.id,
+          experienceInYears: 2,
+          highlight: false,
+        })
         .expect(201)
 
       expect(response.body).toMatchObject({
@@ -57,6 +61,7 @@ describe('SkillsController (e2e)', () => {
         cvId: cv.id,
         skillSubjectId: skillSubject.id,
         experienceInYears: 2,
+        highlight: false,
       });;
     });
 

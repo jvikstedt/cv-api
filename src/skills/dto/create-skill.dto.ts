@@ -1,4 +1,4 @@
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsBoolean } from 'class-validator';
 
 export class CreateSkillDto {
   @IsNumber()
@@ -6,4 +6,7 @@ export class CreateSkillDto {
 
   @IsNumber()
   experienceInYears: number;
+
+  @IsBoolean()
+  highlight: boolean;
 }
