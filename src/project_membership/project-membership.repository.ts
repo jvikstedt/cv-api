@@ -13,6 +13,7 @@ export class ProjectMembershipRepository extends Repository<ProjectMembership> {
       startMonth: createProjectMembershipDto.startMonth,
       endYear: createProjectMembershipDto.endYear,
       endMonth: createProjectMembershipDto.endMonth,
+      highlight: createProjectMembershipDto.highlight,
     });
     return projectMembership.save();
   }

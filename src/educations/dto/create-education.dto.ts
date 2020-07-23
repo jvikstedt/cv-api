@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsOptional } from 'class-validator';
+import { IsNumber, IsString, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateEducationDto {
   @IsNumber()
@@ -19,4 +19,7 @@ export class CreateEducationDto {
   @IsOptional()
   @IsNumber()
   endYear: number;
+
+  @IsBoolean()
+  highlight: boolean;
 }

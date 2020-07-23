@@ -12,7 +12,8 @@ export class EducationRepository extends Repository<Education> {
       fieldOfStudy: createEducationDto.fieldOfStudy,
       description: createEducationDto.description,
       startYear: createEducationDto.startYear,
-      endYear: createEducationDto.endYear
+      endYear: createEducationDto.endYear,
+      highlight: createEducationDto.highlight,
     });
     return education.save();
   }

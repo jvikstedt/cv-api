@@ -22,6 +22,7 @@ define(ProjectMembership, (faker: typeof Faker) => {
   projectMembership.endYear = projectMembership.startYear + 4;
 
   projectMembership.description = faker.lorem.words(10);
+  projectMembership.highlight = false;
 
   return projectMembership;
 })

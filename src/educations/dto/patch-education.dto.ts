@@ -1,4 +1,4 @@
-import { IsOptional, IsNumber, IsString } from 'class-validator';
+import { IsOptional, IsNumber, IsString, IsBoolean } from 'class-validator';
 
 export class PatchEducationDto {
   @IsOptional()
@@ -20,4 +20,8 @@ export class PatchEducationDto {
   @IsOptional()
   @IsNumber()
   endYear?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  highlight?: boolean;
 }

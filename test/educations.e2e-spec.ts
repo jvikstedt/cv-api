@@ -51,6 +51,7 @@ describe('EducationsController (e2e)', () => {
           fieldOfStudy: 'Computer Software Engineering',
           description: '',
           startYear: 2000,
+          highlight: false,
         })
         .expect(201)
 
