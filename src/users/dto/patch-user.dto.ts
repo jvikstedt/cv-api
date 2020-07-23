@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsNumber } from 'class-validator';
 
 export class PatchUserDto {
   @IsOptional()
@@ -24,6 +24,10 @@ export class PatchUserDto {
   @IsOptional()
   @IsString()
   location?: string;
+
+  @IsOptional()
+  @IsNumber()
+  experienceInYears?: number;
 
   @IsOptional()
   @IsString()

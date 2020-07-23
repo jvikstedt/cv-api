@@ -14,5 +14,10 @@ define(User, (faker: typeof Faker) => {
   user.email = user.username;
   user.password = faker.internet.password(10, false);
   user.salt = bcrypt.genSaltSync();
+
+  user.workExperienceInYears = faker.random.number({
+    'min': 1,
+    'max': 20,
+  });
   return user
 })

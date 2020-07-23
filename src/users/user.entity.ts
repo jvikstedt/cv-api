@@ -29,6 +29,9 @@ export class User extends BaseEntity {
   location: string;
 
   @Column()
+  workExperienceInYears: number;
+
+  @Column()
   email: string;
 
   @Column({ select: false, nullable: true })
