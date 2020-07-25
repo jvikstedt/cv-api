@@ -53,6 +53,7 @@ describe('ProjectMembershipService', () => {
         startMonth: 1,
         endYear: 2004,
         endMonth: 12,
+        highlight: false,
       };
       const projectMembership = await factory(ProjectMembership)().make({ id: projectMembershipId, ...createProjectMembershipDto });
       projectMembershipRepository.createProjectMembership.mockResolvedValue(projectMembership);

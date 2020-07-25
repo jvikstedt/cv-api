@@ -37,7 +37,8 @@ describe('EducationRepository', () => {
         fieldOfStudy: 'Computer Software Engineering',
         description: '',
         startYear: 2000,
-        endYear: 2004
+        endYear: 2004,
+        highlight: false,
       };
       const education = await factory(Education)().make({ ...createEducationDto, cvId });
       save.mockResolvedValue(education);
