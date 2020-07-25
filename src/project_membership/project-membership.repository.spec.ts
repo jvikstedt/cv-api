@@ -38,6 +38,7 @@ describe('ProjectMembershipRepository', () => {
         startMonth: 1,
         endYear: 2004,
         endMonth: 12,
+        highlight: false,
       };
       const projectMembership = await factory(ProjectMembership)().make({ ...createProjectMembershipDto, cvId });
       save.mockResolvedValue(projectMembership);
