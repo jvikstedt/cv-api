@@ -1,13 +1,24 @@
 import * as puppeteer from 'puppeteer';
+import * as nunjucks from "nunjucks";
+import createReport from 'docx-templates';
+import * as fs from 'fs';
 import { Injectable } from '@nestjs/common';
 import { ExportPdfDto } from './dto/export-pdf.dto';
+import { ExportDocxDto } from './dto/export-docx.dto';
 
 @Injectable()
 export class ExportersService {
   async exportPdf(exportPdfDto: ExportPdfDto): Promise<Buffer> {
+    nunjucks.configure({ autoescape: true });
+
+    const content = nunjucks.renderString(
+      exportPdfDto.bodyTemplate,
+      exportPdfDto.data
+    );
+
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-    await page.setContent(exportPdfDto.content);
+    await page.setContent(content);
     const buffer = await page.pdf({
       scale: exportPdfDto.scale,
       displayHeaderFooter: exportPdfDto.displayHeaderFooter,
@@ -28,6 +39,18 @@ export class ExportersService {
       preferCSSPageSize: exportPdfDto.preferCSSPageSize,
     });
     await browser.close();
+    return buffer;
+  }
+
+  async exportDocx(exportDocxDto: ExportDocxDto): Promise<Uint8Array> {
+    const fileId = exportDocxDto.fileId;
+    const template = fs.readFileSync(`./files/${fileId}`);
+
+    const buffer = await createReport({
+      template,
+      data: exportDocxDto.data,
+    });
+
     return buffer;
   }
 }
