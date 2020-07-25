@@ -31,7 +31,6 @@ export class ExportersController {
   }
 
   @Post('/docx/export')
-  // @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
   @UsePipes(new ValidationPipe({
     transform: true,
     whitelist: true,
@@ -40,7 +39,6 @@ export class ExportersController {
   exportDocx(@Res() res: Response, @Body() exportDocxDto: ExportDocxDto) {
     this.exportersService.exportDocx(exportDocxDto)
       .then(response => {
-        // res.send(response);
         const readStream = new stream.PassThrough();
         readStream.end(response);
         res.set("Content-disposition", 'attachment; filename=' + "output.docx");

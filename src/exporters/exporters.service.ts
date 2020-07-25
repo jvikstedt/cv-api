@@ -1,13 +1,21 @@
+import { InjectRepository } from '@nestjs/typeorm';
 import * as puppeteer from 'puppeteer';
 import * as nunjucks from "nunjucks";
 import createReport from 'docx-templates';
 import * as fs from 'fs';
-import { Injectable } from '@nestjs/common';
+import * as path from 'path';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ExportPdfDto } from './dto/export-pdf.dto';
 import { ExportDocxDto } from './dto/export-docx.dto';
+import { FileRepository } from '../files/file.repository';
 
 @Injectable()
 export class ExportersService {
+  constructor(
+    @InjectRepository(FileRepository)
+    private readonly fileRepository: FileRepository,
+  ) {}
+
   async exportPdf(exportPdfDto: ExportPdfDto): Promise<Buffer> {
     nunjucks.configure({ autoescape: true });
 
@@ -49,6 +57,18 @@ export class ExportersService {
     const buffer = await createReport({
       template,
       data: exportDocxDto.data,
+      additionalJsContext: {
+        image: async (id: string, width: number, height: number) => {
+          const entity = await this.fileRepository.findOne(id);
+          if (!entity) {
+            throw new NotFoundException();
+          }
+          const extension = path.extname(entity.originalname)
+          const file = fs.readFileSync(`./files/${id}`);
+
+          return { width, height, data: file, extension };
+        },
+      }
     });
 
     return buffer;
