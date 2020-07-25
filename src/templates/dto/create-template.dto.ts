@@ -6,8 +6,8 @@ export class CreateTemplateDto {
   name: string;
 
   @IsNotEmpty()
-  @IsIn(['pdf'])
-  exporter: "pdf";
+  @IsIn(['pdf', 'docx'])
+  exporter: 'pdf' | 'docx';
 
   @IsNotEmpty()
   data: any;
