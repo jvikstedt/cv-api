@@ -1,4 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
+import * as R from 'ramda';
 import * as puppeteer from 'puppeteer';
 import * as nunjucks from "nunjucks";
 import createReport from 'docx-templates';
@@ -58,6 +59,7 @@ export class ExportersService {
       template,
       data: exportDocxDto.data,
       additionalJsContext: {
+        R,
         image: async (id: string, width: number, height: number) => {
           const entity = await this.fileRepository.findOne(id);
           if (!entity) {
