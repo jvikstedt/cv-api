@@ -12,6 +12,7 @@ async function bootstrap() {
   const serverConfig = config.get(CONFIG_SERVER);
   const logger = new Logger('bootstrap');
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
 
   const options = new DocumentBuilder()
     .setTitle('CV')
