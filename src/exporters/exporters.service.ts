@@ -5,7 +5,7 @@ import * as nunjucks from "nunjucks";
 import createReport from 'docx-templates';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ExportPdfDto } from './dto/export-pdf.dto';
 import { ExportDocxDto } from './dto/export-docx.dto';
 import { FileRepository } from '../files/file.repository';
@@ -61,9 +61,12 @@ export class ExportersService {
       additionalJsContext: {
         R,
         image: async (id: string, width: number, height: number) => {
+          if (!id) {
+            return null;
+          }
           const entity = await this.fileRepository.findOne(id);
           if (!entity) {
-            throw new NotFoundException();
+            return null;
           }
           const extension = path.extname(entity.originalname)
           const file = fs.readFileSync(`./files/${id}`);
