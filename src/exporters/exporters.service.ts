@@ -70,6 +70,13 @@ export class ExportersService {
 
           return { width, height, data: file, extension };
         },
+        formatYearMonth: (month: number | null, year: number | null) => {
+          if (month && year) {
+            return `${month}.${year}`;
+          }
+
+          return `${month ? month : ''}${year ? year : ''}`;
+        }
       }
     });
 
