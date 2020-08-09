@@ -58,6 +58,7 @@ export class ExportersService {
     const buffer = await createReport({
       template,
       data: exportDocxDto.data,
+      cmdDelimiter: ['{{', '}}'],
       additionalJsContext: {
         R,
         image: async (id: string, width: number, height: number) => {
