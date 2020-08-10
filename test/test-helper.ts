@@ -3,11 +3,11 @@ import { useSeeding } from 'typeorm-seeding';
 import { Connection } from 'typeorm';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { JwtService } from "@nestjs/jwt";
+import { JwtService } from '@nestjs/jwt';
 import { Queue } from 'bull';
 import { getQueueToken } from '@nestjs/bull';
-import { User } from "../src/users/user.entity";
-import { JwtPayload } from "../src/auth/jwt-payload.interface";
+import { User } from '../src/users/user.entity';
+import { JwtPayload } from '../src/auth/jwt-payload.interface';
 import { AppModule } from '../src/app.module';
 import { QUEUE_NAME_CV } from '../src/constants';
 
@@ -18,13 +18,12 @@ export class TestHelper {
   public jwtService: JwtService;
   public cvQueue: Queue;
 
-  public async setup() {
+  public async setup(): Promise<void> {
     this.accessToken = '';
 
     const module = await Test.createTestingModule({
       imports: [AppModule],
-    })
-    .compile();
+    }).compile();
 
     this.app = module.createNestApplication();
     await this.app.init();
@@ -43,7 +42,7 @@ export class TestHelper {
       firstName: user.firstName,
       lastName: user.lastName,
       cvIds: [user.cv.id],
-      templateIds: R.map(t => t.id, user.templates),
+      templateIds: R.map((t) => t.id, user.templates),
     };
     this.accessToken = this.jwtService.sign(payload);
     return this.accessToken;

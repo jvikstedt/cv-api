@@ -5,10 +5,7 @@ import { AuthModule } from '../auth/auth.module';
 import { ProjectModule } from './project.module';
 
 @Module({
-  imports: [
-    ProjectModule,
-    AuthModule,
-  ],
+  imports: [ProjectModule, AuthModule],
   controllers: [ProjectController],
   providers: [ProjectService],
 })

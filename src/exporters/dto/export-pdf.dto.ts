@@ -1,14 +1,38 @@
-import { IsNotEmpty, Min, Max, IsNumber, IsBoolean, IsString, IsIn, IsOptional, IsObject } from 'class-validator';
+import {
+  IsNotEmpty,
+  Min,
+  Max,
+  IsNumber,
+  IsBoolean,
+  IsString,
+  IsIn,
+  IsOptional,
+  IsObject,
+} from 'class-validator';
 
-const ALLOWED_FORMATS = ["", "Letter", "Legal", "Tabloid", "Ledger", "A0", "A1", "A2", "A3", "A4", "A5", "A6"];
+const ALLOWED_FORMATS = [
+  '',
+  'Letter',
+  'Legal',
+  'Tabloid',
+  'Ledger',
+  'A0',
+  'A1',
+  'A2',
+  'A3',
+  'A4',
+  'A5',
+  'A6',
+];
 
 export class ExportPdfDto {
   @IsOptional()
   @IsNotEmpty()
-  bodyTemplate? = "";
+  bodyTemplate? = '';
 
   @IsOptional()
   @IsObject()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any = {};
 
   @IsOptional()
@@ -23,11 +47,11 @@ export class ExportPdfDto {
 
   @IsOptional()
   @IsString()
-  headerTemplate? = "";
+  headerTemplate? = '';
 
   @IsOptional()
   @IsString()
-  footerTemplate? = "";
+  footerTemplate? = '';
 
   @IsOptional()
   @IsBoolean()
@@ -39,36 +63,36 @@ export class ExportPdfDto {
 
   @IsOptional()
   @IsString()
-  pageRanges? = "";
+  pageRanges? = '';
 
   @IsOptional()
   @IsString()
   @IsIn(ALLOWED_FORMATS)
-  format? = "Letter";
+  format? = 'Letter';
 
   @IsOptional()
   @IsString()
-  width? = "";
+  width? = '';
 
   @IsOptional()
   @IsString()
-  height? = "";
+  height? = '';
 
   @IsOptional()
   @IsString()
-  marginTop? = "0px";
+  marginTop? = '0px';
 
   @IsOptional()
   @IsString()
-  marginRight? = "0px";
+  marginRight? = '0px';
 
   @IsOptional()
   @IsString()
-  marginBottom? = "0px";
+  marginBottom? = '0px';
 
   @IsOptional()
   @IsString()
-  marginLeft? = "0px";
+  marginLeft? = '0px';
 
   @IsOptional()
   @IsBoolean()

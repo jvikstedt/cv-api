@@ -6,11 +6,7 @@ import { EducationsModule } from './educations.module';
 import { CVModule } from '../cv/cv.module';
 
 @Module({
-  imports: [
-    EducationsModule,
-    AuthModule,
-    CVModule,
-  ],
+  imports: [EducationsModule, AuthModule, CVModule],
   controllers: [EducationsController],
   providers: [EducationsService],
 })

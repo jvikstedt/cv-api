@@ -7,7 +7,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserRepository } from './user.repository';
 import { PatchUserDto } from './dto/patch-user.dto';
 import { User } from './user.entity';
-import { QUEUE_NAME_CV, CONFIG_QUEUE, CONFIG_QUEUE_CV_RELOAD, EventType } from '../constants';
+import {
+  QUEUE_NAME_CV,
+  CONFIG_QUEUE,
+  CONFIG_QUEUE_CV_RELOAD,
+  EventType,
+} from '../constants';
 
 const queueConfig = config.get(CONFIG_QUEUE);
 const cvReloadDelay = queueConfig[CONFIG_QUEUE_CV_RELOAD];
@@ -33,7 +38,9 @@ export class UsersService {
   }
 
   async patch(userId: number, patchUserDto: PatchUserDto): Promise<User> {
-    const oldUser = await this.userRepository.findOne(userId, { relations: ['cv'] });
+    const oldUser = await this.userRepository.findOne(userId, {
+      relations: ['cv'],
+    });
     if (!oldUser) {
       throw new NotFoundException();
     }
@@ -43,12 +50,16 @@ export class UsersService {
     );
 
     if (oldUser.cv) {
-      await this.cvQueue.add(EventType.Reload, {
-        id: oldUser.cv.id,
-        updateTimestamp: true,
-      }, {
-        delay: cvReloadDelay,
-      });
+      await this.cvQueue.add(
+        EventType.Reload,
+        {
+          id: oldUser.cv.id,
+          updateTimestamp: true,
+        },
+        {
+          delay: cvReloadDelay,
+        },
+      );
     }
 
     return newUser;

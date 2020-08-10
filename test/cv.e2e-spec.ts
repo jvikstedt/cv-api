@@ -46,13 +46,13 @@ describe('CVController (e2e)', () => {
         .patch(`/cv/${cv.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send(patchSkillDto)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject({
         id: cv.id,
         userId: user.id,
         description: patchSkillDto.description,
-      });;
+      });
     });
 
     it('responds with forbidden (403) when trying to modify someone elses cv', async () => {
@@ -64,24 +64,23 @@ describe('CVController (e2e)', () => {
         .patch(`/cv/10`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send(patchSkillDto)
-        .expect(403)
+        .expect(403);
     });
   });
-
 
   describe('/cv (GET)', () => {
     it('returns cvs', async () => {
       const response = await request(app.getHttpServer())
         .get(`/cv`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject([
         {
           ...cv,
           createdAt: cv.createdAt.toJSON(),
           updatedAt: cv.updatedAt.toJSON(),
-        }
+        },
       ]);
     });
   });
@@ -91,7 +90,7 @@ describe('CVController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .get(`/cv/${cv.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject({
         ...cv,
@@ -102,7 +101,7 @@ describe('CVController (e2e)', () => {
       await request(app.getHttpServer())
         .get('/cv/10')
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
   });
 });

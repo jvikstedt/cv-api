@@ -1,4 +1,11 @@
-import { Controller, Param, ParseIntPipe, UseGuards, Patch, Body } from '@nestjs/common';
+import {
+  Controller,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  Patch,
+  Body,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
@@ -11,13 +18,14 @@ import { UserGuard } from './user.guard';
 @Controller('users')
 @UseGuards(AuthGuard())
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-  ) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Patch('/:userId')
   @UseGuards(UserGuard)
-  patch(@Param('userId', ParseIntPipe) userId: number, @Body() patchUserDto: PatchUserDto): Promise<User> {
+  patch(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Body() patchUserDto: PatchUserDto,
+  ): Promise<User> {
     return this.usersService.patch(userId, patchUserDto);
   }
 }

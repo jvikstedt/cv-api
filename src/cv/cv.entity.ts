@@ -1,4 +1,14 @@
-import { Column, PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, OneToOne, OneToMany, JoinColumn } from 'typeorm';
+import {
+  Column,
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../users/user.entity';
 import { Skill } from '../skills/skill.entity';
 import { Education } from '../educations/education.entity';
@@ -13,20 +23,23 @@ export class CV extends BaseEntity {
   @Column()
   description: string;
 
-  @OneToOne(() => User, user => user.cv)
+  @OneToOne(() => User, (user) => user.cv)
   @JoinColumn()
   user: User;
 
-  @OneToMany(() => Skill, skill => skill.cv)
+  @OneToMany(() => Skill, (skill) => skill.cv)
   skills: Skill[];
 
-  @OneToMany(() => Education, education => education.cv)
+  @OneToMany(() => Education, (education) => education.cv)
   educations: Education[];
 
-  @OneToMany(() => WorkExperience, workExperience => workExperience.cv)
+  @OneToMany(() => WorkExperience, (workExperience) => workExperience.cv)
   workExperiences: WorkExperience[];
 
-  @OneToMany(() => ProjectMembership, projectMembership => projectMembership.cv)
+  @OneToMany(
+    () => ProjectMembership,
+    (projectMembership) => projectMembership.cv,
+  )
   projectMemberships: ProjectMembership[];
 
   @Column()

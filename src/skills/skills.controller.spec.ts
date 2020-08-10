@@ -25,15 +25,10 @@ describe('SkillsController', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-      ],
+      imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
       controllers: [SkillsController],
-      providers: [
-        { provide: SkillsService, useFactory: mockSkillsService },
-      ],
-    })
-    .compile();
+      providers: [{ provide: SkillsService, useFactory: mockSkillsService }],
+    }).compile();
 
     skillsController = module.get<SkillsController>(SkillsController);
     skillsService = module.get<SkillsService>(SkillsService);
@@ -42,7 +37,10 @@ describe('SkillsController', () => {
   describe('patch', () => {
     it('calls service patch with passed data', async () => {
       const patchSkillDto: PatchSkillDto = { experienceInYears: 5 };
-      const oldSkill = await factory(Skill)().make({ id: 1, experienceInYears: 1 });
+      const oldSkill = await factory(Skill)().make({
+        id: 1,
+        experienceInYears: 1,
+      });
       skillsService.patch.mockResolvedValue({ ...oldSkill, ...patchSkillDto });
 
       expect(skillsService.patch).not.toHaveBeenCalled();
@@ -57,7 +55,7 @@ describe('SkillsController', () => {
       const createSkillDto: CreateSkillDto = {
         skillSubjectId: 1,
         experienceInYears: 2,
-        highlight: false
+        highlight: false,
       };
       const skill = await factory(Skill)().make(createSkillDto);
       skillsService.create.mockResolvedValue(skill);

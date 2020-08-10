@@ -52,7 +52,7 @@ describe('WorkExperienceController (e2e)', () => {
           startYear: 2000,
           startMonth: 1,
         })
-        .expect(201)
+        .expect(201);
 
       expect(response.body).toMatchObject({
         id: 1,
@@ -62,7 +62,7 @@ describe('WorkExperienceController (e2e)', () => {
         jobTitle: 'Developer',
         startYear: 2000,
         startMonth: 1,
-      });;
+      });
     });
 
     it('responds with forbidden (403) when trying to add work_experience to someone elses cv', async () => {
@@ -70,10 +70,9 @@ describe('WorkExperienceController (e2e)', () => {
         .post('/cv/10/work_experience')
         .set('Authorization', `Bearer ${accessToken}`)
         .send({ companyId: company.id, description: '' })
-        .expect(403)
+        .expect(403);
     });
   });
-
 
   describe('/cv/:cvId/work_experience/:workExperienceId (PATCH)', () => {
     let workExperience: WorkExperience;
@@ -95,13 +94,13 @@ describe('WorkExperienceController (e2e)', () => {
         .patch(`/cv/${cv.id}/work_experience/${workExperience.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send(patchWorkExperienceDto)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject({
         id: workExperience.id,
         cvId: cv.id,
         ...patchWorkExperienceDto,
-      });;
+      });
     });
 
     it('responds with forbidden (403) when trying to modify workExperience to someone elses cv', async () => {
@@ -109,37 +108,43 @@ describe('WorkExperienceController (e2e)', () => {
         .patch(`/cv/10/work_experience/${workExperience.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send(patchWorkExperienceDto)
-        .expect(403)
+        .expect(403);
     });
   });
 
   describe('/cv/:cvId/work_experience (GET)', () => {
     it('returns work_experience', async () => {
-      const workExperience = await factory(WorkExperience)().create({ cvId: cv.id, companyId: company.id });
+      const workExperience = await factory(WorkExperience)().create({
+        cvId: cv.id,
+        companyId: company.id,
+      });
 
       const response = await request(app.getHttpServer())
         .get(`/cv/${cv.id}/work_experience`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject([
         {
           ...workExperience,
           createdAt: workExperience.createdAt.toJSON(),
           updatedAt: workExperience.updatedAt.toJSON(),
-        }
+        },
       ]);
     });
   });
 
   describe('/cv/:cvId/work_experience/:workExperienceId (GET)', () => {
     it('returns workExperience', async () => {
-      const workExperience = await factory(WorkExperience)().create({ cvId: cv.id, companyId: company.id });
+      const workExperience = await factory(WorkExperience)().create({
+        cvId: cv.id,
+        companyId: company.id,
+      });
 
       const response = await request(app.getHttpServer())
         .get(`/cv/${cv.id}/work_experience/${workExperience.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject({
         ...workExperience,
@@ -150,7 +155,7 @@ describe('WorkExperienceController (e2e)', () => {
       await request(app.getHttpServer())
         .get(`/cv/${cv.id}/work_experience/2`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
   });
 
@@ -168,21 +173,23 @@ describe('WorkExperienceController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .delete(`/cv/${cv.id}/work_experience/${workExperience.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
-      expect(response.body).toMatchObject({ description: workExperience.description });;
+      expect(response.body).toMatchObject({
+        description: workExperience.description,
+      });
 
       await request(app.getHttpServer())
         .get(`/cv/${cv.id}/work_experience/${workExperience.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
 
     it('responds with forbidden (403) when trying to delete workExperience from someone elses cv', async () => {
       await request(app.getHttpServer())
         .delete(`/cv/10/work_experience/${workExperience.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(403)
+        .expect(403);
     });
   });
 });

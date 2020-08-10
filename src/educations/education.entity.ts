@@ -1,4 +1,12 @@
-import { PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, ManyToOne, Column } from 'typeorm';
+import {
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  Column,
+} from 'typeorm';
 import { CV } from '../cv/cv.entity';
 import { School } from '../schools/school.entity';
 
@@ -25,7 +33,7 @@ export class Education extends BaseEntity {
   @Column({ default: false })
   highlight: boolean;
 
-  @ManyToOne(() => CV, cv => cv.educations, {
+  @ManyToOne(() => CV, (cv) => cv.educations, {
     nullable: false,
   })
   cv: CV;
@@ -33,7 +41,7 @@ export class Education extends BaseEntity {
   @Column()
   cvId: number;
 
-  @ManyToOne(() => School, school => school.educations, {
+  @ManyToOne(() => School, (school) => school.educations, {
     nullable: false,
   })
   school: School;

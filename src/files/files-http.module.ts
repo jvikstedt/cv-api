@@ -5,10 +5,7 @@ import { AuthModule } from '../auth/auth.module';
 import { FilesModule } from './files.module';
 
 @Module({
-  imports: [
-    FilesModule,
-    AuthModule,
-  ],
+  imports: [FilesModule, AuthModule],
   controllers: [FilesController],
   providers: [FilesService],
 })

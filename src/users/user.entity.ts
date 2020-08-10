@@ -1,5 +1,16 @@
 import * as bcrypt from 'bcrypt';
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, OneToOne, OneToMany, JoinColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  Unique,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { CV } from '../cv/cv.entity';
 import { Template } from '../templates/template.entity';
 import { File } from '../files/file.entity';
@@ -40,10 +51,10 @@ export class User extends BaseEntity {
   @Column({ select: false, nullable: true })
   salt: string;
 
-  @OneToOne(() => CV, cv => cv.user)
+  @OneToOne(() => CV, (cv) => cv.user)
   cv: CV;
 
-  @OneToMany(() => Template, template => template.user)
+  @OneToMany(() => Template, (template) => template.user)
   templates: Template[];
 
   @OneToOne(() => File)

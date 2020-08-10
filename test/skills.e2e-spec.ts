@@ -30,7 +30,9 @@ describe('SkillsController (e2e)', () => {
 
     user = await factory(User)().create();
     skillGroup = await factory(SkillGroup)().create();
-    skillSubject = await factory(SkillSubject)().create({ skillGroupId: skillGroup.id });
+    skillSubject = await factory(SkillSubject)().create({
+      skillGroupId: skillGroup.id,
+    });
     cv = await factory(CV)().create({ userId: user.id });
     user.cv = cv;
     user.templates = [];
@@ -54,7 +56,7 @@ describe('SkillsController (e2e)', () => {
           experienceInYears: 2,
           highlight: false,
         })
-        .expect(201)
+        .expect(201);
 
       expect(response.body).toMatchObject({
         id: 1,
@@ -62,7 +64,7 @@ describe('SkillsController (e2e)', () => {
         skillSubjectId: skillSubject.id,
         experienceInYears: 2,
         highlight: false,
-      });;
+      });
     });
 
     it('responds with forbidden (403) when trying to add skill to someone elses cv', async () => {
@@ -70,10 +72,9 @@ describe('SkillsController (e2e)', () => {
         .post('/cv/10/skills')
         .set('Authorization', `Bearer ${accessToken}`)
         .send({ skillSubjectId: skillSubject.id, experienceInYears: 2 })
-        .expect(403)
+        .expect(403);
     });
   });
-
 
   describe('/cv/:cvId/skills/:skillId (PATCH)', () => {
     let skill: Skill;
@@ -96,14 +97,14 @@ describe('SkillsController (e2e)', () => {
         .patch(`/cv/${cv.id}/skills/${skill.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send(patchSkillDto)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject({
         id: skill.id,
         cvId: cv.id,
         skillSubjectId: skillSubject.id,
         experienceInYears: 6,
-      });;
+      });
     });
 
     it('responds with forbidden (403) when trying to modify skill to someone elses cv', async () => {
@@ -111,37 +112,43 @@ describe('SkillsController (e2e)', () => {
         .patch(`/cv/10/skills/${skill.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send(patchSkillDto)
-        .expect(403)
+        .expect(403);
     });
   });
 
   describe('/cv/:cvId/skills (GET)', () => {
     it('returns skills', async () => {
-      const skill = await factory(Skill)().create({ cvId: cv.id, skillSubjectId: skillSubject.id });
+      const skill = await factory(Skill)().create({
+        cvId: cv.id,
+        skillSubjectId: skillSubject.id,
+      });
 
       const response = await request(app.getHttpServer())
         .get(`/cv/${cv.id}/skills`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject([
         {
           ...skill,
           createdAt: skill.createdAt.toJSON(),
           updatedAt: skill.updatedAt.toJSON(),
-        }
+        },
       ]);
     });
   });
 
   describe('/cv/:cvId/skills/:skillId (GET)', () => {
     it('returns skill', async () => {
-      const skill = await factory(Skill)().create({ cvId: cv.id, skillSubjectId: skillSubject.id });
+      const skill = await factory(Skill)().create({
+        cvId: cv.id,
+        skillSubjectId: skillSubject.id,
+      });
 
       const response = await request(app.getHttpServer())
         .get(`/cv/${cv.id}/skills/${skill.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject({
         ...skill,
@@ -152,7 +159,7 @@ describe('SkillsController (e2e)', () => {
       await request(app.getHttpServer())
         .get(`/cv/${cv.id}/skills/2`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
   });
 
@@ -170,21 +177,23 @@ describe('SkillsController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .delete(`/cv/${cv.id}/skills/${skill.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
-      expect(response.body).toMatchObject({ experienceInYears: skill.experienceInYears });;
+      expect(response.body).toMatchObject({
+        experienceInYears: skill.experienceInYears,
+      });
 
       await request(app.getHttpServer())
         .get(`/cv/${cv.id}/skills/${skill.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
 
     it('responds with forbidden (403) when trying to delete skill from someone elses cv', async () => {
       await request(app.getHttpServer())
         .delete(`/cv/10/skills/${skill.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(403)
+        .expect(403);
     });
   });
 });

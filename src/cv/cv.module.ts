@@ -4,11 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bull';
 import { CVRepository } from './cv.repository';
 
-import {
-  CONFIG_REDIS,
-  CONFIG_REDIS_PORT,
-  QUEUE_NAME_CV,
-} from '../constants';
+import { CONFIG_REDIS, CONFIG_REDIS_PORT, QUEUE_NAME_CV } from '../constants';
 
 const redisConfig = config.get(CONFIG_REDIS);
 
@@ -21,13 +17,7 @@ const CVQueue = BullModule.registerQueue({
 });
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([CVRepository]),
-    CVQueue,
-  ],
-  exports: [
-    TypeOrmModule,
-    CVQueue,
-  ],
+  imports: [TypeOrmModule.forFeature([CVRepository]), CVQueue],
+  exports: [TypeOrmModule, CVQueue],
 })
 export class CVModule {}

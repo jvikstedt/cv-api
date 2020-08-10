@@ -1,5 +1,9 @@
 import * as R from 'ramda';
-import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from './company.entity';
 import { CompanyRepository } from './company.repository';
@@ -17,21 +21,27 @@ export class CompanyService {
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
     const companies = await this.companyRepository
       .createQueryBuilder()
-      .where("LOWER(name) = LOWER(:name)", {
-        name: createCompanyDto.name
-      }).getMany();
+      .where('LOWER(name) = LOWER(:name)', {
+        name: createCompanyDto.name,
+      })
+      .getMany();
 
     if (companies.length > 0) {
       throw new UnprocessableEntityException();
     }
 
-    const company = await this.companyRepository.createCompany(createCompanyDto);
+    const company = await this.companyRepository.createCompany(
+      createCompanyDto,
+    );
 
     return company;
   }
 
-  async patch(companyId: number, patchCompanyDto: PatchCompanyDto): Promise<Company> {
-    const oldCompany = await this.findOne(companyId)
+  async patch(
+    companyId: number,
+    patchCompanyDto: PatchCompanyDto,
+  ): Promise<Company> {
+    const oldCompany = await this.findOne(companyId);
 
     const newCompany = R.merge(oldCompany, patchCompanyDto);
 
@@ -61,7 +71,7 @@ export class CompanyService {
   async search(searchCompanyDto: SearchCompanyDto): Promise<Company[]> {
     return this.companyRepository
       .createQueryBuilder('company')
-      .where("company.name ilike :name", { name: `%${searchCompanyDto.name}%` })
+      .where('company.name ilike :name', { name: `%${searchCompanyDto.name}%` })
       .limit(searchCompanyDto.limit)
       .getMany();
   }

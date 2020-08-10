@@ -1,4 +1,10 @@
-import { IsNumber, IsString, IsArray, IsBoolean, IsOptional } from 'class-validator';
+import {
+  IsNumber,
+  IsString,
+  IsArray,
+  IsBoolean,
+  IsOptional,
+} from 'class-validator';
 
 export class SkillSearch {
   @IsBoolean()

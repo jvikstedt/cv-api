@@ -1,5 +1,9 @@
 import * as R from 'ramda';
-import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './project.entity';
 import { ProjectRepository } from './project.repository';
@@ -17,21 +21,27 @@ export class ProjectService {
   async create(createProjectDto: CreateProjectDto): Promise<Project> {
     const companies = await this.projectRepository
       .createQueryBuilder()
-      .where("LOWER(name) = LOWER(:name)", {
-        name: createProjectDto.name
-      }).getMany();
+      .where('LOWER(name) = LOWER(:name)', {
+        name: createProjectDto.name,
+      })
+      .getMany();
 
     if (companies.length > 0) {
       throw new UnprocessableEntityException();
     }
 
-    const project = await this.projectRepository.createProject(createProjectDto);
+    const project = await this.projectRepository.createProject(
+      createProjectDto,
+    );
 
     return project;
   }
 
-  async patch(projectId: number, patchProjectDto: PatchProjectDto): Promise<Project> {
-    const oldProject = await this.findOne(projectId)
+  async patch(
+    projectId: number,
+    patchProjectDto: PatchProjectDto,
+  ): Promise<Project> {
+    const oldProject = await this.findOne(projectId);
 
     const newProject = R.merge(oldProject, patchProjectDto);
 
@@ -43,7 +53,9 @@ export class ProjectService {
   }
 
   async findOne(projectId: number): Promise<Project> {
-    const entity = await this.projectRepository.findOne(projectId, { relations: ['company'] });
+    const entity = await this.projectRepository.findOne(projectId, {
+      relations: ['company'],
+    });
     if (!entity) {
       throw new NotFoundException();
     }
@@ -61,8 +73,8 @@ export class ProjectService {
   async search(searchProjectDto: SearchProjectDto): Promise<Project[]> {
     return this.projectRepository
       .createQueryBuilder('project')
-      .where("project.name ilike :name", { name: `%${searchProjectDto.name}%` })
-      .leftJoinAndSelect("project.company", "company")
+      .where('project.name ilike :name', { name: `%${searchProjectDto.name}%` })
+      .leftJoinAndSelect('project.company', 'company')
       .limit(searchProjectDto.limit)
       .getMany();
   }

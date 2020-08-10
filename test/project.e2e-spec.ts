@@ -41,11 +41,13 @@ describe('ProjectController (e2e)', () => {
   describe('/project (GET)', () => {
     it('successfully retrieves all companies', async () => {
       const company = await factory(Company)().create();
-      const project = await factory(Project)().create({ companyId: company.id });
+      const project = await factory(Project)().create({
+        companyId: company.id,
+      });
       const response = await request(app.getHttpServer())
         .get('/project')
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toStrictEqual([
         {
@@ -56,26 +58,26 @@ describe('ProjectController (e2e)', () => {
             ...company,
             createdAt: company.createdAt.toJSON(),
             updatedAt: company.updatedAt.toJSON(),
-          }
-        }
+          },
+        },
       ]);
     });
 
     it('responds with 401 when not authenticated', async () => {
-      await request(app.getHttpServer())
-        .get('/project')
-        .expect(401)
+      await request(app.getHttpServer()).get('/project').expect(401);
     });
   });
 
   describe('/project/:id (GET)', () => {
     it('successfully responds requested project', async () => {
       const company = await factory(Company)().create();
-      const project = await factory(Project)().create({ companyId: company.id });
+      const project = await factory(Project)().create({
+        companyId: company.id,
+      });
       const response = await request(app.getHttpServer())
         .get(`/project/${project.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toStrictEqual({
         ...project,
@@ -85,7 +87,7 @@ describe('ProjectController (e2e)', () => {
           ...company,
           createdAt: company.createdAt.toJSON(),
           updatedAt: company.updatedAt.toJSON(),
-        }
+        },
       });
     });
 
@@ -93,18 +95,20 @@ describe('ProjectController (e2e)', () => {
       await request(app.getHttpServer())
         .get('/project/2')
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
   });
 
   describe('/project/:id (DELETE)', () => {
     it('deletes project', async () => {
       const company = await factory(Company)().create();
-      const project = await factory(Project)().create({ companyId: company.id });
+      const project = await factory(Project)().create({
+        companyId: company.id,
+      });
       const response = await request(app.getHttpServer())
         .delete(`/project/${project.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toEqual({});
     });
@@ -113,22 +117,24 @@ describe('ProjectController (e2e)', () => {
       await request(app.getHttpServer())
         .get('/project/2')
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
   });
 
   describe('/project (POST)', () => {
     it('successfully creates new project', async () => {
       const company = await factory(Company)().create();
-      const newProject = await factory(Project)().make({ companyId: company.id });
+      const newProject = await factory(Project)().make({
+        companyId: company.id,
+      });
 
       const response = await request(app.getHttpServer())
         .post('/project')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(newProject)
-        .expect(201)
+        .expect(201);
 
-      expect(response.body).toMatchObject({ ...newProject, id: 1 });;
+      expect(response.body).toMatchObject({ ...newProject, id: 1 });
     });
 
     it('fails and responds status 400 when name is empty', async () => {
@@ -137,14 +143,16 @@ describe('ProjectController (e2e)', () => {
         .post('/project')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(newProject)
-        .expect(400)
+        .expect(400);
     });
   });
 
   describe('/project/:projectId (PATCH)', () => {
     it('updates project', async () => {
       const company = await factory(Company)().create();
-      const project = await factory(Project)().create({ companyId: company.id });
+      const project = await factory(Project)().create({
+        companyId: company.id,
+      });
 
       const patchProjectDto: PatchProjectDto = {
         name: 'Project A',
@@ -154,12 +162,12 @@ describe('ProjectController (e2e)', () => {
         .patch(`/project/${project.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send(patchProjectDto)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject({
         id: project.id,
         name: patchProjectDto.name,
-      });;
+      });
     });
   });
 });

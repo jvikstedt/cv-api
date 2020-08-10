@@ -1,4 +1,13 @@
-import { Column, PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, OneToMany, Unique } from 'typeorm';
+import {
+  Column,
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  Unique,
+} from 'typeorm';
 import { SkillSubject } from '../skill_subjects/skill-subject.entity';
 
 @Entity()
@@ -10,7 +19,7 @@ export class SkillGroup extends BaseEntity {
   @Column()
   name: string;
 
-  @OneToMany(() => SkillSubject, skillSubject => skillSubject.skillGroup)
+  @OneToMany(() => SkillSubject, (skillSubject) => skillSubject.skillGroup)
   skillSubjects: SkillSubject[];
 
   @CreateDateColumn()

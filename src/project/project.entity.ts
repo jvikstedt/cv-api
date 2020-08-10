@@ -1,4 +1,14 @@
-import { Column, PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, Unique, OneToMany, ManyToOne } from 'typeorm';
+import {
+  Column,
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Unique,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
 import { ProjectMembership } from '../project_membership/project-membership.entity';
 import { Company } from '../company/company.entity';
 
@@ -11,10 +21,13 @@ export class Project extends BaseEntity {
   @Column()
   name: string;
 
-  @OneToMany(() => ProjectMembership, projectMembership => projectMembership.project)
+  @OneToMany(
+    () => ProjectMembership,
+    (projectMembership) => projectMembership.project,
+  )
   projectMemberships: ProjectMembership[];
 
-  @ManyToOne(() => Company, company => company.projects, {
+  @ManyToOne(() => Company, (company) => company.projects, {
     nullable: false,
   })
   company: Company;

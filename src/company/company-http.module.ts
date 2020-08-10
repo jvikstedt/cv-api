@@ -5,10 +5,7 @@ import { AuthModule } from '../auth/auth.module';
 import { CompanyModule } from './company.module';
 
 @Module({
-  imports: [
-    CompanyModule,
-    AuthModule,
-  ],
+  imports: [CompanyModule, AuthModule],
   controllers: [CompanyController],
   providers: [CompanyService],
 })

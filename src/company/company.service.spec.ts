@@ -60,7 +60,9 @@ describe('CompanyService', () => {
     it('throws an error as company is not found', async () => {
       companyRepository.findOne.mockResolvedValue(null);
 
-      await expect(companyService.findOne(1)).rejects.toThrow(NotFoundException);
+      await expect(companyService.findOne(1)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -99,7 +101,9 @@ describe('CompanyService', () => {
       expect(companyRepository.createCompany).not.toHaveBeenCalled();
       const result = await companyService.create(createCompanyDto);
       expect(result).toEqual(company);
-      expect(companyRepository.createCompany).toHaveBeenCalledWith(createCompanyDto);
+      expect(companyRepository.createCompany).toHaveBeenCalledWith(
+        createCompanyDto,
+      );
     });
   });
 
@@ -109,20 +113,28 @@ describe('CompanyService', () => {
       const patchCompanyDto: PatchCompanyDto = { name: 'New company' };
 
       companyRepository.findOne.mockResolvedValue(company);
-      companyRepository.save.mockResolvedValue({ ...company, ...patchCompanyDto });
+      companyRepository.save.mockResolvedValue({
+        ...company,
+        ...patchCompanyDto,
+      });
 
       expect(companyRepository.findOne).not.toHaveBeenCalled();
       expect(companyRepository.save).not.toHaveBeenCalled();
       const result = await companyService.patch(1, patchCompanyDto);
       expect(result).toEqual({ ...company, ...patchCompanyDto });
       expect(companyRepository.findOne).toHaveBeenCalledWith(1);
-      expect(companyRepository.save).toHaveBeenCalledWith({ ...company, ...patchCompanyDto });
+      expect(companyRepository.save).toHaveBeenCalledWith({
+        ...company,
+        ...patchCompanyDto,
+      });
     });
 
     it('throws an error as company is not found', async () => {
       companyRepository.findOne.mockResolvedValue(null);
 
-      await expect(companyService.patch(1, {})).rejects.toThrow(NotFoundException);
+      await expect(companyService.patch(1, {})).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

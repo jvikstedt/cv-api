@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SkillSubject } from './skill-subject.entity';
 import { SkillSubjectRepository } from './skill-subject.repository';
@@ -13,23 +17,31 @@ export class SkillSubjectsService {
     private readonly skillSubjectRepository: SkillSubjectRepository,
   ) {}
 
-  async create(createSkillSubjectDto: CreateSkillSubjectDto): Promise<SkillSubject> {
+  async create(
+    createSkillSubjectDto: CreateSkillSubjectDto,
+  ): Promise<SkillSubject> {
     const skillSubjects = await this.skillSubjectRepository
       .createQueryBuilder()
-      .where("LOWER(name) = LOWER(:name)", {
-        name: createSkillSubjectDto.name
-      }).getMany();
+      .where('LOWER(name) = LOWER(:name)', {
+        name: createSkillSubjectDto.name,
+      })
+      .getMany();
 
     if (skillSubjects.length > 0) {
       throw new UnprocessableEntityException();
     }
 
-    const skillSubject = await this.skillSubjectRepository.createSkillSubject(createSkillSubjectDto);
+    const skillSubject = await this.skillSubjectRepository.createSkillSubject(
+      createSkillSubjectDto,
+    );
 
     return skillSubject;
   }
 
-  async update(id: number, updateSkillSubjectDto: UpdateSkillSubjectDto): Promise<SkillSubject> {
+  async update(
+    id: number,
+    updateSkillSubjectDto: UpdateSkillSubjectDto,
+  ): Promise<SkillSubject> {
     const skillSubject = await this.findOne(id);
 
     skillSubject.name = updateSkillSubjectDto.name;
@@ -42,7 +54,9 @@ export class SkillSubjectsService {
   }
 
   async findOne(id: number): Promise<SkillSubject> {
-    const entity = await this.skillSubjectRepository.findOne(id, { relations: ['skillGroup'] });
+    const entity = await this.skillSubjectRepository.findOne(id, {
+      relations: ['skillGroup'],
+    });
     if (!entity) {
       throw new NotFoundException();
     }
@@ -57,11 +71,15 @@ export class SkillSubjectsService {
     }
   }
 
-  async search(searchSkillSubjectDto: SearchSkillSubjectDto): Promise<SkillSubject[]> {
+  async search(
+    searchSkillSubjectDto: SearchSkillSubjectDto,
+  ): Promise<SkillSubject[]> {
     return this.skillSubjectRepository
       .createQueryBuilder('skillSubject')
-      .where("skillSubject.name ilike :name", { name: `%${searchSkillSubjectDto.name}%` })
-      .leftJoinAndSelect("skillSubject.skillGroup", "skillGroup")
+      .where('skillSubject.name ilike :name', {
+        name: `%${searchSkillSubjectDto.name}%`,
+      })
+      .leftJoinAndSelect('skillSubject.skillGroup', 'skillGroup')
       .limit(searchSkillSubjectDto.limit)
       .getMany();
   }

@@ -55,7 +55,10 @@ describe('EducationsService', () => {
         endYear: 2004,
         highlight: false,
       };
-      const education = await factory(Education)().make({ id: educationId, ...createEducationDto });
+      const education = await factory(Education)().make({
+        id: educationId,
+        ...createEducationDto,
+      });
       educationRepository.createEducation.mockResolvedValue(education);
       educationRepository.findOne.mockResolvedValue(education);
 
@@ -63,8 +66,14 @@ describe('EducationsService', () => {
       expect(educationRepository.findOne).not.toHaveBeenCalled();
       const result = await educationsService.create(cvId, createEducationDto);
       expect(result).toEqual(education);
-      expect(educationRepository.createEducation).toHaveBeenCalledWith(cvId, createEducationDto);
-      expect(educationRepository.findOne).toHaveBeenCalledWith({ cvId, id: educationId }, { relations: ['school'] });
+      expect(educationRepository.createEducation).toHaveBeenCalledWith(
+        cvId,
+        createEducationDto,
+      );
+      expect(educationRepository.findOne).toHaveBeenCalledWith(
+        { cvId, id: educationId },
+        { relations: ['school'] },
+      );
     });
   });
 
@@ -76,14 +85,27 @@ describe('EducationsService', () => {
       const patchEducationDto: PatchEducationDto = { endYear: 2020 };
 
       educationRepository.findOne.mockResolvedValue(education);
-      educationRepository.save.mockResolvedValue({ ...education, ...patchEducationDto });
+      educationRepository.save.mockResolvedValue({
+        ...education,
+        ...patchEducationDto,
+      });
 
       expect(educationRepository.findOne).not.toHaveBeenCalled();
       expect(educationRepository.save).not.toHaveBeenCalled();
-      const result = await educationsService.patch(cvId, educationId, patchEducationDto);
+      const result = await educationsService.patch(
+        cvId,
+        educationId,
+        patchEducationDto,
+      );
       expect(result).toEqual({ ...education, ...patchEducationDto });
-      expect(educationRepository.findOne).toHaveBeenCalledWith({ cvId, id: educationId }, { relations: ['school'] });
-      expect(educationRepository.save).toHaveBeenCalledWith({ ...education, ...patchEducationDto });
+      expect(educationRepository.findOne).toHaveBeenCalledWith(
+        { cvId, id: educationId },
+        { relations: ['school'] },
+      );
+      expect(educationRepository.save).toHaveBeenCalledWith({
+        ...education,
+        ...patchEducationDto,
+      });
     });
   });
 
@@ -108,13 +130,18 @@ describe('EducationsService', () => {
       const result = await educationsService.findOne(cvId, educationId);
       expect(result).toEqual(education);
 
-      expect(educationRepository.findOne).toHaveBeenCalledWith({ cvId, id: educationId }, { relations: ['school'] });
+      expect(educationRepository.findOne).toHaveBeenCalledWith(
+        { cvId, id: educationId },
+        { relations: ['school'] },
+      );
     });
 
     it('throws an error as education is not found', async () => {
       educationRepository.findOne.mockResolvedValue(null);
 
-      await expect(educationsService.findOne(1)).rejects.toThrow(NotFoundException);
+      await expect(educationsService.findOne(1)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -122,18 +149,26 @@ describe('EducationsService', () => {
     it('calls educationRepository.delete(id) and deletes retrieves affected result', async () => {
       const cvId = 2;
       const educationId = 1;
-      const education = await factory(Education)().make({ cvId, id: educationId });
+      const education = await factory(Education)().make({
+        cvId,
+        id: educationId,
+      });
       educationRepository.findOne.mockResolvedValue(education);
 
       expect(educationRepository.delete).not.toHaveBeenCalled();
       await educationsService.remove(cvId, educationId);
-      expect(educationRepository.delete).toHaveBeenCalledWith({ cvId, id: educationId });
+      expect(educationRepository.delete).toHaveBeenCalledWith({
+        cvId,
+        id: educationId,
+      });
     });
 
     it('throws an error if affected result is 0', async () => {
       educationRepository.delete.mockResolvedValue({ affected: 0 });
 
-      await expect(educationsService.remove(2, 1)).rejects.toThrow(NotFoundException);
+      await expect(educationsService.remove(2, 1)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

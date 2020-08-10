@@ -25,32 +25,55 @@ describe('ProjectMembershipController', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-      ],
+      imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
       controllers: [ProjectMembershipController],
       providers: [
-        { provide: ProjectMembershipService, useFactory: mockProjectMembershipService },
+        {
+          provide: ProjectMembershipService,
+          useFactory: mockProjectMembershipService,
+        },
       ],
-    })
-    .compile();
+    }).compile();
 
-    projectMembershipController = module.get<ProjectMembershipController>(ProjectMembershipController);
-    projectMembershipService = module.get<ProjectMembershipService>(ProjectMembershipService);
+    projectMembershipController = module.get<ProjectMembershipController>(
+      ProjectMembershipController,
+    );
+    projectMembershipService = module.get<ProjectMembershipService>(
+      ProjectMembershipService,
+    );
   });
 
   describe('patch', () => {
     it('calls service patch with passed data', async () => {
       const cvId = 2;
       const projectMembershipId = 1;
-      const patchProjectMembershipDto: PatchProjectMembershipDto = { endYear: 2020 };
-      const oldProjectMembership = await factory(ProjectMembership)().make({ id: projectMembershipId, endYear: 2019 });
-      projectMembershipService.patch.mockResolvedValue({ ...oldProjectMembership, ...patchProjectMembershipDto });
+      const patchProjectMembershipDto: PatchProjectMembershipDto = {
+        endYear: 2020,
+      };
+      const oldProjectMembership = await factory(ProjectMembership)().make({
+        id: projectMembershipId,
+        endYear: 2019,
+      });
+      projectMembershipService.patch.mockResolvedValue({
+        ...oldProjectMembership,
+        ...patchProjectMembershipDto,
+      });
 
       expect(projectMembershipService.patch).not.toHaveBeenCalled();
-      const result = await projectMembershipController.patch(cvId, projectMembershipId, patchProjectMembershipDto);
-      expect(projectMembershipService.patch).toHaveBeenCalledWith(cvId, projectMembershipId, patchProjectMembershipDto);
-      expect(result).toEqual({ ...oldProjectMembership, ...patchProjectMembershipDto });
+      const result = await projectMembershipController.patch(
+        cvId,
+        projectMembershipId,
+        patchProjectMembershipDto,
+      );
+      expect(projectMembershipService.patch).toHaveBeenCalledWith(
+        cvId,
+        projectMembershipId,
+        patchProjectMembershipDto,
+      );
+      expect(result).toEqual({
+        ...oldProjectMembership,
+        ...patchProjectMembershipDto,
+      });
     });
   });
 
@@ -66,12 +89,20 @@ describe('ProjectMembershipController', () => {
         endMonth: 12,
         highlight: false,
       };
-      const projectMembership = await factory(ProjectMembership)().make(createProjectMembershipDto);
+      const projectMembership = await factory(ProjectMembership)().make(
+        createProjectMembershipDto,
+      );
       projectMembershipService.create.mockResolvedValue(projectMembership);
 
       expect(projectMembershipService.create).not.toHaveBeenCalled();
-      const result = await projectMembershipController.create(cvId, createProjectMembershipDto);
-      expect(projectMembershipService.create).toHaveBeenCalledWith(cvId, createProjectMembershipDto);
+      const result = await projectMembershipController.create(
+        cvId,
+        createProjectMembershipDto,
+      );
+      expect(projectMembershipService.create).toHaveBeenCalledWith(
+        cvId,
+        createProjectMembershipDto,
+      );
       expect(result).toEqual(projectMembership);
     });
   });
@@ -96,8 +127,14 @@ describe('ProjectMembershipController', () => {
       projectMembershipService.findOne.mockResolvedValue(projectMembership);
 
       expect(projectMembershipService.findOne).not.toHaveBeenCalled();
-      const result = await projectMembershipController.findOne(cvId, projectMembershipId);
-      expect(projectMembershipService.findOne).toHaveBeenCalledWith(cvId, projectMembershipId);
+      const result = await projectMembershipController.findOne(
+        cvId,
+        projectMembershipId,
+      );
+      expect(projectMembershipService.findOne).toHaveBeenCalledWith(
+        cvId,
+        projectMembershipId,
+      );
       expect(result).toEqual(projectMembership);
     });
   });
@@ -110,7 +147,10 @@ describe('ProjectMembershipController', () => {
 
       expect(projectMembershipService.remove).not.toHaveBeenCalled();
       await projectMembershipController.remove(cvId, projectMembershipId);
-      expect(projectMembershipService.remove).toHaveBeenCalledWith(cvId, projectMembershipId);
+      expect(projectMembershipService.remove).toHaveBeenCalledWith(
+        cvId,
+        projectMembershipId,
+      );
     });
   });
 });

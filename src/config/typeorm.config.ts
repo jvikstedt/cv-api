@@ -27,4 +27,4 @@ export = {
   subscribers: [__dirname + '/../**/*.subscriber.{js,ts}'],
   synchronize: process.env.TYPEORM_SYNC || dbConfig[CONFIG_DB_SYNCHRONIZE],
   logging: process.env.DB_LOGGING || dbConfig[CONFIG_DB_LOGGING],
-}
+};

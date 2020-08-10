@@ -7,7 +7,12 @@ import { Education } from './education.entity';
 import { EducationRepository } from './education.repository';
 import { CreateEducationDto } from './dto/create-education.dto';
 import { PatchEducationDto } from './dto/patch-education.dto';
-import { QUEUE_NAME_CV, CONFIG_QUEUE, CONFIG_QUEUE_CV_RELOAD, EventType } from '../constants';
+import {
+  QUEUE_NAME_CV,
+  CONFIG_QUEUE,
+  CONFIG_QUEUE_CV_RELOAD,
+  EventType,
+} from '../constants';
 import { InjectQueue } from '@nestjs/bull';
 
 const queueConfig = config.get(CONFIG_QUEUE);
@@ -23,32 +28,50 @@ export class EducationsService {
     private cvQueue: Queue,
   ) {}
 
-  async create(cvId: number, createEducationDto: CreateEducationDto): Promise<Education> {
-    const education = await this.educationRepository.createEducation(cvId, createEducationDto);
+  async create(
+    cvId: number,
+    createEducationDto: CreateEducationDto,
+  ): Promise<Education> {
+    const education = await this.educationRepository.createEducation(
+      cvId,
+      createEducationDto,
+    );
 
-    await this.cvQueue.add(EventType.Reload, {
-      id: cvId,
-      updateTimestamp: true,
-    }, {
-      delay: cvReloadDelay,
-    });
+    await this.cvQueue.add(
+      EventType.Reload,
+      {
+        id: cvId,
+        updateTimestamp: true,
+      },
+      {
+        delay: cvReloadDelay,
+      },
+    );
 
     return this.findOne(cvId, education.id);
   }
 
-  async patch(cvId: number, educationId: number, patchEducationDto: PatchEducationDto): Promise<Education> {
+  async patch(
+    cvId: number,
+    educationId: number,
+    patchEducationDto: PatchEducationDto,
+  ): Promise<Education> {
     const oldEducation = await this.findOne(cvId, educationId);
 
     const newEducation = await this.educationRepository.save(
       R.merge(oldEducation, patchEducationDto),
     );
 
-    await this.cvQueue.add(EventType.Reload, {
-      id: cvId,
-      updateTimestamp: true,
-    }, {
-      delay: cvReloadDelay,
-    });
+    await this.cvQueue.add(
+      EventType.Reload,
+      {
+        id: cvId,
+        updateTimestamp: true,
+      },
+      {
+        delay: cvReloadDelay,
+      },
+    );
 
     return newEducation;
   }
@@ -78,12 +101,16 @@ export class EducationsService {
 
     await this.educationRepository.delete({ cvId, id: educationId });
 
-    await this.cvQueue.add(EventType.Reload, {
-      id: cvId,
-      updateTimestamp: true,
-    }, {
-      delay: cvReloadDelay,
-    });
+    await this.cvQueue.add(
+      EventType.Reload,
+      {
+        id: cvId,
+        updateTimestamp: true,
+      },
+      {
+        delay: cvReloadDelay,
+      },
+    );
 
     return education;
   }

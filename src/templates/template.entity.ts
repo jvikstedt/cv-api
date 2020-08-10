@@ -1,4 +1,13 @@
-import { Column, PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, Unique, ManyToOne } from 'typeorm';
+import {
+  Column,
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Unique,
+  ManyToOne,
+} from 'typeorm';
 import { User } from '../users/user.entity';
 
 @Entity()
@@ -13,7 +22,7 @@ export class Template extends BaseEntity {
   @Column()
   exporter: string;
 
-  @ManyToOne(() => User, user => user.templates)
+  @ManyToOne(() => User, (user) => user.templates)
   user: User;
 
   @Column()

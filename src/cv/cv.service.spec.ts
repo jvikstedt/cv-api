@@ -60,7 +60,9 @@ describe('CVService', () => {
       expect(cvRepository.save).not.toHaveBeenCalled();
       const result = await cvService.patch(1, patchCVDto);
       expect(result).toEqual({ ...cv, ...patchCVDto });
-      expect(cvRepository.findOne).toHaveBeenCalledWith(1, { relations: ['user'] });
+      expect(cvRepository.findOne).toHaveBeenCalledWith(1, {
+        relations: ['user'],
+      });
       expect(cvRepository.save).toHaveBeenCalledWith({ ...cv, ...patchCVDto });
     });
   });
@@ -84,7 +86,9 @@ describe('CVService', () => {
       const result = await cvService.findOne(1);
       expect(result).toEqual(cv);
 
-      expect(cvRepository.findOne).toHaveBeenCalledWith(1, { relations: ['user'] });
+      expect(cvRepository.findOne).toHaveBeenCalledWith(1, {
+        relations: ['user'],
+      });
     });
 
     it('throws an error as cv is not found', async () => {
@@ -103,11 +107,9 @@ describe('CVService', () => {
         statusCode: 200,
         body: {
           hits: {
-            hits: [
-              { _source: { name: 'john' } }
-            ]
-          }
-        }
+            hits: [{ _source: { name: 'john' } }],
+          },
+        },
       });
 
       expect(elasticsearch.search).not.toHaveBeenCalled();

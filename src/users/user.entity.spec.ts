@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
 import * as bcrypt from 'bcrypt';
-import { factory, useSeeding } from 'typeorm-seeding'
+import { factory, useSeeding } from 'typeorm-seeding';
 import { User } from './user.entity';
 
 describe('User Entity', () => {

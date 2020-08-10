@@ -1,4 +1,18 @@
-import { Controller, Get, Post, Body, Param, ParseIntPipe, UseGuards, Patch, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  Patch,
+  UsePipes,
+  ValidationPipe,
+  BadRequestException,
+  ValidationError,
+  HttpException,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CVService } from './cv.service';
@@ -12,18 +26,22 @@ import { CVGuard } from './cv.guard';
 @Controller('cv')
 @UseGuards(AuthGuard())
 export class CVController {
-  constructor(
-    private readonly cvService: CVService,
-  ) {}
+  constructor(private readonly cvService: CVService) {}
 
   @Patch('/:cvId')
   @UseGuards(CVGuard)
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
-  patch(@Param('cvId', ParseIntPipe) cvId: number, @Body() patchCVDto: PatchCVDto): Promise<CV> {
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
+  patch(
+    @Param('cvId', ParseIntPipe) cvId: number,
+    @Body() patchCVDto: PatchCVDto,
+  ): Promise<CV> {
     return this.cvService.patch(cvId, patchCVDto);
   }
 
@@ -38,11 +56,14 @@ export class CVController {
   }
 
   @Post('/search')
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
   search(@Body() searchCVDto: SearchCVDto): Promise<CV[]> {
     return this.cvService.search(searchCVDto);
   }

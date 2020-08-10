@@ -6,14 +6,8 @@ import { AuthModule } from '../auth/auth.module';
 import { CVModule } from '../cv/cv.module';
 
 @Module({
-  imports: [
-    AuthModule,
-    UsersModule,
-    CVModule,
-  ],
+  imports: [AuthModule, UsersModule, CVModule],
   controllers: [UsersController],
-  providers: [
-    UsersService,
-  ],
+  providers: [UsersService],
 })
 export class UsersHttpModule {}

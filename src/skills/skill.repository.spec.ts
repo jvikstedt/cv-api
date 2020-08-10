@@ -13,9 +13,7 @@ describe('SkillRepository', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [
-        SkillRepository,
-      ],
+      providers: [SkillRepository],
     }).compile();
 
     skillRepository = module.get<SkillRepository>(SkillRepository);
@@ -34,7 +32,7 @@ describe('SkillRepository', () => {
       const createSkillDto: CreateSkillDto = {
         skillSubjectId: 1,
         experienceInYears: 2,
-        highlight: false
+        highlight: false,
       };
       const skill = await factory(Skill)().make({ ...createSkillDto, cvId });
       save.mockResolvedValue(skill);

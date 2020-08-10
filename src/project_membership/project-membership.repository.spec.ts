@@ -13,12 +13,12 @@ describe('ProjectMembershipRepository', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [
-        ProjectMembershipRepository,
-      ],
+      providers: [ProjectMembershipRepository],
     }).compile();
 
-    projectMembershipRepository = module.get<ProjectMembershipRepository>(ProjectMembershipRepository);
+    projectMembershipRepository = module.get<ProjectMembershipRepository>(
+      ProjectMembershipRepository,
+    );
   });
 
   describe('createProjectMembership', () => {
@@ -40,11 +40,17 @@ describe('ProjectMembershipRepository', () => {
         endMonth: 12,
         highlight: false,
       };
-      const projectMembership = await factory(ProjectMembership)().make({ ...createProjectMembershipDto, cvId });
+      const projectMembership = await factory(ProjectMembership)().make({
+        ...createProjectMembershipDto,
+        cvId,
+      });
       save.mockResolvedValue(projectMembership);
 
       expect(save).not.toHaveBeenCalled();
-      const result = await projectMembershipRepository.createProjectMembership(cvId, createProjectMembershipDto);
+      const result = await projectMembershipRepository.createProjectMembership(
+        cvId,
+        createProjectMembershipDto,
+      );
       expect(save).toHaveBeenCalled();
       expect(result).toEqual(projectMembership);
     });

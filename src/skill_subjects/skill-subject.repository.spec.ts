@@ -13,12 +13,12 @@ describe('SkillSubjectRepository', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [
-        SkillSubjectRepository,
-      ],
+      providers: [SkillSubjectRepository],
     }).compile();
 
-    skillSubjectRepository = module.get<SkillSubjectRepository>(SkillSubjectRepository);
+    skillSubjectRepository = module.get<SkillSubjectRepository>(
+      SkillSubjectRepository,
+    );
   });
 
   describe('createSkillSubject', () => {
@@ -30,12 +30,17 @@ describe('SkillSubjectRepository', () => {
     });
 
     it('returns created skillSubject', async () => {
-      const mockCreateSkillSubjectDto: CreateSkillSubjectDto = { name: 'Typescript', skillGroupId: 1 };
+      const mockCreateSkillSubjectDto: CreateSkillSubjectDto = {
+        name: 'Typescript',
+        skillGroupId: 1,
+      };
       const skillSubject = await factory(SkillSubject)().make();
       save.mockResolvedValue(skillSubject);
 
       expect(save).not.toHaveBeenCalled();
-      const result = await skillSubjectRepository.createSkillSubject(mockCreateSkillSubjectDto);
+      const result = await skillSubjectRepository.createSkillSubject(
+        mockCreateSkillSubjectDto,
+      );
       expect(save).toHaveBeenCalled();
       expect(result).toEqual(skillSubject);
     });

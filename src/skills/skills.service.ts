@@ -8,7 +8,12 @@ import { Skill } from './skill.entity';
 import { SkillRepository } from './skill.repository';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { PatchSkillDto } from './dto/patch-skill.dto';
-import { QUEUE_NAME_CV, CONFIG_QUEUE, CONFIG_QUEUE_CV_RELOAD, EventType } from '../constants';
+import {
+  QUEUE_NAME_CV,
+  CONFIG_QUEUE,
+  CONFIG_QUEUE_CV_RELOAD,
+  EventType,
+} from '../constants';
 
 const queueConfig = config.get(CONFIG_QUEUE);
 const cvReloadDelay = queueConfig[CONFIG_QUEUE_CV_RELOAD];
@@ -26,29 +31,41 @@ export class SkillsService {
   async create(cvId: number, createSkillDto: CreateSkillDto): Promise<Skill> {
     const skill = await this.skillRepository.createSkill(cvId, createSkillDto);
 
-    await this.cvQueue.add(EventType.Reload, {
-      id: cvId,
-      updateTimestamp: true,
-    }, {
-      delay: cvReloadDelay,
-    });
+    await this.cvQueue.add(
+      EventType.Reload,
+      {
+        id: cvId,
+        updateTimestamp: true,
+      },
+      {
+        delay: cvReloadDelay,
+      },
+    );
 
     return this.findOne(cvId, skill.id);
   }
 
-  async patch(cvId: number, skillId: number, patchSkillDto: PatchSkillDto): Promise<Skill> {
+  async patch(
+    cvId: number,
+    skillId: number,
+    patchSkillDto: PatchSkillDto,
+  ): Promise<Skill> {
     const oldSkill = await this.findOne(cvId, skillId);
 
     const newSkill = await this.skillRepository.save(
       R.merge(oldSkill, patchSkillDto),
     );
 
-    await this.cvQueue.add(EventType.Reload, {
-      id: cvId,
-      updateTimestamp: true,
-    }, {
-      delay: cvReloadDelay,
-    });
+    await this.cvQueue.add(
+      EventType.Reload,
+      {
+        id: cvId,
+        updateTimestamp: true,
+      },
+      {
+        delay: cvReloadDelay,
+      },
+    );
 
     return newSkill;
   }
@@ -78,12 +95,16 @@ export class SkillsService {
 
     await this.skillRepository.delete({ cvId, id: skillId });
 
-    await this.cvQueue.add(EventType.Reload, {
-      id: cvId,
-      updateTimestamp: true,
-    }, {
-      delay: cvReloadDelay,
-    });
+    await this.cvQueue.add(
+      EventType.Reload,
+      {
+        id: cvId,
+        updateTimestamp: true,
+      },
+      {
+        delay: cvReloadDelay,
+      },
+    );
 
     return skill;
   }

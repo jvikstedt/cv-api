@@ -1,4 +1,19 @@
-import { Controller, Get, Post, Put, Body, Delete, Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Body,
+  Delete,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+  BadRequestException,
+  ValidationError,
+  HttpException,
+} from '@nestjs/common';
 import { SkillSubjectsService } from './skill-subjects.service';
 import { SkillSubject } from './skill-subject.entity';
 import { CreateSkillSubjectDto } from './dto/create-skill-subject.dto';
@@ -12,27 +27,36 @@ import { SearchSkillSubjectDto } from './dto/search-skill-subject.dto';
 @Controller('skill_subjects')
 @UseGuards(AuthGuard())
 export class SkillSubjectsController {
-  constructor(
-    private readonly skillSubjectsService: SkillSubjectsService,
-  ) {}
+  constructor(private readonly skillSubjectsService: SkillSubjectsService) {}
 
   @Post()
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
-  create(@Body() createSkillSubjectDto: CreateSkillSubjectDto): Promise<SkillSubject> {
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
+  create(
+    @Body() createSkillSubjectDto: CreateSkillSubjectDto,
+  ): Promise<SkillSubject> {
     return this.skillSubjectsService.create(createSkillSubjectDto);
   }
 
   @Put('/:id')
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateSkillSubjectDto: UpdateSkillSubjectDto): Promise<SkillSubject> {
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateSkillSubjectDto: UpdateSkillSubjectDto,
+  ): Promise<SkillSubject> {
     return this.skillSubjectsService.update(id, updateSkillSubjectDto);
   }
 
@@ -52,12 +76,17 @@ export class SkillSubjectsController {
   }
 
   @Post('/search')
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
-  search(@Body() searchSkillSubjectDto: SearchSkillSubjectDto): Promise<SkillSubject[]> {
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
+  search(
+    @Body() searchSkillSubjectDto: SearchSkillSubjectDto,
+  ): Promise<SkillSubject[]> {
     return this.skillSubjectsService.search(searchSkillSubjectDto);
   }
 }

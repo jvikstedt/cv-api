@@ -55,7 +55,7 @@ describe('ProjectMembershipController (e2e)', () => {
           startMonth: 1,
           highlight: false,
         })
-        .expect(201)
+        .expect(201);
 
       expect(response.body).toMatchObject({
         id: 1,
@@ -64,7 +64,7 @@ describe('ProjectMembershipController (e2e)', () => {
         description: '',
         startYear: 2000,
         startMonth: 1,
-      });;
+      });
     });
 
     it('responds with forbidden (403) when trying to add project_membership to someone elses cv', async () => {
@@ -72,10 +72,9 @@ describe('ProjectMembershipController (e2e)', () => {
         .post('/cv/10/project_membership')
         .set('Authorization', `Bearer ${accessToken}`)
         .send({ projectId: project.id, description: '' })
-        .expect(403)
+        .expect(403);
     });
   });
-
 
   describe('/cv/:cvId/project_membership/:projectMembershipId (PATCH)', () => {
     let projectMembership: ProjectMembership;
@@ -97,13 +96,13 @@ describe('ProjectMembershipController (e2e)', () => {
         .patch(`/cv/${cv.id}/project_membership/${projectMembership.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send(patchProjectMembershipDto)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject({
         id: projectMembership.id,
         cvId: cv.id,
         ...patchProjectMembershipDto,
-      });;
+      });
     });
 
     it('responds with forbidden (403) when trying to modify projectMembership to someone elses cv', async () => {
@@ -111,37 +110,43 @@ describe('ProjectMembershipController (e2e)', () => {
         .patch(`/cv/10/project_membership/${projectMembership.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send(patchProjectMembershipDto)
-        .expect(403)
+        .expect(403);
     });
   });
 
   describe('/cv/:cvId/project_membership (GET)', () => {
     it('returns project_membership', async () => {
-      const projectMembership = await factory(ProjectMembership)().create({ cvId: cv.id, projectId: project.id });
+      const projectMembership = await factory(ProjectMembership)().create({
+        cvId: cv.id,
+        projectId: project.id,
+      });
 
       const response = await request(app.getHttpServer())
         .get(`/cv/${cv.id}/project_membership`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject([
         {
           ...projectMembership,
           createdAt: projectMembership.createdAt.toJSON(),
           updatedAt: projectMembership.updatedAt.toJSON(),
-        }
+        },
       ]);
     });
   });
 
   describe('/cv/:cvId/project_membership/:projectMembershipId (GET)', () => {
     it('returns projectMembership', async () => {
-      const projectMembership = await factory(ProjectMembership)().create({ cvId: cv.id, projectId: project.id });
+      const projectMembership = await factory(ProjectMembership)().create({
+        cvId: cv.id,
+        projectId: project.id,
+      });
 
       const response = await request(app.getHttpServer())
         .get(`/cv/${cv.id}/project_membership/${projectMembership.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject({
         ...projectMembership,
@@ -152,7 +157,7 @@ describe('ProjectMembershipController (e2e)', () => {
       await request(app.getHttpServer())
         .get(`/cv/${cv.id}/project_membership/2`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
   });
 
@@ -170,21 +175,23 @@ describe('ProjectMembershipController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .delete(`/cv/${cv.id}/project_membership/${projectMembership.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
-      expect(response.body).toMatchObject({ description: projectMembership.description });;
+      expect(response.body).toMatchObject({
+        description: projectMembership.description,
+      });
 
       await request(app.getHttpServer())
         .get(`/cv/${cv.id}/project_membership/${projectMembership.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
 
     it('responds with forbidden (403) when trying to delete projectMembership from someone elses cv', async () => {
       await request(app.getHttpServer())
         .delete(`/cv/10/project_membership/${projectMembership.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(403)
+        .expect(403);
     });
   });
 });

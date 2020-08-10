@@ -13,9 +13,7 @@ describe('CompanyRepository', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [
-        CompanyRepository,
-      ],
+      providers: [CompanyRepository],
     }).compile();
 
     companyRepository = module.get<CompanyRepository>(CompanyRepository);

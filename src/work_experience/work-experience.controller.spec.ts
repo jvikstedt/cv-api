@@ -25,18 +25,22 @@ describe('WorkExperienceController', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-      ],
+      imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
       controllers: [WorkExperienceController],
       providers: [
-        { provide: WorkExperienceService, useFactory: mockWorkExperienceService },
+        {
+          provide: WorkExperienceService,
+          useFactory: mockWorkExperienceService,
+        },
       ],
-    })
-    .compile();
+    }).compile();
 
-    workExperienceController = module.get<WorkExperienceController>(WorkExperienceController);
-    workExperienceService = module.get<WorkExperienceService>(WorkExperienceService);
+    workExperienceController = module.get<WorkExperienceController>(
+      WorkExperienceController,
+    );
+    workExperienceService = module.get<WorkExperienceService>(
+      WorkExperienceService,
+    );
   });
 
   describe('patch', () => {
@@ -44,13 +48,30 @@ describe('WorkExperienceController', () => {
       const cvId = 2;
       const workExperienceId = 1;
       const patchWorkExperienceDto: PatchWorkExperienceDto = { endYear: 2020 };
-      const oldWorkExperience = await factory(WorkExperience)().make({ id: workExperienceId, endYear: 2019 });
-      workExperienceService.patch.mockResolvedValue({ ...oldWorkExperience, ...patchWorkExperienceDto });
+      const oldWorkExperience = await factory(WorkExperience)().make({
+        id: workExperienceId,
+        endYear: 2019,
+      });
+      workExperienceService.patch.mockResolvedValue({
+        ...oldWorkExperience,
+        ...patchWorkExperienceDto,
+      });
 
       expect(workExperienceService.patch).not.toHaveBeenCalled();
-      const result = await workExperienceController.patch(cvId, workExperienceId, patchWorkExperienceDto);
-      expect(workExperienceService.patch).toHaveBeenCalledWith(cvId, workExperienceId, patchWorkExperienceDto);
-      expect(result).toEqual({ ...oldWorkExperience, ...patchWorkExperienceDto });
+      const result = await workExperienceController.patch(
+        cvId,
+        workExperienceId,
+        patchWorkExperienceDto,
+      );
+      expect(workExperienceService.patch).toHaveBeenCalledWith(
+        cvId,
+        workExperienceId,
+        patchWorkExperienceDto,
+      );
+      expect(result).toEqual({
+        ...oldWorkExperience,
+        ...patchWorkExperienceDto,
+      });
     });
   });
 
@@ -66,12 +87,20 @@ describe('WorkExperienceController', () => {
         endYear: 2004,
         endMonth: 12,
       };
-      const workExperience = await factory(WorkExperience)().make(createWorkExperienceDto);
+      const workExperience = await factory(WorkExperience)().make(
+        createWorkExperienceDto,
+      );
       workExperienceService.create.mockResolvedValue(workExperience);
 
       expect(workExperienceService.create).not.toHaveBeenCalled();
-      const result = await workExperienceController.create(cvId, createWorkExperienceDto);
-      expect(workExperienceService.create).toHaveBeenCalledWith(cvId, createWorkExperienceDto);
+      const result = await workExperienceController.create(
+        cvId,
+        createWorkExperienceDto,
+      );
+      expect(workExperienceService.create).toHaveBeenCalledWith(
+        cvId,
+        createWorkExperienceDto,
+      );
       expect(result).toEqual(workExperience);
     });
   });
@@ -96,8 +125,14 @@ describe('WorkExperienceController', () => {
       workExperienceService.findOne.mockResolvedValue(workExperience);
 
       expect(workExperienceService.findOne).not.toHaveBeenCalled();
-      const result = await workExperienceController.findOne(cvId, workExperienceId);
-      expect(workExperienceService.findOne).toHaveBeenCalledWith(cvId, workExperienceId);
+      const result = await workExperienceController.findOne(
+        cvId,
+        workExperienceId,
+      );
+      expect(workExperienceService.findOne).toHaveBeenCalledWith(
+        cvId,
+        workExperienceId,
+      );
       expect(result).toEqual(workExperience);
     });
   });
@@ -110,7 +145,10 @@ describe('WorkExperienceController', () => {
 
       expect(workExperienceService.remove).not.toHaveBeenCalled();
       await workExperienceController.remove(cvId, workExperienceId);
-      expect(workExperienceService.remove).toHaveBeenCalledWith(cvId, workExperienceId);
+      expect(workExperienceService.remove).toHaveBeenCalledWith(
+        cvId,
+        workExperienceId,
+      );
     });
   });
 });

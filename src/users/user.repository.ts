@@ -1,6 +1,10 @@
 import * as bcrypt from 'bcrypt';
 import { EntityRepository, Repository } from 'typeorm';
-import { ConflictException, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 
 import { User } from './user.entity';
 import { AuthCredentialsDto } from '../auth/dto/auth-credentials.dto';
@@ -38,7 +42,9 @@ export class UserRepository extends Repository<User> {
     }
   }
 
-  async validateUserPassword(authCredentialsDto: AuthCredentialsDto): Promise<User | null> {
+  async validateUserPassword(
+    authCredentialsDto: AuthCredentialsDto,
+  ): Promise<User | null> {
     const { username, password } = authCredentialsDto;
     const user = await this.createQueryBuilder('user')
       .where({ username })
@@ -46,7 +52,7 @@ export class UserRepository extends Repository<User> {
       .addSelect('user.salt')
       .getOne();
 
-    if (user && await user.validatePassword(password)) {
+    if (user && (await user.validatePassword(password))) {
       return user;
     }
 

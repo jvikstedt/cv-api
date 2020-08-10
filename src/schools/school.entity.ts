@@ -1,4 +1,13 @@
-import { Column, PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, Unique, OneToMany } from 'typeorm';
+import {
+  Column,
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Unique,
+  OneToMany,
+} from 'typeorm';
 import { Education } from '../educations/education.entity';
 
 @Entity()
@@ -10,7 +19,7 @@ export class School extends BaseEntity {
   @Column()
   name: string;
 
-  @OneToMany(() => Education, education => education.school)
+  @OneToMany(() => Education, (education) => education.school)
   educations: Education[];
 
   @CreateDateColumn()

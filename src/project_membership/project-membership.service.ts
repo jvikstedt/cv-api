@@ -7,7 +7,12 @@ import { ProjectMembership } from './project-membership.entity';
 import { ProjectMembershipRepository } from './project-membership.repository';
 import { CreateProjectMembershipDto } from './dto/create-project-membership.dto';
 import { PatchProjectMembershipDto } from './dto/patch-project-membership.dto';
-import { QUEUE_NAME_CV, CONFIG_QUEUE, CONFIG_QUEUE_CV_RELOAD, EventType } from '../constants';
+import {
+  QUEUE_NAME_CV,
+  CONFIG_QUEUE,
+  CONFIG_QUEUE_CV_RELOAD,
+  EventType,
+} from '../constants';
 import { InjectQueue } from '@nestjs/bull';
 
 const queueConfig = config.get(CONFIG_QUEUE);
@@ -23,32 +28,50 @@ export class ProjectMembershipService {
     private cvQueue: Queue,
   ) {}
 
-  async create(cvId: number, createProjectMembershipDto: CreateProjectMembershipDto): Promise<ProjectMembership> {
-    const projectMembership = await this.projectMembershipRepository.createProjectMembership(cvId, createProjectMembershipDto);
+  async create(
+    cvId: number,
+    createProjectMembershipDto: CreateProjectMembershipDto,
+  ): Promise<ProjectMembership> {
+    const projectMembership = await this.projectMembershipRepository.createProjectMembership(
+      cvId,
+      createProjectMembershipDto,
+    );
 
-    await this.cvQueue.add(EventType.Reload, {
-      id: cvId,
-      updateTimestamp: true,
-    }, {
-      delay: cvReloadDelay,
-    });
+    await this.cvQueue.add(
+      EventType.Reload,
+      {
+        id: cvId,
+        updateTimestamp: true,
+      },
+      {
+        delay: cvReloadDelay,
+      },
+    );
 
     return this.findOne(cvId, projectMembership.id);
   }
 
-  async patch(cvId: number, projectMembershipId: number, patchProjectMembershipDto: PatchProjectMembershipDto): Promise<ProjectMembership> {
+  async patch(
+    cvId: number,
+    projectMembershipId: number,
+    patchProjectMembershipDto: PatchProjectMembershipDto,
+  ): Promise<ProjectMembership> {
     const oldProjectMembership = await this.findOne(cvId, projectMembershipId);
 
     const newProjectMembership = await this.projectMembershipRepository.save(
       R.merge(oldProjectMembership, patchProjectMembershipDto),
     );
 
-    await this.cvQueue.add(EventType.Reload, {
-      id: cvId,
-      updateTimestamp: true,
-    }, {
-      delay: cvReloadDelay,
-    });
+    await this.cvQueue.add(
+      EventType.Reload,
+      {
+        id: cvId,
+        updateTimestamp: true,
+      },
+      {
+        delay: cvReloadDelay,
+      },
+    );
 
     return newProjectMembership;
   }
@@ -60,7 +83,10 @@ export class ProjectMembershipService {
     });
   }
 
-  async findOne(cvId: number, projectMembershipId: number): Promise<ProjectMembership> {
+  async findOne(
+    cvId: number,
+    projectMembershipId: number,
+  ): Promise<ProjectMembership> {
     const entity = await this.projectMembershipRepository.findOne(
       { cvId, id: projectMembershipId },
       { relations: ['project', 'project.company'] },
@@ -73,17 +99,27 @@ export class ProjectMembershipService {
     return entity;
   }
 
-  async remove(cvId: number, projectMembershipId: number): Promise<ProjectMembership> {
+  async remove(
+    cvId: number,
+    projectMembershipId: number,
+  ): Promise<ProjectMembership> {
     const projectMembership = await this.findOne(cvId, projectMembershipId);
 
-    await this.projectMembershipRepository.delete({ cvId, id: projectMembershipId });
-
-    await this.cvQueue.add(EventType.Reload, {
-      id: cvId,
-      updateTimestamp: true,
-    }, {
-      delay: cvReloadDelay,
+    await this.projectMembershipRepository.delete({
+      cvId,
+      id: projectMembershipId,
     });
+
+    await this.cvQueue.add(
+      EventType.Reload,
+      {
+        id: cvId,
+        updateTimestamp: true,
+      },
+      {
+        delay: cvReloadDelay,
+      },
+    );
 
     return projectMembership;
   }

@@ -13,9 +13,7 @@ describe('EducationRepository', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [
-        EducationRepository,
-      ],
+      providers: [EducationRepository],
     }).compile();
 
     educationRepository = module.get<EducationRepository>(EducationRepository);
@@ -40,11 +38,17 @@ describe('EducationRepository', () => {
         endYear: 2004,
         highlight: false,
       };
-      const education = await factory(Education)().make({ ...createEducationDto, cvId });
+      const education = await factory(Education)().make({
+        ...createEducationDto,
+        cvId,
+      });
       save.mockResolvedValue(education);
 
       expect(save).not.toHaveBeenCalled();
-      const result = await educationRepository.createEducation(cvId, createEducationDto);
+      const result = await educationRepository.createEducation(
+        cvId,
+        createEducationDto,
+      );
       expect(save).toHaveBeenCalled();
       expect(result).toEqual(education);
     });
