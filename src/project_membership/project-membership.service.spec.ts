@@ -33,13 +33,20 @@ describe('ProjectMembershipService', () => {
     const module = await Test.createTestingModule({
       providers: [
         ProjectMembershipService,
-        { provide: ProjectMembershipRepository, useFactory: mockProjectMembershipRepository },
+        {
+          provide: ProjectMembershipRepository,
+          useFactory: mockProjectMembershipRepository,
+        },
         { provide: getQueueToken(QUEUE_NAME_CV), useFactory: mockQueue },
       ],
     }).compile();
 
-    projectMembershipsService = module.get<ProjectMembershipService>(ProjectMembershipService);
-    projectMembershipRepository = module.get<ProjectMembershipRepository>(ProjectMembershipRepository);
+    projectMembershipsService = module.get<ProjectMembershipService>(
+      ProjectMembershipService,
+    );
+    projectMembershipRepository = module.get<ProjectMembershipRepository>(
+      ProjectMembershipRepository,
+    );
   });
 
   describe('create', () => {
@@ -55,16 +62,31 @@ describe('ProjectMembershipService', () => {
         endMonth: 12,
         highlight: false,
       };
-      const projectMembership = await factory(ProjectMembership)().make({ id: projectMembershipId, ...createProjectMembershipDto });
-      projectMembershipRepository.createProjectMembership.mockResolvedValue(projectMembership);
+      const projectMembership = await factory(ProjectMembership)().make({
+        id: projectMembershipId,
+        ...createProjectMembershipDto,
+      });
+      projectMembershipRepository.createProjectMembership.mockResolvedValue(
+        projectMembership,
+      );
       projectMembershipRepository.findOne.mockResolvedValue(projectMembership);
 
-      expect(projectMembershipRepository.createProjectMembership).not.toHaveBeenCalled();
+      expect(
+        projectMembershipRepository.createProjectMembership,
+      ).not.toHaveBeenCalled();
       expect(projectMembershipRepository.findOne).not.toHaveBeenCalled();
-      const result = await projectMembershipsService.create(cvId, createProjectMembershipDto);
+      const result = await projectMembershipsService.create(
+        cvId,
+        createProjectMembershipDto,
+      );
       expect(result).toEqual(projectMembership);
-      expect(projectMembershipRepository.createProjectMembership).toHaveBeenCalledWith(cvId, createProjectMembershipDto);
-      expect(projectMembershipRepository.findOne).toHaveBeenCalledWith({ cvId, id: projectMembershipId }, { relations: ['project', 'project.company'] });
+      expect(
+        projectMembershipRepository.createProjectMembership,
+      ).toHaveBeenCalledWith(cvId, createProjectMembershipDto);
+      expect(projectMembershipRepository.findOne).toHaveBeenCalledWith(
+        { cvId, id: projectMembershipId },
+        { relations: ['project', 'project.company'] },
+      );
     });
   });
 
@@ -72,18 +94,38 @@ describe('ProjectMembershipService', () => {
     it('finds projectMembership by id and updates it', async () => {
       const cvId = 2;
       const projectMembershipId = 1;
-      const projectMembership = await factory(ProjectMembership)().make({ id: projectMembershipId });
-      const patchProjectMembershipDto: PatchProjectMembershipDto = { endYear: 2020 };
+      const projectMembership = await factory(ProjectMembership)().make({
+        id: projectMembershipId,
+      });
+      const patchProjectMembershipDto: PatchProjectMembershipDto = {
+        endYear: 2020,
+      };
 
       projectMembershipRepository.findOne.mockResolvedValue(projectMembership);
-      projectMembershipRepository.save.mockResolvedValue({ ...projectMembership, ...patchProjectMembershipDto });
+      projectMembershipRepository.save.mockResolvedValue({
+        ...projectMembership,
+        ...patchProjectMembershipDto,
+      });
 
       expect(projectMembershipRepository.findOne).not.toHaveBeenCalled();
       expect(projectMembershipRepository.save).not.toHaveBeenCalled();
-      const result = await projectMembershipsService.patch(cvId, projectMembershipId, patchProjectMembershipDto);
-      expect(result).toEqual({ ...projectMembership, ...patchProjectMembershipDto });
-      expect(projectMembershipRepository.findOne).toHaveBeenCalledWith({ cvId, id: projectMembershipId }, { relations: ['project', 'project.company'] });
-      expect(projectMembershipRepository.save).toHaveBeenCalledWith({ ...projectMembership, ...patchProjectMembershipDto });
+      const result = await projectMembershipsService.patch(
+        cvId,
+        projectMembershipId,
+        patchProjectMembershipDto,
+      );
+      expect(result).toEqual({
+        ...projectMembership,
+        ...patchProjectMembershipDto,
+      });
+      expect(projectMembershipRepository.findOne).toHaveBeenCalledWith(
+        { cvId, id: projectMembershipId },
+        { relations: ['project', 'project.company'] },
+      );
+      expect(projectMembershipRepository.save).toHaveBeenCalledWith({
+        ...projectMembership,
+        ...patchProjectMembershipDto,
+      });
     });
   });
 
@@ -105,16 +147,24 @@ describe('ProjectMembershipService', () => {
       const projectMembership = await factory(ProjectMembership)().make();
       projectMembershipRepository.findOne.mockResolvedValue(projectMembership);
 
-      const result = await projectMembershipsService.findOne(cvId, projectMembershipId);
+      const result = await projectMembershipsService.findOne(
+        cvId,
+        projectMembershipId,
+      );
       expect(result).toEqual(projectMembership);
 
-      expect(projectMembershipRepository.findOne).toHaveBeenCalledWith({ cvId, id: projectMembershipId }, { relations: ['project', 'project.company'] });
+      expect(projectMembershipRepository.findOne).toHaveBeenCalledWith(
+        { cvId, id: projectMembershipId },
+        { relations: ['project', 'project.company'] },
+      );
     });
 
     it('throws an error as projectMembership is not found', async () => {
       projectMembershipRepository.findOne.mockResolvedValue(null);
 
-      await expect(projectMembershipsService.findOne(1)).rejects.toThrow(NotFoundException);
+      await expect(projectMembershipsService.findOne(1)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -122,18 +172,26 @@ describe('ProjectMembershipService', () => {
     it('calls projectMembershipRepository.delete(id) and deletes retrieves affected result', async () => {
       const cvId = 2;
       const projectMembershipId = 1;
-      const projectMembership = await factory(ProjectMembership)().make({ cvId, id: projectMembershipId });
+      const projectMembership = await factory(ProjectMembership)().make({
+        cvId,
+        id: projectMembershipId,
+      });
       projectMembershipRepository.findOne.mockResolvedValue(projectMembership);
 
       expect(projectMembershipRepository.delete).not.toHaveBeenCalled();
       await projectMembershipsService.remove(cvId, projectMembershipId);
-      expect(projectMembershipRepository.delete).toHaveBeenCalledWith({ cvId, id: projectMembershipId });
+      expect(projectMembershipRepository.delete).toHaveBeenCalledWith({
+        cvId,
+        id: projectMembershipId,
+      });
     });
 
     it('throws an error if affected result is 0', async () => {
       projectMembershipRepository.delete.mockResolvedValue({ affected: 0 });
 
-      await expect(projectMembershipsService.remove(2, 1)).rejects.toThrow(NotFoundException);
+      await expect(projectMembershipsService.remove(2, 1)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

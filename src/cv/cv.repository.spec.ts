@@ -12,9 +12,7 @@ describe('CVRepository', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [
-        CVRepository,
-      ],
+      providers: [CVRepository],
     }).compile();
 
     cvRepository = module.get<CVRepository>(CVRepository);

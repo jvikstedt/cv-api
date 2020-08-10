@@ -1,4 +1,13 @@
-import { PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, ManyToOne, Column, Unique } from 'typeorm';
+import {
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  Column,
+  Unique,
+} from 'typeorm';
 import { CV } from '../cv/cv.entity';
 import { SkillSubject } from '../skill_subjects/skill-subject.entity';
 
@@ -14,7 +23,7 @@ export class Skill extends BaseEntity {
   @Column({ default: false })
   highlight: boolean;
 
-  @ManyToOne(() => CV, cv => cv.skills, {
+  @ManyToOne(() => CV, (cv) => cv.skills, {
     nullable: false,
   })
   cv: CV;
@@ -22,7 +31,7 @@ export class Skill extends BaseEntity {
   @Column()
   cvId: number;
 
-  @ManyToOne(() => SkillSubject, skillSubject => skillSubject.skills, {
+  @ManyToOne(() => SkillSubject, (skillSubject) => skillSubject.skills, {
     nullable: false,
   })
   skillSubject: SkillSubject;

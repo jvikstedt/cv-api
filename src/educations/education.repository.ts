@@ -4,7 +4,10 @@ import { CreateEducationDto } from './dto/create-education.dto';
 
 @EntityRepository(Education)
 export class EducationRepository extends Repository<Education> {
-  async createEducation(cvId: number, createEducationDto: CreateEducationDto): Promise<Education> {
+  async createEducation(
+    cvId: number,
+    createEducationDto: CreateEducationDto,
+  ): Promise<Education> {
     const education = this.create({
       cvId: cvId,
       schoolId: createEducationDto.schoolId,

@@ -13,13 +13,22 @@ export class TemplatesService {
     private readonly templateRepository: TemplateRepository,
   ) {}
 
-  async create(userId: number, createTemplateDto: CreateTemplateDto): Promise<Template> {
-    const template = await this.templateRepository.createTemplate(userId, createTemplateDto);
+  async create(
+    userId: number,
+    createTemplateDto: CreateTemplateDto,
+  ): Promise<Template> {
+    const template = await this.templateRepository.createTemplate(
+      userId,
+      createTemplateDto,
+    );
 
     return template;
   }
 
-  async patchTemplate(id: number, patchTemplateDto: PatchTemplateDto): Promise<Template> {
+  async patchTemplate(
+    id: number,
+    patchTemplateDto: PatchTemplateDto,
+  ): Promise<Template> {
     const oldTemplate = await this.findOne(id);
 
     const newTemplate = R.merge(oldTemplate, patchTemplateDto);

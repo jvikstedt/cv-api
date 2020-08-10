@@ -53,7 +53,7 @@ describe('EducationsController (e2e)', () => {
           startYear: 2000,
           highlight: false,
         })
-        .expect(201)
+        .expect(201);
 
       expect(response.body).toMatchObject({
         id: 1,
@@ -63,7 +63,7 @@ describe('EducationsController (e2e)', () => {
         fieldOfStudy: 'Computer Software Engineering',
         description: '',
         startYear: 2000,
-      });;
+      });
     });
 
     it('responds with forbidden (403) when trying to add education to someone elses cv', async () => {
@@ -71,10 +71,9 @@ describe('EducationsController (e2e)', () => {
         .post('/cv/10/educations')
         .set('Authorization', `Bearer ${accessToken}`)
         .send({ schoolId: school.id, description: '' })
-        .expect(403)
+        .expect(403);
     });
   });
-
 
   describe('/cv/:cvId/educations/:educationId (PATCH)', () => {
     let education: Education;
@@ -96,13 +95,13 @@ describe('EducationsController (e2e)', () => {
         .patch(`/cv/${cv.id}/educations/${education.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send(patchEducationDto)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject({
         id: education.id,
         cvId: cv.id,
         ...patchEducationDto,
-      });;
+      });
     });
 
     it('responds with forbidden (403) when trying to modify education to someone elses cv', async () => {
@@ -110,37 +109,43 @@ describe('EducationsController (e2e)', () => {
         .patch(`/cv/10/educations/${education.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send(patchEducationDto)
-        .expect(403)
+        .expect(403);
     });
   });
 
   describe('/cv/:cvId/educations (GET)', () => {
     it('returns educations', async () => {
-      const education = await factory(Education)().create({ cvId: cv.id, schoolId: school.id });
+      const education = await factory(Education)().create({
+        cvId: cv.id,
+        schoolId: school.id,
+      });
 
       const response = await request(app.getHttpServer())
         .get(`/cv/${cv.id}/educations`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject([
         {
           ...education,
           createdAt: education.createdAt.toJSON(),
           updatedAt: education.updatedAt.toJSON(),
-        }
+        },
       ]);
     });
   });
 
   describe('/cv/:cvId/educations/:educationId (GET)', () => {
     it('returns education', async () => {
-      const education = await factory(Education)().create({ cvId: cv.id, schoolId: school.id });
+      const education = await factory(Education)().create({
+        cvId: cv.id,
+        schoolId: school.id,
+      });
 
       const response = await request(app.getHttpServer())
         .get(`/cv/${cv.id}/educations/${education.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject({
         ...education,
@@ -151,7 +156,7 @@ describe('EducationsController (e2e)', () => {
       await request(app.getHttpServer())
         .get(`/cv/${cv.id}/educations/2`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
   });
 
@@ -169,21 +174,21 @@ describe('EducationsController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .delete(`/cv/${cv.id}/educations/${education.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
-      expect(response.body).toMatchObject({ degree: education.degree });;
+      expect(response.body).toMatchObject({ degree: education.degree });
 
       await request(app.getHttpServer())
         .get(`/cv/${cv.id}/educations/${education.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
 
     it('responds with forbidden (403) when trying to delete education from someone elses cv', async () => {
       await request(app.getHttpServer())
         .delete(`/cv/10/educations/${education.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(403)
+        .expect(403);
     });
   });
 });

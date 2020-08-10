@@ -1,5 +1,9 @@
 import * as R from 'ramda';
-import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { School } from './school.entity';
 import { SchoolRepository } from './school.repository';
@@ -17,9 +21,10 @@ export class SchoolsService {
   async create(createSchoolDto: CreateSchoolDto): Promise<School> {
     const schools = await this.schoolRepository
       .createQueryBuilder()
-      .where("LOWER(name) = LOWER(:name)", {
-        name: createSchoolDto.name
-      }).getMany();
+      .where('LOWER(name) = LOWER(:name)', {
+        name: createSchoolDto.name,
+      })
+      .getMany();
 
     if (schools.length > 0) {
       throw new UnprocessableEntityException();
@@ -30,8 +35,11 @@ export class SchoolsService {
     return school;
   }
 
-  async patch(schoolId: number, patchSchoolDto: PatchSchoolDto): Promise<School> {
-    const oldSchool = await this.findOne(schoolId)
+  async patch(
+    schoolId: number,
+    patchSchoolDto: PatchSchoolDto,
+  ): Promise<School> {
+    const oldSchool = await this.findOne(schoolId);
 
     const newSchool = R.merge(oldSchool, patchSchoolDto);
 
@@ -61,7 +69,7 @@ export class SchoolsService {
   async search(searchSchoolDto: SearchSchoolDto): Promise<School[]> {
     return this.schoolRepository
       .createQueryBuilder('school')
-      .where("school.name ilike :name", { name: `%${searchSchoolDto.name}%` })
+      .where('school.name ilike :name', { name: `%${searchSchoolDto.name}%` })
       .limit(searchSchoolDto.limit)
       .getMany();
   }

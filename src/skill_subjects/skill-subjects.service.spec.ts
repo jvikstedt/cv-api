@@ -27,12 +27,19 @@ describe('SkillSubjectsService', () => {
     const module = await Test.createTestingModule({
       providers: [
         SkillSubjectsService,
-        { provide: SkillSubjectRepository, useFactory: mockSkillSubjectRepository },
+        {
+          provide: SkillSubjectRepository,
+          useFactory: mockSkillSubjectRepository,
+        },
       ],
     }).compile();
 
-    skillSubjectsService = module.get<SkillSubjectsService>(SkillSubjectsService);
-    skillSubjectRepository = module.get<SkillSubjectRepository>(SkillSubjectRepository);
+    skillSubjectsService = module.get<SkillSubjectsService>(
+      SkillSubjectsService,
+    );
+    skillSubjectRepository = module.get<SkillSubjectRepository>(
+      SkillSubjectRepository,
+    );
   });
 
   describe('findAll', () => {
@@ -54,13 +61,17 @@ describe('SkillSubjectsService', () => {
       const result = await skillSubjectsService.findOne(1);
       expect(result).toEqual(skillSubject);
 
-      expect(skillSubjectRepository.findOne).toHaveBeenCalledWith(1, { relations: ['skillGroup'] });
+      expect(skillSubjectRepository.findOne).toHaveBeenCalledWith(1, {
+        relations: ['skillGroup'],
+      });
     });
 
     it('throws an error as skillSubject is not found', async () => {
       skillSubjectRepository.findOne.mockResolvedValue(null);
 
-      await expect(skillSubjectsService.findOne(1)).rejects.toThrow(NotFoundException);
+      await expect(skillSubjectsService.findOne(1)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -76,7 +87,9 @@ describe('SkillSubjectsService', () => {
     it('throws an error if affected result is 0', async () => {
       skillSubjectRepository.delete.mockResolvedValue({ affected: 0 });
 
-      await expect(skillSubjectsService.delete(1)).rejects.toThrow(NotFoundException);
+      await expect(skillSubjectsService.delete(1)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -91,15 +104,22 @@ describe('SkillSubjectsService', () => {
     });
 
     it('calls skillSubjectRepository.createSkillSubject(createSkillSubjectDto) and successfully retrieves and return skillSubject', async () => {
-      const createSkillSubjectDto: CreateSkillSubjectDto = { name: 'Vue', skillGroupId: 1 };
-      const skillSubject = await factory(SkillSubject)().make(createSkillSubjectDto);
+      const createSkillSubjectDto: CreateSkillSubjectDto = {
+        name: 'Vue',
+        skillGroupId: 1,
+      };
+      const skillSubject = await factory(SkillSubject)().make(
+        createSkillSubjectDto,
+      );
       skillSubjectRepository.createSkillSubject.mockResolvedValue(skillSubject);
       getMany.mockResolvedValue([]);
 
       expect(skillSubjectRepository.createSkillSubject).not.toHaveBeenCalled();
       const result = await skillSubjectsService.create(createSkillSubjectDto);
       expect(result).toEqual(skillSubject);
-      expect(skillSubjectRepository.createSkillSubject).toHaveBeenCalledWith(createSkillSubjectDto);
+      expect(skillSubjectRepository.createSkillSubject).toHaveBeenCalledWith(
+        createSkillSubjectDto,
+      );
     });
   });
 
@@ -108,21 +128,34 @@ describe('SkillSubjectsService', () => {
       const updateSkillSubjectDto: UpdateSkillSubjectDto = { name: 'Vue' };
       const skillSubject = await factory(SkillSubject)().make();
       skillSubjectRepository.findOne.mockResolvedValue(skillSubject);
-      skillSubjectRepository.save.mockResolvedValue({ ...skillSubject, name: 'Vue' });
+      skillSubjectRepository.save.mockResolvedValue({
+        ...skillSubject,
+        name: 'Vue',
+      });
 
       expect(skillSubjectRepository.findOne).not.toHaveBeenCalled();
       expect(skillSubjectRepository.save).not.toHaveBeenCalled();
-      const result = await skillSubjectsService.update(1, updateSkillSubjectDto);
+      const result = await skillSubjectsService.update(
+        1,
+        updateSkillSubjectDto,
+      );
       expect(result).toEqual({ ...skillSubject, name: 'Vue' });
-      expect(skillSubjectRepository.findOne).toHaveBeenCalledWith(1, { relations: ['skillGroup'] });
-      expect(skillSubjectRepository.save).toHaveBeenCalledWith({ ...skillSubject, name: 'Vue' });
+      expect(skillSubjectRepository.findOne).toHaveBeenCalledWith(1, {
+        relations: ['skillGroup'],
+      });
+      expect(skillSubjectRepository.save).toHaveBeenCalledWith({
+        ...skillSubject,
+        name: 'Vue',
+      });
     });
 
     it('throws an error as skillSubject is not found', async () => {
       const updateSkillSubjectDto: UpdateSkillSubjectDto = { name: 'Vue' };
       skillSubjectRepository.findOne.mockResolvedValue(null);
 
-      await expect(skillSubjectsService.update(1, updateSkillSubjectDto)).rejects.toThrow(NotFoundException);
+      await expect(
+        skillSubjectsService.update(1, updateSkillSubjectDto),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

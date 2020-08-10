@@ -43,21 +43,19 @@ describe('CompanyController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .get('/company')
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toStrictEqual([
         {
           ...company,
           createdAt: company.createdAt.toJSON(),
           updatedAt: company.updatedAt.toJSON(),
-        }
+        },
       ]);
     });
 
     it('responds with 401 when not authenticated', async () => {
-      await request(app.getHttpServer())
-        .get('/company')
-        .expect(401)
+      await request(app.getHttpServer()).get('/company').expect(401);
     });
   });
 
@@ -67,7 +65,7 @@ describe('CompanyController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .get(`/company/${company.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toStrictEqual({
         ...company,
@@ -80,7 +78,7 @@ describe('CompanyController (e2e)', () => {
       await request(app.getHttpServer())
         .get('/company/2')
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
   });
 
@@ -90,7 +88,7 @@ describe('CompanyController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .delete(`/company/${company.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toEqual({});
     });
@@ -99,7 +97,7 @@ describe('CompanyController (e2e)', () => {
       await request(app.getHttpServer())
         .get('/company/2')
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
   });
 
@@ -111,9 +109,9 @@ describe('CompanyController (e2e)', () => {
         .post('/company')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(newCompany)
-        .expect(201)
+        .expect(201);
 
-      expect(response.body).toMatchObject({ ...newCompany, id: 1 });;
+      expect(response.body).toMatchObject({ ...newCompany, id: 1 });
     });
 
     it('fails and responds status 400 when name is empty', async () => {
@@ -122,7 +120,7 @@ describe('CompanyController (e2e)', () => {
         .post('/company')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(newCompany)
-        .expect(400)
+        .expect(400);
     });
   });
 
@@ -138,12 +136,12 @@ describe('CompanyController (e2e)', () => {
         .patch(`/company/${company.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send(patchCompanyDto)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject({
         id: company.id,
         name: patchCompanyDto.name,
-      });;
+      });
     });
   });
 });

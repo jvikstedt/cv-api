@@ -4,7 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { CompanyService } from './company.service';
 import { CompanyController } from './company.controller';
 import { Company } from './company.entity';
-import {PatchCompanyDto} from './dto/patch-company.dto';
+import { PatchCompanyDto } from './dto/patch-company.dto';
 
 const mockCompanyService = () => ({
   findAll: jest.fn(),
@@ -24,15 +24,10 @@ describe('CompanyController', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-      ],
+      imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
       controllers: [CompanyController],
-      providers: [
-        { provide: CompanyService, useFactory: mockCompanyService },
-      ],
-    })
-    .compile();
+      providers: [{ provide: CompanyService, useFactory: mockCompanyService }],
+    }).compile();
 
     companyController = module.get<CompanyController>(CompanyController);
     companyService = module.get<CompanyService>(CompanyService);
@@ -79,19 +74,27 @@ describe('CompanyController', () => {
 
       expect(companyService.create).not.toHaveBeenCalled();
       const result = await companyController.create({ name: company.name });
-      expect(companyService.create).toHaveBeenCalledWith({ name: company.name });
+      expect(companyService.create).toHaveBeenCalledWith({
+        name: company.name,
+      });
       expect(result).toEqual(company);
     });
   });
 
   describe('patch', () => {
     it('calls service patch', async () => {
-      const company = await factory(Company)().make({ id: 1, name: 'old company' });
+      const company = await factory(Company)().make({
+        id: 1,
+        name: 'old company',
+      });
       const patchCompanyDto: PatchCompanyDto = {
         name: 'new company',
       };
 
-      companyService.patch.mockResolvedValue({ ...company, ...patchCompanyDto });
+      companyService.patch.mockResolvedValue({
+        ...company,
+        ...patchCompanyDto,
+      });
 
       expect(companyService.patch).not.toHaveBeenCalled();
       const result = await companyController.patch(1, patchCompanyDto);

@@ -13,9 +13,7 @@ describe('ProjectRepository', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [
-        ProjectRepository,
-      ],
+      providers: [ProjectRepository],
     }).compile();
 
     projectRepository = module.get<ProjectRepository>(ProjectRepository);
@@ -30,7 +28,10 @@ describe('ProjectRepository', () => {
     });
 
     it('returns created project', async () => {
-      const createProjectDto: CreateProjectDto = { companyId: 1, name: 'Metropolia' };
+      const createProjectDto: CreateProjectDto = {
+        companyId: 1,
+        name: 'Metropolia',
+      };
       const project = await factory(Project)().make(createProjectDto);
       save.mockResolvedValue(project);
 

@@ -24,15 +24,10 @@ describe('CVController', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-      ],
+      imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
       controllers: [CVController],
-      providers: [
-        { provide: CVService, useFactory: mockCVService },
-      ],
-    })
-    .compile();
+      providers: [{ provide: CVService, useFactory: mockCVService }],
+    }).compile();
 
     cvController = module.get<CVController>(CVController);
     cvService = module.get<CVService>(CVService);

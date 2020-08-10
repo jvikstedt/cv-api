@@ -4,7 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { SchoolsService } from './schools.service';
 import { SchoolsController } from './schools.controller';
 import { School } from './school.entity';
-import {PatchSchoolDto} from './dto/patch-school.dto';
+import { PatchSchoolDto } from './dto/patch-school.dto';
 
 const mockSchoolsService = () => ({
   findAll: jest.fn(),
@@ -24,15 +24,10 @@ describe('SchoolsController', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-      ],
+      imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
       controllers: [SchoolsController],
-      providers: [
-        { provide: SchoolsService, useFactory: mockSchoolsService },
-      ],
-    })
-    .compile();
+      providers: [{ provide: SchoolsService, useFactory: mockSchoolsService }],
+    }).compile();
 
     schoolsController = module.get<SchoolsController>(SchoolsController);
     schoolsService = module.get<SchoolsService>(SchoolsService);
@@ -86,7 +81,10 @@ describe('SchoolsController', () => {
 
   describe('patch', () => {
     it('calls service patch', async () => {
-      const school = await factory(School)().make({ id: 1, name: 'old school' });
+      const school = await factory(School)().make({
+        id: 1,
+        name: 'old school',
+      });
       const patchSchoolDto: PatchSchoolDto = {
         name: 'new school',
       };

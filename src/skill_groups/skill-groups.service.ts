@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SkillGroup } from './skill-group.entity';
 import { SkillGroupRepository } from './skill-group.repository';
@@ -16,20 +20,26 @@ export class SkillGroupsService {
   async create(createSkillGroupDto: CreateSkillGroupDto): Promise<SkillGroup> {
     const skillGroups = await this.skillGroupRepository
       .createQueryBuilder()
-      .where("LOWER(name) = LOWER(:name)", {
-        name: createSkillGroupDto.name
-      }).getMany();
+      .where('LOWER(name) = LOWER(:name)', {
+        name: createSkillGroupDto.name,
+      })
+      .getMany();
 
     if (skillGroups.length > 0) {
       throw new UnprocessableEntityException();
     }
 
-    const skillGroup = await this.skillGroupRepository.createSkillGroup(createSkillGroupDto);
+    const skillGroup = await this.skillGroupRepository.createSkillGroup(
+      createSkillGroupDto,
+    );
 
     return skillGroup;
   }
 
-  async update(id: number, updateSkillGroupDto: UpdateSkillGroupDto): Promise<SkillGroup> {
+  async update(
+    id: number,
+    updateSkillGroupDto: UpdateSkillGroupDto,
+  ): Promise<SkillGroup> {
     const skillGroup = await this.findOne(id);
 
     skillGroup.name = updateSkillGroupDto.name;
@@ -57,10 +67,12 @@ export class SkillGroupsService {
     }
   }
 
-  async search(searchSkillGroupDto: SearchSkillGroupDto): Promise<SkillGroup[]> {
+  async search(
+    searchSkillGroupDto: SearchSkillGroupDto,
+  ): Promise<SkillGroup[]> {
     return this.skillGroupRepository
       .createQueryBuilder()
-      .where("name ilike :name", { name: `%${searchSkillGroupDto.name}%` })
+      .where('name ilike :name', { name: `%${searchSkillGroupDto.name}%` })
       .limit(searchSkillGroupDto.limit)
       .getMany();
   }

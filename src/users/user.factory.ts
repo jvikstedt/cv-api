@@ -1,10 +1,10 @@
 import * as bcrypt from 'bcrypt';
-import * as Faker from 'faker'
-import { define } from 'typeorm-seeding'
-import { User } from './user.entity'
+import * as Faker from 'faker';
+import { define } from 'typeorm-seeding';
+import { User } from './user.entity';
 
 define(User, (faker: typeof Faker) => {
-  const user = new User()
+  const user = new User();
   user.username = faker.internet.email();
   user.firstName = faker.name.firstName();
   user.lastName = faker.name.lastName();
@@ -16,8 +16,8 @@ define(User, (faker: typeof Faker) => {
   user.salt = bcrypt.genSaltSync();
 
   user.workExperienceInYears = faker.random.number({
-    'min': 1,
-    'max': 20,
+    min: 1,
+    max: 20,
   });
-  return user
-})
+  return user;
+});

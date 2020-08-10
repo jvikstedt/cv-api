@@ -1,4 +1,19 @@
-import { Controller, Get, Post, Body, Delete, Param, ParseIntPipe, UseGuards, Patch, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Delete,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  Patch,
+  UsePipes,
+  ValidationPipe,
+  BadRequestException,
+  ValidationError,
+  HttpException,
+} from '@nestjs/common';
 import { EducationsService } from './educations.service';
 import { Education } from './education.entity';
 import { CreateEducationDto } from './dto/create-education.dto';
@@ -12,32 +27,39 @@ import { CVGuard } from '../cv/cv.guard';
 @Controller('cv/:cvId/educations')
 @UseGuards(AuthGuard())
 export class EducationsController {
-  constructor(
-    private readonly educationsService: EducationsService,
-  ) {}
+  constructor(private readonly educationsService: EducationsService) {}
 
   @Post()
   @UseGuards(CVGuard)
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
-  create(@Param('cvId', ParseIntPipe) cvId: number, @Body() createEducationDto: CreateEducationDto): Promise<Education> {
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
+  create(
+    @Param('cvId', ParseIntPipe) cvId: number,
+    @Body() createEducationDto: CreateEducationDto,
+  ): Promise<Education> {
     return this.educationsService.create(cvId, createEducationDto);
   }
 
   @Patch('/:educationId')
   @UseGuards(CVGuard)
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
   patch(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('educationId', ParseIntPipe) educationId: number,
-    @Body() patchEducationDto: PatchEducationDto
+    @Body() patchEducationDto: PatchEducationDto,
   ): Promise<Education> {
     return this.educationsService.patch(cvId, educationId, patchEducationDto);
   }
@@ -59,7 +81,7 @@ export class EducationsController {
   @UseGuards(CVGuard)
   remove(
     @Param('cvId', ParseIntPipe) cvId: number,
-    @Param('educationId', ParseIntPipe) educationId: number
+    @Param('educationId', ParseIntPipe) educationId: number,
   ): Promise<Education> {
     return this.educationsService.remove(cvId, educationId);
   }

@@ -3,12 +3,9 @@ import { Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as config from 'config';
-import {
-  CONFIG_SERVER,
-  CONFIG_SERVER_PORT,
-} from './constants';
+import { CONFIG_SERVER, CONFIG_SERVER_PORT } from './constants';
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   const serverConfig = config.get(CONFIG_SERVER);
   const logger = new Logger('bootstrap');
   const app = await NestFactory.create(AppModule);

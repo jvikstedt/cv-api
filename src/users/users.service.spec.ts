@@ -54,8 +54,13 @@ describe('UsersService', () => {
       expect(userRepository.save).not.toHaveBeenCalled();
       const result = await usersService.patch(1, patchUserDto);
       expect(result).toEqual({ ...user, ...patchUserDto });
-      expect(userRepository.findOne).toHaveBeenCalledWith(1, { relations: ['cv'] });
-      expect(userRepository.save).toHaveBeenCalledWith({ ...user, ...patchUserDto });
+      expect(userRepository.findOne).toHaveBeenCalledWith(1, {
+        relations: ['cv'],
+      });
+      expect(userRepository.save).toHaveBeenCalledWith({
+        ...user,
+        ...patchUserDto,
+      });
     });
   });
 

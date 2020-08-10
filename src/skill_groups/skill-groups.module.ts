@@ -3,11 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SkillGroupRepository } from './skill-group.repository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([SkillGroupRepository]),
-  ],
-  exports: [
-    TypeOrmModule,
-  ],
+  imports: [TypeOrmModule.forFeature([SkillGroupRepository])],
+  exports: [TypeOrmModule],
 })
 export class SkillGroupsModule {}

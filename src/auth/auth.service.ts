@@ -23,7 +23,8 @@ import {
 
 const googleConfig = config.get(CONFIG_GOOGLE);
 
-const CLIENT_ID = process.env.GOOGLE_CLIENT_ID || googleConfig[CONFIG_GOOGLE_CLIENT_ID];
+const CLIENT_ID =
+  process.env.GOOGLE_CLIENT_ID || googleConfig[CONFIG_GOOGLE_CLIENT_ID];
 
 const queueConfig = config.get(CONFIG_QUEUE);
 const cvReloadDelay = queueConfig[CONFIG_QUEUE_CV_RELOAD];
@@ -49,24 +50,34 @@ export class AuthService {
     cv.userId = user.id;
     cv.description = '';
 
-    await this.cvQueue.add(EventType.Reload, {
-      id: cv.id,
-      updateTimestamp: true,
-    }, {
-      delay: cvReloadDelay,
-    });
+    await this.cvQueue.add(
+      EventType.Reload,
+      {
+        id: cv.id,
+        updateTimestamp: true,
+      },
+      {
+        delay: cvReloadDelay,
+      },
+    );
 
     await cv.save();
   }
 
-  async signIn(authCredentialsDto: AuthCredentialsDto): Promise<{ accessToken: string }> {
-    let user = await this.userRepository.validateUserPassword(authCredentialsDto);
+  async signIn(
+    authCredentialsDto: AuthCredentialsDto,
+  ): Promise<{ accessToken: string }> {
+    let user = await this.userRepository.validateUserPassword(
+      authCredentialsDto,
+    );
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    user = await this.userRepository.findOne(user.id, { relations: ['cv', 'templates'] })
+    user = await this.userRepository.findOne(user.id, {
+      relations: ['cv', 'templates'],
+    });
 
     const payload: JwtPayload = {
       userId: user.id,
@@ -74,21 +85,30 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       cvIds: [user.cv.id],
-      templateIds: R.map(t => t.id, user.templates),
+      templateIds: R.map((t) => t.id, user.templates),
     };
     const accessToken = this.jwtService.sign(payload);
 
     return { accessToken };
   }
 
-  async googleAuth(googleAuthDto: GoogleAuthDto): Promise<{ accessToken: string }> {
+  async googleAuth(
+    googleAuthDto: GoogleAuthDto,
+  ): Promise<{ accessToken: string }> {
     const ticket = await client.verifyIdToken({
-        idToken: googleAuthDto.idToken,
-        audience: CLIENT_ID,
+      idToken: googleAuthDto.idToken,
+      audience: CLIENT_ID,
     });
-    const { email, given_name: firstName, family_name: lastName } = ticket.getPayload();
+    const {
+      email,
+      given_name: firstName,
+      family_name: lastName,
+    } = ticket.getPayload();
 
-    let user = await this.userRepository.findOne({ username: email }, { relations: ['cv', 'templates'] });
+    let user = await this.userRepository.findOne(
+      { username: email },
+      { relations: ['cv', 'templates'] },
+    );
     if (!user) {
       user = this.userRepository.create({
         username: email,
@@ -102,19 +122,25 @@ export class AuthService {
       });
       await user.save();
 
-      const cv = await this.cvRepository.create({
-        userId: user.id,
-        description: '',
-      }).save();
+      const cv = await this.cvRepository
+        .create({
+          userId: user.id,
+          description: '',
+        })
+        .save();
       user.cv = cv;
       user.templates = [];
 
-      await this.cvQueue.add(EventType.Reload, {
-        id: cv.id,
-        updateTimestamp: true,
-      }, {
-        delay: cvReloadDelay,
-      });
+      await this.cvQueue.add(
+        EventType.Reload,
+        {
+          id: cv.id,
+          updateTimestamp: true,
+        },
+        {
+          delay: cvReloadDelay,
+        },
+      );
     }
 
     const payload: JwtPayload = {
@@ -123,7 +149,7 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       cvIds: [user.cv.id],
-      templateIds: R.map(t => t.id, user.templates),
+      templateIds: R.map((t) => t.id, user.templates),
     };
     const accessToken = this.jwtService.sign(payload);
 

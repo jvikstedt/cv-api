@@ -1,4 +1,19 @@
-import { Controller, Get, Post, Body, Delete, Param, ParseIntPipe, UseGuards, Patch, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Delete,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  Patch,
+  UsePipes,
+  ValidationPipe,
+  BadRequestException,
+  ValidationError,
+  HttpException,
+} from '@nestjs/common';
 import { ProjectMembershipService } from './project-membership.service';
 import { ProjectMembership } from './project-membership.entity';
 import { CreateProjectMembershipDto } from './dto/create-project-membership.dto';
@@ -18,32 +33,50 @@ export class ProjectMembershipController {
 
   @Post()
   @UseGuards(CVGuard)
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
-  create(@Param('cvId', ParseIntPipe) cvId: number, @Body() createProjectMembershipDto: CreateProjectMembershipDto): Promise<ProjectMembership> {
-    return this.projectMembershipService.create(cvId, createProjectMembershipDto);
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
+  create(
+    @Param('cvId', ParseIntPipe) cvId: number,
+    @Body() createProjectMembershipDto: CreateProjectMembershipDto,
+  ): Promise<ProjectMembership> {
+    return this.projectMembershipService.create(
+      cvId,
+      createProjectMembershipDto,
+    );
   }
 
   @Patch('/:projectMembershipId')
   @UseGuards(CVGuard)
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
   patch(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('projectMembershipId', ParseIntPipe) projectMembershipId: number,
-    @Body() patchProjectMembershipDto: PatchProjectMembershipDto
+    @Body() patchProjectMembershipDto: PatchProjectMembershipDto,
   ): Promise<ProjectMembership> {
-    return this.projectMembershipService.patch(cvId, projectMembershipId, patchProjectMembershipDto);
+    return this.projectMembershipService.patch(
+      cvId,
+      projectMembershipId,
+      patchProjectMembershipDto,
+    );
   }
 
   @Get()
-  findAll(@Param('cvId', ParseIntPipe) cvId: number): Promise<ProjectMembership[]> {
+  findAll(
+    @Param('cvId', ParseIntPipe) cvId: number,
+  ): Promise<ProjectMembership[]> {
     return this.projectMembershipService.findAll(cvId);
   }
 
@@ -59,7 +92,7 @@ export class ProjectMembershipController {
   @UseGuards(CVGuard)
   remove(
     @Param('cvId', ParseIntPipe) cvId: number,
-    @Param('projectMembershipId', ParseIntPipe) projectMembershipId: number
+    @Param('projectMembershipId', ParseIntPipe) projectMembershipId: number,
   ): Promise<ProjectMembership> {
     return this.projectMembershipService.remove(cvId, projectMembershipId);
   }

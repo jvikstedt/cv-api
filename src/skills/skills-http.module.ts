@@ -6,11 +6,7 @@ import { SkillsModule } from './skills.module';
 import { CVModule } from '../cv/cv.module';
 
 @Module({
-  imports: [
-    SkillsModule,
-    AuthModule,
-    CVModule,
-  ],
+  imports: [SkillsModule, AuthModule, CVModule],
   controllers: [SkillsController],
   providers: [SkillsService],
 })

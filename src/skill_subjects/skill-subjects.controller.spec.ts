@@ -23,18 +23,19 @@ describe('SkillSubjectsController', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-      ],
+      imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
       controllers: [SkillSubjectsController],
       providers: [
         { provide: SkillSubjectsService, useFactory: mockSkillSubjectsService },
       ],
-    })
-    .compile();
+    }).compile();
 
-    skillSubjectsController = module.get<SkillSubjectsController>(SkillSubjectsController);
-    skillSubjectsService = module.get<SkillSubjectsService>(SkillSubjectsService);
+    skillSubjectsController = module.get<SkillSubjectsController>(
+      SkillSubjectsController,
+    );
+    skillSubjectsService = module.get<SkillSubjectsService>(
+      SkillSubjectsService,
+    );
   });
 
   describe('findAll', () => {
@@ -77,8 +78,12 @@ describe('SkillSubjectsController', () => {
       skillSubjectsService.create.mockResolvedValue(skillSubject);
 
       expect(skillSubjectsService.create).not.toHaveBeenCalled();
-      const result = await skillSubjectsController.create({ name: skillSubject.name });
-      expect(skillSubjectsService.create).toHaveBeenCalledWith({ name: skillSubject.name });
+      const result = await skillSubjectsController.create({
+        name: skillSubject.name,
+      });
+      expect(skillSubjectsService.create).toHaveBeenCalledWith({
+        name: skillSubject.name,
+      });
       expect(result).toEqual(skillSubject);
     });
   });
@@ -86,11 +91,18 @@ describe('SkillSubjectsController', () => {
   describe('update', () => {
     it('calls service update with id and passed data', async () => {
       const skillSubject = await factory(SkillSubject)().make();
-      skillSubjectsService.update.mockResolvedValue({ ...skillSubject, name: 'Vue.js' });
+      skillSubjectsService.update.mockResolvedValue({
+        ...skillSubject,
+        name: 'Vue.js',
+      });
 
       expect(skillSubjectsService.update).not.toHaveBeenCalled();
-      const result = await skillSubjectsController.update(1, { name: 'Vue.js' });
-      expect(skillSubjectsService.update).toHaveBeenCalledWith(1, { name: 'Vue.js' });
+      const result = await skillSubjectsController.update(1, {
+        name: 'Vue.js',
+      });
+      expect(skillSubjectsService.update).toHaveBeenCalledWith(1, {
+        name: 'Vue.js',
+      });
       expect(result).toEqual({ ...skillSubject, name: 'Vue.js' });
     });
   });

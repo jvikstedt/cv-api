@@ -6,11 +6,7 @@ import { ProjectMembershipModule } from './project-membership.module';
 import { CVModule } from '../cv/cv.module';
 
 @Module({
-  imports: [
-    ProjectMembershipModule,
-    AuthModule,
-    CVModule,
-  ],
+  imports: [ProjectMembershipModule, AuthModule, CVModule],
   controllers: [ProjectMembershipController],
   providers: [ProjectMembershipService],
 })

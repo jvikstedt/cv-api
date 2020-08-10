@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import * as repl from 'repl';
-import { AppModule } from './app.module'
+import { AppModule } from './app.module';
 
 class Repl {
-  async run() {
+  async run(): Promise<void> {
     const applicationContext = await NestFactory.createApplicationContext(
       AppModule,
     );

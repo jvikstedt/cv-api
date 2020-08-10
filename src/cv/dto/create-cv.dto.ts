@@ -6,5 +6,5 @@ export class CreateCVDto {
 
   @IsOptional()
   @IsString()
-  description?: string = "";
+  description?: string = '';
 }

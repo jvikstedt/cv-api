@@ -21,15 +21,10 @@ describe('UsersController', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-      ],
+      imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
       controllers: [UsersController],
-      providers: [
-        { provide: UsersService, useFactory: mockUsersService },
-      ],
-    })
-    .compile();
+      providers: [{ provide: UsersService, useFactory: mockUsersService }],
+    }).compile();
 
     usersController = module.get<UsersController>(UsersController);
     usersService = module.get<UsersService>(UsersService);

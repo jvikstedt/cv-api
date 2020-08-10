@@ -1,4 +1,13 @@
-import { Column, PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, Unique, OneToMany } from 'typeorm';
+import {
+  Column,
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Unique,
+  OneToMany,
+} from 'typeorm';
 import { WorkExperience } from '../work_experience/work-experience.entity';
 import { Project } from '../project/project.entity';
 
@@ -11,10 +20,10 @@ export class Company extends BaseEntity {
   @Column()
   name: string;
 
-  @OneToMany(() => WorkExperience, workExperience => workExperience.company)
+  @OneToMany(() => WorkExperience, (workExperience) => workExperience.company)
   workExperiences: WorkExperience[];
 
-  @OneToMany(() => Project, project => project.company)
+  @OneToMany(() => Project, (project) => project.company)
   projects: Project[];
 
   @CreateDateColumn()

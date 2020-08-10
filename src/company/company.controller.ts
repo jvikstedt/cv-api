@@ -1,4 +1,19 @@
-import { Controller, Get, Post, Body, Delete, Param, ParseIntPipe, UseGuards, Patch, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Delete,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  Patch,
+  UsePipes,
+  ValidationPipe,
+  BadRequestException,
+  ValidationError,
+  HttpException,
+} from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { Company } from './company.entity';
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -12,27 +27,34 @@ import { SearchCompanyDto } from './dto/search-company.dto';
 @Controller('company')
 @UseGuards(AuthGuard())
 export class CompanyController {
-  constructor(
-    private readonly companyService: CompanyService,
-  ) {}
+  constructor(private readonly companyService: CompanyService) {}
 
   @Post()
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
   create(@Body() createCompanyDto: CreateCompanyDto): Promise<Company> {
     return this.companyService.create(createCompanyDto);
   }
 
   @Patch('/:companyId')
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
-  patch(@Param('companyId', ParseIntPipe) companyId: number, @Body() patchCompanyDto: PatchCompanyDto): Promise<Company> {
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
+  patch(
+    @Param('companyId', ParseIntPipe) companyId: number,
+    @Body() patchCompanyDto: PatchCompanyDto,
+  ): Promise<Company> {
     return this.companyService.patch(companyId, patchCompanyDto);
   }
 
@@ -52,11 +74,14 @@ export class CompanyController {
   }
 
   @Post('/search')
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
   search(@Body() searchCompanyDto: SearchCompanyDto): Promise<Company[]> {
     return this.companyService.search(searchCompanyDto);
   }

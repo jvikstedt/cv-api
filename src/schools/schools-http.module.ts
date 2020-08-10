@@ -5,10 +5,7 @@ import { AuthModule } from '../auth/auth.module';
 import { SchoolsModule } from './schools.module';
 
 @Module({
-  imports: [
-    SchoolsModule,
-    AuthModule,
-  ],
+  imports: [SchoolsModule, AuthModule],
   controllers: [SchoolsController],
   providers: [SchoolsService],
 })

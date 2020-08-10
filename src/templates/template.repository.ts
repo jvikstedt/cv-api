@@ -4,7 +4,10 @@ import { CreateTemplateDto } from './dto/create-template.dto';
 
 @EntityRepository(Template)
 export class TemplateRepository extends Repository<Template> {
-  async createTemplate(userId: number, createTemplateDto: CreateTemplateDto): Promise<Template> {
+  async createTemplate(
+    userId: number,
+    createTemplateDto: CreateTemplateDto,
+  ): Promise<Template> {
     const { name, exporter, data } = createTemplateDto;
 
     const template = this.create({

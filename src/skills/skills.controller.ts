@@ -1,4 +1,19 @@
-import { Controller, Get, Post, Body, Delete, Param, ParseIntPipe, UseGuards, Patch, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Delete,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  Patch,
+  UsePipes,
+  ValidationPipe,
+  BadRequestException,
+  ValidationError,
+  HttpException,
+} from '@nestjs/common';
 import { SkillsService } from './skills.service';
 import { Skill } from './skill.entity';
 import { CreateSkillDto } from './dto/create-skill.dto';
@@ -12,32 +27,39 @@ import { CVGuard } from '../cv/cv.guard';
 @Controller('cv/:cvId/skills')
 @UseGuards(AuthGuard())
 export class SkillsController {
-  constructor(
-    private readonly skillsService: SkillsService,
-  ) {}
+  constructor(private readonly skillsService: SkillsService) {}
 
   @Post()
   @UseGuards(CVGuard)
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
-  create(@Param('cvId', ParseIntPipe) cvId: number, @Body() createSkillDto: CreateSkillDto): Promise<Skill> {
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
+  create(
+    @Param('cvId', ParseIntPipe) cvId: number,
+    @Body() createSkillDto: CreateSkillDto,
+  ): Promise<Skill> {
     return this.skillsService.create(cvId, createSkillDto);
   }
 
   @Patch('/:skillId')
   @UseGuards(CVGuard)
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
   patch(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('skillId', ParseIntPipe) skillId: number,
-    @Body() patchSkillDto: PatchSkillDto
+    @Body() patchSkillDto: PatchSkillDto,
   ): Promise<Skill> {
     return this.skillsService.patch(cvId, skillId, patchSkillDto);
   }
@@ -59,7 +81,7 @@ export class SkillsController {
   @UseGuards(CVGuard)
   remove(
     @Param('cvId', ParseIntPipe) cvId: number,
-    @Param('skillId', ParseIntPipe) skillId: number
+    @Param('skillId', ParseIntPipe) skillId: number,
   ): Promise<Skill> {
     return this.skillsService.remove(cvId, skillId);
   }

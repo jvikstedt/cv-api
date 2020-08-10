@@ -25,17 +25,16 @@ describe('EducationsController', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-      ],
+      imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
       controllers: [EducationsController],
       providers: [
         { provide: EducationsService, useFactory: mockEducationsService },
       ],
-    })
-    .compile();
+    }).compile();
 
-    educationsController = module.get<EducationsController>(EducationsController);
+    educationsController = module.get<EducationsController>(
+      EducationsController,
+    );
     educationsService = module.get<EducationsService>(EducationsService);
   });
 
@@ -44,12 +43,26 @@ describe('EducationsController', () => {
       const cvId = 2;
       const educationId = 1;
       const patchEducationDto: PatchEducationDto = { endYear: 2020 };
-      const oldEducation = await factory(Education)().make({ id: educationId, endYear: 2019 });
-      educationsService.patch.mockResolvedValue({ ...oldEducation, ...patchEducationDto });
+      const oldEducation = await factory(Education)().make({
+        id: educationId,
+        endYear: 2019,
+      });
+      educationsService.patch.mockResolvedValue({
+        ...oldEducation,
+        ...patchEducationDto,
+      });
 
       expect(educationsService.patch).not.toHaveBeenCalled();
-      const result = await educationsController.patch(cvId, educationId, patchEducationDto);
-      expect(educationsService.patch).toHaveBeenCalledWith(cvId, educationId, patchEducationDto);
+      const result = await educationsController.patch(
+        cvId,
+        educationId,
+        patchEducationDto,
+      );
+      expect(educationsService.patch).toHaveBeenCalledWith(
+        cvId,
+        educationId,
+        patchEducationDto,
+      );
       expect(result).toEqual({ ...oldEducation, ...patchEducationDto });
     });
   });
@@ -70,8 +83,14 @@ describe('EducationsController', () => {
       educationsService.create.mockResolvedValue(education);
 
       expect(educationsService.create).not.toHaveBeenCalled();
-      const result = await educationsController.create(cvId, createEducationDto);
-      expect(educationsService.create).toHaveBeenCalledWith(cvId, createEducationDto);
+      const result = await educationsController.create(
+        cvId,
+        createEducationDto,
+      );
+      expect(educationsService.create).toHaveBeenCalledWith(
+        cvId,
+        createEducationDto,
+      );
       expect(result).toEqual(education);
     });
   });

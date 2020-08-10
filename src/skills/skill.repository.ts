@@ -4,7 +4,10 @@ import { CreateSkillDto } from './dto/create-skill.dto';
 
 @EntityRepository(Skill)
 export class SkillRepository extends Repository<Skill> {
-  async createSkill(cvId: number, createSkillDto: CreateSkillDto): Promise<Skill> {
+  async createSkill(
+    cvId: number,
+    createSkillDto: CreateSkillDto,
+  ): Promise<Skill> {
     const skill = this.create({
       skillSubjectId: createSkillDto.skillSubjectId,
       experienceInYears: createSkillDto.experienceInYears,

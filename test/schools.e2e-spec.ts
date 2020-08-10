@@ -43,21 +43,19 @@ describe('SchoolsController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .get('/schools')
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toStrictEqual([
         {
           ...school,
           createdAt: school.createdAt.toJSON(),
           updatedAt: school.updatedAt.toJSON(),
-        }
+        },
       ]);
     });
 
     it('responds with 401 when not authenticated', async () => {
-      await request(app.getHttpServer())
-        .get('/schools')
-        .expect(401)
+      await request(app.getHttpServer()).get('/schools').expect(401);
     });
   });
 
@@ -67,7 +65,7 @@ describe('SchoolsController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .get(`/schools/${school.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toStrictEqual({
         ...school,
@@ -80,7 +78,7 @@ describe('SchoolsController (e2e)', () => {
       await request(app.getHttpServer())
         .get('/schools/2')
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
   });
 
@@ -90,7 +88,7 @@ describe('SchoolsController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .delete(`/schools/${school.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toEqual({});
     });
@@ -99,7 +97,7 @@ describe('SchoolsController (e2e)', () => {
       await request(app.getHttpServer())
         .get('/schools/2')
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(404)
+        .expect(404);
     });
   });
 
@@ -111,9 +109,9 @@ describe('SchoolsController (e2e)', () => {
         .post('/schools')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(newSchool)
-        .expect(201)
+        .expect(201);
 
-      expect(response.body).toMatchObject({ ...newSchool, id: 1 });;
+      expect(response.body).toMatchObject({ ...newSchool, id: 1 });
     });
 
     it('fails and responds status 400 when name is empty', async () => {
@@ -122,7 +120,7 @@ describe('SchoolsController (e2e)', () => {
         .post('/schools')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(newSchool)
-        .expect(400)
+        .expect(400);
     });
   });
 
@@ -138,12 +136,12 @@ describe('SchoolsController (e2e)', () => {
         .patch(`/schools/${school.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send(patchSchoolDto)
-        .expect(200)
+        .expect(200);
 
       expect(response.body).toMatchObject({
         id: school.id,
         name: patchSchoolDto.name,
-      });;
+      });
     });
   });
 });

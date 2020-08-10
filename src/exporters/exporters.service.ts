@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import * as R from 'ramda';
 import * as puppeteer from 'puppeteer';
-import * as nunjucks from "nunjucks";
+import * as nunjucks from 'nunjucks';
 import createReport from 'docx-templates';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -22,7 +22,7 @@ export class ExportersService {
 
     const content = nunjucks.renderString(
       exportPdfDto.bodyTemplate,
-      exportPdfDto.data
+      exportPdfDto.data,
     );
 
     const browser = await puppeteer.launch({ headless: true });
@@ -61,7 +61,12 @@ export class ExportersService {
       cmdDelimiter: ['{{', '}}'],
       additionalJsContext: {
         R,
-        image: async (id: string, width: number, height: number) => {
+        image: async (
+          id: string,
+          width: number,
+          height: number,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ): Promise<any> => {
           if (!id) {
             return null;
           }
@@ -69,19 +74,22 @@ export class ExportersService {
           if (!entity) {
             return null;
           }
-          const extension = path.extname(entity.originalname)
+          const extension = path.extname(entity.originalname);
           const file = fs.readFileSync(`./files/${id}`);
 
           return { width, height, data: file, extension };
         },
-        formatYearMonth: (month: number | null, year: number | null) => {
+        formatYearMonth: (
+          month: number | null,
+          year: number | null,
+        ): string => {
           if (month && year) {
             return `${month}.${year}`;
           }
 
           return `${month ? month : ''}${year ? year : ''}`;
-        }
-      }
+        },
+      },
     });
 
     return buffer;

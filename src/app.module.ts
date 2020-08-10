@@ -16,7 +16,7 @@ import { FilesHttpModule } from './files/files-http.module';
 import { SchoolsHttpModule } from './schools/schools-http.module';
 import { CompanyHttpModule } from './company/company-http.module';
 import { ProjectHttpModule } from './project/project-http.module';
-import typeOrmConfig = require("./config/typeorm.config");
+import typeOrmConfig = require('./config/typeorm.config');
 
 @Module({
   imports: [

@@ -5,10 +5,7 @@ import { AuthModule } from '../auth/auth.module';
 import { SkillGroupsModule } from './skill-groups.module';
 
 @Module({
-  imports: [
-    SkillGroupsModule,
-    AuthModule,
-  ],
+  imports: [SkillGroupsModule, AuthModule],
   controllers: [SkillGroupsController],
   providers: [SkillGroupsService],
 })

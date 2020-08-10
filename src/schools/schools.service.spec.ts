@@ -60,7 +60,9 @@ describe('SchoolsService', () => {
     it('throws an error as school is not found', async () => {
       schoolRepository.findOne.mockResolvedValue(null);
 
-      await expect(schoolsService.findOne(1)).rejects.toThrow(NotFoundException);
+      await expect(schoolsService.findOne(1)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -99,7 +101,9 @@ describe('SchoolsService', () => {
       expect(schoolRepository.createSchool).not.toHaveBeenCalled();
       const result = await schoolsService.create(createSchoolDto);
       expect(result).toEqual(school);
-      expect(schoolRepository.createSchool).toHaveBeenCalledWith(createSchoolDto);
+      expect(schoolRepository.createSchool).toHaveBeenCalledWith(
+        createSchoolDto,
+      );
     });
   });
 
@@ -116,13 +120,18 @@ describe('SchoolsService', () => {
       const result = await schoolsService.patch(1, patchSchoolDto);
       expect(result).toEqual({ ...school, ...patchSchoolDto });
       expect(schoolRepository.findOne).toHaveBeenCalledWith(1);
-      expect(schoolRepository.save).toHaveBeenCalledWith({ ...school, ...patchSchoolDto });
+      expect(schoolRepository.save).toHaveBeenCalledWith({
+        ...school,
+        ...patchSchoolDto,
+      });
     });
 
     it('throws an error as school is not found', async () => {
       schoolRepository.findOne.mockResolvedValue(null);
 
-      await expect(schoolsService.patch(1, {})).rejects.toThrow(NotFoundException);
+      await expect(schoolsService.patch(1, {})).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

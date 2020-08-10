@@ -1,5 +1,5 @@
-import { define } from 'typeorm-seeding'
-import { Skill } from "./skill.entity"
+import { define } from 'typeorm-seeding';
+import { Skill } from './skill.entity';
 
 define(Skill, () => {
   const skill = new Skill();
@@ -8,4 +8,4 @@ define(Skill, () => {
   skill.highlight = false;
 
   return skill;
-})
+});

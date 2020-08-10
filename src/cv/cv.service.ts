@@ -10,7 +10,12 @@ import { CVRepository } from './cv.repository';
 import { PatchCVDto } from './dto/patch-cv.dto';
 import { ELASTIC_INDEX_CV } from '../constants';
 import { SearchCVDto, SkillSearch } from './dto/search-cv.dto';
-import { QUEUE_NAME_CV, CONFIG_QUEUE, CONFIG_QUEUE_CV_RELOAD, EventType } from '../constants';
+import {
+  QUEUE_NAME_CV,
+  CONFIG_QUEUE,
+  CONFIG_QUEUE_CV_RELOAD,
+  EventType,
+} from '../constants';
 import { InjectQueue } from '@nestjs/bull';
 
 const queueConfig = config.get(CONFIG_QUEUE);
@@ -29,18 +34,20 @@ export class CVService {
   ) {}
 
   async patch(cvId: number, patchCVDto: PatchCVDto): Promise<CV> {
-    const oldCV = await this.findOne(cvId)
+    const oldCV = await this.findOne(cvId);
 
-    const newCV = await this.cvRepository.save(
-      R.merge(oldCV, patchCVDto),
+    const newCV = await this.cvRepository.save(R.merge(oldCV, patchCVDto));
+
+    await this.cvQueue.add(
+      EventType.Reload,
+      {
+        id: cvId,
+        updateTimestamp: true,
+      },
+      {
+        delay: cvReloadDelay,
+      },
     );
-
-    await this.cvQueue.add(EventType.Reload, {
-      id: cvId,
-      updateTimestamp: true,
-    }, {
-      delay: cvReloadDelay,
-    });
 
     return newCV;
   }
@@ -62,38 +69,86 @@ export class CVService {
 
   async search(searchCVDto: SearchCVDto): Promise<CV[]> {
     let body = esb.requestBodySearch().query(
-      esb.boolQuery()
+      esb
+        .boolQuery()
         .must([
-          R.isEmpty(searchCVDto.fullName) ? esb.matchAllQuery() : esb.matchQuery('fullName', searchCVDto.fullName),
-          ...R.map((skill: SkillSearch) =>
-            esb.nestedQuery()
-              .path('skills')
-              .query(esb.termQuery('skills.skillSubjectId', skill.skillSubjectId)),
-            R.filter(skill => skill.required, searchCVDto.skills))
+          R.isEmpty(searchCVDto.fullName)
+            ? esb.matchAllQuery()
+            : esb.matchQuery('fullName', searchCVDto.fullName),
+          ...R.map(
+            (skill: SkillSearch) =>
+              esb
+                .nestedQuery()
+                .path('skills')
+                .query(
+                  esb.termQuery('skills.skillSubjectId', skill.skillSubjectId),
+                ),
+            R.filter((skill) => skill.required, searchCVDto.skills),
+          ),
         ])
         .should([
-          ...R.isEmpty(searchCVDto.text) ? [] : [
-            esb.multiMatchQuery(['location', 'jobTitle', 'fullName', 'email'], searchCVDto.text),
-            esb.nestedQuery()
-              .path('workExperiences')
-              .query(esb.matchQuery('workExperiences.companyName', searchCVDto.text)),
-            esb.nestedQuery()
-              .path('educations')
-              .query(esb.multiMatchQuery(['educations.schoolName', 'educations.degree', 'educations.fieldOfStudy'], searchCVDto.text)),
-            esb.nestedQuery()
-              .path('projectMemberships')
-              .query(esb.multiMatchQuery(['projectMemberships.projectName', 'projectMemberships.companyName'], searchCVDto.text)),
-          ],
-          ...R.map((skill: SkillSearch) =>
-            esb.nestedQuery()
-              .path('skills')
-              .query(esb.termQuery('skills.skillSubjectId', skill.skillSubjectId)),
-            R.reject(skill => skill.required, searchCVDto.skills))
-        ])
+          ...(R.isEmpty(searchCVDto.text)
+            ? []
+            : [
+                esb.multiMatchQuery(
+                  ['location', 'jobTitle', 'fullName', 'email'],
+                  searchCVDto.text,
+                ),
+                esb
+                  .nestedQuery()
+                  .path('workExperiences')
+                  .query(
+                    esb.matchQuery(
+                      'workExperiences.companyName',
+                      searchCVDto.text,
+                    ),
+                  ),
+                esb
+                  .nestedQuery()
+                  .path('educations')
+                  .query(
+                    esb.multiMatchQuery(
+                      [
+                        'educations.schoolName',
+                        'educations.degree',
+                        'educations.fieldOfStudy',
+                      ],
+                      searchCVDto.text,
+                    ),
+                  ),
+                esb
+                  .nestedQuery()
+                  .path('projectMemberships')
+                  .query(
+                    esb.multiMatchQuery(
+                      [
+                        'projectMemberships.projectName',
+                        'projectMemberships.companyName',
+                      ],
+                      searchCVDto.text,
+                    ),
+                  ),
+              ]),
+          ...R.map(
+            (skill: SkillSearch) =>
+              esb
+                .nestedQuery()
+                .path('skills')
+                .query(
+                  esb.termQuery('skills.skillSubjectId', skill.skillSubjectId),
+                ),
+            R.reject((skill) => skill.required, searchCVDto.skills),
+          ),
+        ]),
     );
 
     if (searchCVDto.sorts) {
-      body = body.sorts(R.map(sort => new esb.Sort(sort.field, sort.order) as esb.Sort, searchCVDto.sorts))
+      body = body.sorts(
+        R.map(
+          (sort) => new esb.Sort(sort.field, sort.order) as esb.Sort,
+          searchCVDto.sorts,
+        ),
+      );
     }
 
     const res = await this.elasticsearchService.search({
@@ -105,6 +160,6 @@ export class CVService {
     if (res.statusCode !== 200) {
       throw new Error(`Elasticsearch returned status: ${res.statusCode}`);
     }
-    return R.map(h => h._source, res.body.hits.hits);
+    return R.map((h) => h._source, res.body.hits.hits);
   }
 }

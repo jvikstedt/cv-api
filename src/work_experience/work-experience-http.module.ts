@@ -6,11 +6,7 @@ import { WorkExperienceModule } from './work-experience.module';
 import { CVModule } from '../cv/cv.module';
 
 @Module({
-  imports: [
-    WorkExperienceModule,
-    AuthModule,
-    CVModule,
-  ],
+  imports: [WorkExperienceModule, AuthModule, CVModule],
   controllers: [WorkExperienceController],
   providers: [WorkExperienceService],
 })

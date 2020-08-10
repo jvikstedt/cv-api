@@ -13,12 +13,12 @@ describe('WorkExperienceRepository', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [
-        WorkExperienceRepository,
-      ],
+      providers: [WorkExperienceRepository],
     }).compile();
 
-    workExperienceRepository = module.get<WorkExperienceRepository>(WorkExperienceRepository);
+    workExperienceRepository = module.get<WorkExperienceRepository>(
+      WorkExperienceRepository,
+    );
   });
 
   describe('createWorkExperience', () => {
@@ -40,11 +40,17 @@ describe('WorkExperienceRepository', () => {
         endYear: 2004,
         endMonth: 12,
       };
-      const workExperience = await factory(WorkExperience)().make({ ...createWorkExperienceDto, cvId });
+      const workExperience = await factory(WorkExperience)().make({
+        ...createWorkExperienceDto,
+        cvId,
+      });
       save.mockResolvedValue(workExperience);
 
       expect(save).not.toHaveBeenCalled();
-      const result = await workExperienceRepository.createWorkExperience(cvId, createWorkExperienceDto);
+      const result = await workExperienceRepository.createWorkExperience(
+        cvId,
+        createWorkExperienceDto,
+      );
       expect(save).toHaveBeenCalled();
       expect(result).toEqual(workExperience);
     });

@@ -1,4 +1,19 @@
-import { Controller, Get, Post, Body, Delete, Param, ParseIntPipe, UseGuards, Patch, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Delete,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  Patch,
+  UsePipes,
+  ValidationPipe,
+  BadRequestException,
+  ValidationError,
+  HttpException,
+} from '@nestjs/common';
 import { SchoolsService } from './schools.service';
 import { School } from './school.entity';
 import { CreateSchoolDto } from './dto/create-school.dto';
@@ -12,27 +27,34 @@ import { SearchSchoolDto } from './dto/search-school.dto';
 @Controller('schools')
 @UseGuards(AuthGuard())
 export class SchoolsController {
-  constructor(
-    private readonly schoolsService: SchoolsService,
-  ) {}
+  constructor(private readonly schoolsService: SchoolsService) {}
 
   @Post()
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
   create(@Body() createSchoolDto: CreateSchoolDto): Promise<School> {
     return this.schoolsService.create(createSchoolDto);
   }
 
   @Patch('/:schoolId')
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
-  patch(@Param('schoolId', ParseIntPipe) schoolId: number, @Body() patchSchoolDto: PatchSchoolDto): Promise<School> {
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
+  patch(
+    @Param('schoolId', ParseIntPipe) schoolId: number,
+    @Body() patchSchoolDto: PatchSchoolDto,
+  ): Promise<School> {
     return this.schoolsService.patch(schoolId, patchSchoolDto);
   }
 
@@ -52,11 +74,14 @@ export class SchoolsController {
   }
 
   @Post('/search')
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
   search(@Body() searchSchoolDto: SearchSchoolDto): Promise<School[]> {
     return this.schoolsService.search(searchSchoolDto);
   }

@@ -1,4 +1,19 @@
-import { Controller, Get, Post, Body, Delete, Param, ParseIntPipe, UseGuards, Patch, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Delete,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  Patch,
+  UsePipes,
+  ValidationPipe,
+  BadRequestException,
+  ValidationError,
+  HttpException,
+} from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { Project } from './project.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -12,27 +27,34 @@ import { SearchProjectDto } from './dto/search-project.dto';
 @Controller('project')
 @UseGuards(AuthGuard())
 export class ProjectController {
-  constructor(
-    private readonly projectService: ProjectService,
-  ) {}
+  constructor(private readonly projectService: ProjectService) {}
 
   @Post()
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
   create(@Body() createProjectDto: CreateProjectDto): Promise<Project> {
     return this.projectService.create(createProjectDto);
   }
 
   @Patch('/:projectId')
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
-  patch(@Param('projectId', ParseIntPipe) projectId: number, @Body() patchProjectDto: PatchProjectDto): Promise<Project> {
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
+  patch(
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @Body() patchProjectDto: PatchProjectDto,
+  ): Promise<Project> {
     return this.projectService.patch(projectId, patchProjectDto);
   }
 
@@ -52,11 +74,14 @@ export class ProjectController {
   }
 
   @Post('/search')
-  @UsePipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    exceptionFactory: (errors) => new BadRequestException(errors)
-  }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors: ValidationError[]): HttpException =>
+        new BadRequestException(errors),
+    }),
+  )
   search(@Body() searchProjectDto: SearchProjectDto): Promise<Project[]> {
     return this.projectService.search(searchProjectDto);
   }

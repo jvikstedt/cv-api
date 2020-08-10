@@ -24,15 +24,10 @@ describe('ProjectController', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-      ],
+      imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
       controllers: [ProjectController],
-      providers: [
-        { provide: ProjectService, useFactory: mockProjectService },
-      ],
-    })
-    .compile();
+      providers: [{ provide: ProjectService, useFactory: mockProjectService }],
+    }).compile();
 
     projectController = module.get<ProjectController>(ProjectController);
     projectService = module.get<ProjectService>(ProjectService);
@@ -79,19 +74,27 @@ describe('ProjectController', () => {
 
       expect(projectService.create).not.toHaveBeenCalled();
       const result = await projectController.create({ name: project.name });
-      expect(projectService.create).toHaveBeenCalledWith({ name: project.name });
+      expect(projectService.create).toHaveBeenCalledWith({
+        name: project.name,
+      });
       expect(result).toEqual(project);
     });
   });
 
   describe('patch', () => {
     it('calls service patch', async () => {
-      const project = await factory(Project)().make({ id: 1, name: 'old project' });
+      const project = await factory(Project)().make({
+        id: 1,
+        name: 'old project',
+      });
       const patchProjectDto: PatchProjectDto = {
         name: 'new project',
       };
 
-      projectService.patch.mockResolvedValue({ ...project, ...patchProjectDto });
+      projectService.patch.mockResolvedValue({
+        ...project,
+        ...patchProjectDto,
+      });
 
       expect(projectService.patch).not.toHaveBeenCalled();
       const result = await projectController.patch(1, patchProjectDto);

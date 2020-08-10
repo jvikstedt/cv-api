@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Delete, Param, UseGuards, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Param,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  Res,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { FilesService } from './files.service';
 import { File } from './file.entity';
@@ -11,16 +21,12 @@ import { CreateFileDto } from './dto/create-file.dto';
 @ApiTags('files')
 @Controller('files')
 export class FilesController {
-  constructor(
-    private readonly filesService: FilesService,
-  ) {}
+  constructor(private readonly filesService: FilesService) {}
 
   @UseGuards(AuthGuard())
   @Post()
-  @UseInterceptors(
-    FileInterceptor('file', { dest: './files' }),
-  )
-  async uploadedFile(@UploadedFile() file: any): Promise<File> {
+  @UseInterceptors(FileInterceptor('file', { dest: './files' }))
+  async uploadedFile(@UploadedFile() file: File): Promise<File> {
     const createFileDto: CreateFileDto = {
       originalname: file.originalname,
       encoding: file.encoding,

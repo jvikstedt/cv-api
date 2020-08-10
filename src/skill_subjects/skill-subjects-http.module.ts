@@ -5,10 +5,7 @@ import { AuthModule } from '../auth/auth.module';
 import { SkillSubjectsModule } from './skill-subjects.module';
 
 @Module({
-  imports: [
-    SkillSubjectsModule,
-    AuthModule,
-  ],
+  imports: [SkillSubjectsModule, AuthModule],
   controllers: [SkillSubjectsController],
   providers: [SkillSubjectsService],
 })

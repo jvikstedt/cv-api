@@ -1,5 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
-import { HealthCheckService, HealthCheck, TypeOrmHealthIndicator } from '@nestjs/terminus';
+import {
+  HealthCheckService,
+  HealthCheck,
+  TypeOrmHealthIndicator,
+  HealthIndicatorResult,
+  HealthCheckResult,
+} from '@nestjs/terminus';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('health')
@@ -12,9 +18,10 @@ export class HealthController {
 
   @Get()
   @HealthCheck()
-  readiness() {
+  readiness(): Promise<HealthCheckResult> {
     return this.health.check([
-      () => this.db.pingCheck('database', { timeout: 300 }),
+      (): Promise<HealthIndicatorResult> =>
+        this.db.pingCheck('database', { timeout: 300 }),
     ]);
   }
 }

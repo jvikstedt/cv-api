@@ -39,4 +39,4 @@ export enum EventType {
   Update = 'update',
   Remove = 'remove',
   Reload = 'reload',
-};
+}

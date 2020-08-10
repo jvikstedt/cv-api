@@ -1,4 +1,12 @@
-import { PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, ManyToOne, Column } from 'typeorm';
+import {
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  Column,
+} from 'typeorm';
 import { CV } from '../cv/cv.entity';
 import { Project } from '../project/project.entity';
 
@@ -25,7 +33,7 @@ export class ProjectMembership extends BaseEntity {
   @Column({ default: false })
   highlight: boolean;
 
-  @ManyToOne(() => CV, cv => cv.projectMemberships, {
+  @ManyToOne(() => CV, (cv) => cv.projectMemberships, {
     nullable: false,
   })
   cv: CV;
@@ -33,7 +41,7 @@ export class ProjectMembership extends BaseEntity {
   @Column()
   cvId: number;
 
-  @ManyToOne(() => Project, project => project.projectMemberships, {
+  @ManyToOne(() => Project, (project) => project.projectMemberships, {
     nullable: false,
   })
   project: Project;

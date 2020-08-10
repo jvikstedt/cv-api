@@ -11,9 +11,7 @@ describe('JwtStrategy', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [
-        JwtStrategy,
-      ],
+      providers: [JwtStrategy],
     }).compile();
 
     jwtStrategy = module.get<JwtStrategy>(JwtStrategy);

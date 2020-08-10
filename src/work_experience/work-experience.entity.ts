@@ -1,4 +1,12 @@
-import { PrimaryGeneratedColumn, BaseEntity, Entity, CreateDateColumn, UpdateDateColumn, ManyToOne, Column } from 'typeorm';
+import {
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  Column,
+} from 'typeorm';
 import { CV } from '../cv/cv.entity';
 import { Company } from '../company/company.entity';
 
@@ -25,7 +33,7 @@ export class WorkExperience extends BaseEntity {
   @Column({ type: 'smallint', nullable: true })
   endMonth: number;
 
-  @ManyToOne(() => CV, cv => cv.workExperiences, {
+  @ManyToOne(() => CV, (cv) => cv.workExperiences, {
     nullable: false,
   })
   cv: CV;
@@ -33,7 +41,7 @@ export class WorkExperience extends BaseEntity {
   @Column()
   cvId: number;
 
-  @ManyToOne(() => Company, company => company.workExperiences, {
+  @ManyToOne(() => Company, (company) => company.workExperiences, {
     nullable: false,
   })
   company: Company;
