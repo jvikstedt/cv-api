@@ -36,13 +36,12 @@ export class ExportersController {
         new BadRequestException(errors),
     }),
   )
-  exportPdf(
+  async exportPdf(
     @Res() res: Response,
     @Body() exportPdfDto: ExportPdfDto,
   ): Promise<void> {
-    return this.exportersService.exportPdf(exportPdfDto).then((response) => {
-      res.send(response);
-    });
+    const response = await this.exportersService.exportPdf(exportPdfDto);
+    res.send(response);
   }
 
   @Post('/docx/export')
@@ -54,19 +53,18 @@ export class ExportersController {
         new BadRequestException(errors),
     }),
   )
-  exportDocx(
+  async exportDocx(
     @Res() res: Response,
     @Body() exportDocxDto: ExportDocxDto,
   ): Promise<void> {
-    return this.exportersService.exportDocx(exportDocxDto).then((response) => {
-      const readStream = new stream.PassThrough();
-      readStream.end(response);
-      res.set('Content-disposition', 'attachment; filename=' + 'output.docx');
-      res.set(
-        'Content-Type',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      );
-      readStream.pipe(res);
-    });
+    const response = await this.exportersService.exportDocx(exportDocxDto);
+    const readStream = new stream.PassThrough();
+    readStream.end(response);
+    res.set('Content-disposition', 'attachment; filename=' + 'output.docx');
+    res.set(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    );
+    readStream.pipe(res);
   }
 }
