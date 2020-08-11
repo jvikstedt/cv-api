@@ -5,7 +5,7 @@ import * as nunjucks from 'nunjucks';
 import createReport from 'docx-templates';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { ExportPdfDto } from './dto/export-pdf.dto';
 import { ExportDocxDto } from './dto/export-docx.dto';
 import { FileRepository } from '../files/file.repository';
@@ -18,80 +18,100 @@ export class ExportersService {
   ) {}
 
   async exportPdf(exportPdfDto: ExportPdfDto): Promise<Buffer> {
-    nunjucks.configure({ autoescape: true });
+    try {
+      nunjucks.configure({ autoescape: true });
+      const content = nunjucks.renderString(
+        exportPdfDto.bodyTemplate,
+        exportPdfDto.data,
+      );
 
-    const content = nunjucks.renderString(
-      exportPdfDto.bodyTemplate,
-      exportPdfDto.data,
-    );
-
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    await page.setContent(content);
-    const buffer = await page.pdf({
-      scale: exportPdfDto.scale,
-      displayHeaderFooter: exportPdfDto.displayHeaderFooter,
-      headerTemplate: exportPdfDto.headerTemplate,
-      footerTemplate: exportPdfDto.footerTemplate,
-      printBackground: exportPdfDto.printBackground,
-      landscape: exportPdfDto.landscape,
-      pageRanges: exportPdfDto.pageRanges,
-      format: exportPdfDto.format as puppeteer.PDFFormat,
-      width: exportPdfDto.width,
-      height: exportPdfDto.height,
-      margin: {
-        top: exportPdfDto.marginTop,
-        right: exportPdfDto.marginRight,
-        bottom: exportPdfDto.marginBottom,
-        left: exportPdfDto.marginLeft,
-      },
-      preferCSSPageSize: exportPdfDto.preferCSSPageSize,
-    });
-    await browser.close();
-    return buffer;
+      const browser = await puppeteer.launch({ headless: true });
+      const page = await browser.newPage();
+      await page.setContent(content);
+      const buffer = await page.pdf({
+        scale: exportPdfDto.scale,
+        displayHeaderFooter: exportPdfDto.displayHeaderFooter,
+        headerTemplate: exportPdfDto.headerTemplate,
+        footerTemplate: exportPdfDto.footerTemplate,
+        printBackground: exportPdfDto.printBackground,
+        landscape: exportPdfDto.landscape,
+        pageRanges: exportPdfDto.pageRanges,
+        format: exportPdfDto.format as puppeteer.PDFFormat,
+        width: exportPdfDto.width,
+        height: exportPdfDto.height,
+        margin: {
+          top: exportPdfDto.marginTop,
+          right: exportPdfDto.marginRight,
+          bottom: exportPdfDto.marginBottom,
+          left: exportPdfDto.marginLeft,
+        },
+        preferCSSPageSize: exportPdfDto.preferCSSPageSize,
+      });
+      await browser.close();
+      return buffer;
+    } catch (err) {
+      console.log(err.toString());
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: err.toString(),
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async exportDocx(exportDocxDto: ExportDocxDto): Promise<Uint8Array> {
     const fileId = exportDocxDto.fileId;
     const template = fs.readFileSync(`./files/${fileId}`);
 
-    const buffer = await createReport({
-      template,
-      data: exportDocxDto.data,
-      cmdDelimiter: ['{{', '}}'],
-      additionalJsContext: {
-        R,
-        image: async (
-          id: string,
-          width: number,
-          height: number,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ): Promise<any> => {
-          if (!id) {
-            return null;
-          }
-          const entity = await this.fileRepository.findOne(id);
-          if (!entity) {
-            return null;
-          }
-          const extension = path.extname(entity.originalname);
-          const file = fs.readFileSync(`./files/${id}`);
+    try {
+      const buffer = await createReport({
+        template,
+        data: exportDocxDto.data,
+        cmdDelimiter: ['{{', '}}'],
+        additionalJsContext: {
+          R,
+          image: async (
+            id: string,
+            width: number,
+            height: number,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ): Promise<any> => {
+            if (!id) {
+              return null;
+            }
+            const entity = await this.fileRepository.findOne(id);
+            if (!entity) {
+              return null;
+            }
+            const extension = path.extname(entity.originalname);
+            const file = fs.readFileSync(`./files/${id}`);
 
-          return { width, height, data: file, extension };
+            return { width, height, data: file, extension };
+          },
+          formatYearMonth: (
+            month: number | null,
+            year: number | null,
+          ): string => {
+            if (month && year) {
+              return `${month}.${year}`;
+            }
+
+            return `${month ? month : ''}${year ? year : ''}`;
+          },
         },
-        formatYearMonth: (
-          month: number | null,
-          year: number | null,
-        ): string => {
-          if (month && year) {
-            return `${month}.${year}`;
-          }
+      });
 
-          return `${month ? month : ''}${year ? year : ''}`;
+      return buffer;
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: err.toString(),
         },
-      },
-    });
-
-    return buffer;
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }
