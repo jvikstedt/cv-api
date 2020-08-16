@@ -85,11 +85,9 @@ export class CVService {
                 ),
             R.filter((skill) => skill.required, searchCVDto.skills),
           ),
-        ])
-        .should([
-          ...(R.isEmpty(searchCVDto.text)
-            ? []
-            : [
+          R.isEmpty(searchCVDto.text)
+            ? esb.matchAllQuery()
+            : esb.boolQuery().should([
                 esb.multiMatchQuery(
                   ['location', 'jobTitle', 'fullName', 'email'],
                   searchCVDto.text,
@@ -129,6 +127,8 @@ export class CVService {
                     ),
                   ),
               ]),
+        ])
+        .should([
           ...R.map(
             (skill: SkillSearch) =>
               esb
