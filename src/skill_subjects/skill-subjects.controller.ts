@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Put,
   Body,
   Delete,
   Param,
@@ -13,14 +12,15 @@ import {
   BadRequestException,
   ValidationError,
   HttpException,
+  Patch,
 } from '@nestjs/common';
 import { SkillSubjectsService } from './skill-subjects.service';
 import { SkillSubject } from './skill-subject.entity';
 import { CreateSkillSubjectDto } from './dto/create-skill-subject.dto';
-import { UpdateSkillSubjectDto } from './dto/update-skill-subject.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchSkillSubjectDto } from './dto/search-skill-subject.dto';
+import { PatchSkillSubjectDto } from './dto/patch-skill-subject.dto';
 
 @ApiBearerAuth()
 @ApiTags('skill_subjects')
@@ -44,7 +44,7 @@ export class SkillSubjectsController {
     return this.skillSubjectsService.create(createSkillSubjectDto);
   }
 
-  @Put('/:id')
+  @Patch('/:skillSubjectId')
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -53,11 +53,14 @@ export class SkillSubjectsController {
         new BadRequestException(errors),
     }),
   )
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateSkillSubjectDto: UpdateSkillSubjectDto,
+  patch(
+    @Param('skillSubjectId', ParseIntPipe) skillSubjectId: number,
+    @Body() patchSkillSubjectDto: PatchSkillSubjectDto,
   ): Promise<SkillSubject> {
-    return this.skillSubjectsService.update(id, updateSkillSubjectDto);
+    return this.skillSubjectsService.patch(
+      skillSubjectId,
+      patchSkillSubjectDto,
+    );
   }
 
   @Get()

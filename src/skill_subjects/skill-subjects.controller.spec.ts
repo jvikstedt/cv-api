@@ -4,13 +4,14 @@ import { PassportModule } from '@nestjs/passport';
 import { SkillSubjectsService } from './skill-subjects.service';
 import { SkillSubjectsController } from './skill-subjects.controller';
 import { SkillSubject } from './skill-subject.entity';
+import { PatchSkillSubjectDto } from './dto/patch-skill-subject.dto';
 
 const mockSkillSubjectsService = () => ({
   findAll: jest.fn(),
   findOne: jest.fn(),
   delete: jest.fn(),
   create: jest.fn(),
-  update: jest.fn(),
+  patch: jest.fn(),
 });
 
 describe('SkillSubjectsController', () => {
@@ -88,22 +89,31 @@ describe('SkillSubjectsController', () => {
     });
   });
 
-  describe('update', () => {
-    it('calls service update with id and passed data', async () => {
-      const skillSubject = await factory(SkillSubject)().make();
-      skillSubjectsService.update.mockResolvedValue({
-        ...skillSubject,
+  describe('patch', () => {
+    it('calls service patch', async () => {
+      const skillSubject = await factory(SkillSubject)().make({
+        id: 1,
+        name: 'vue',
+      });
+      const patchSkillSubjectDto: PatchSkillSubjectDto = {
         name: 'Vue.js',
+      };
+
+      skillSubjectsService.patch.mockResolvedValue({
+        ...skillSubject,
+        ...patchSkillSubjectDto,
       });
 
-      expect(skillSubjectsService.update).not.toHaveBeenCalled();
-      const result = await skillSubjectsController.update(1, {
-        name: 'Vue.js',
-      });
-      expect(skillSubjectsService.update).toHaveBeenCalledWith(1, {
-        name: 'Vue.js',
-      });
-      expect(result).toEqual({ ...skillSubject, name: 'Vue.js' });
+      expect(skillSubjectsService.patch).not.toHaveBeenCalled();
+      const result = await skillSubjectsController.patch(
+        1,
+        patchSkillSubjectDto,
+      );
+      expect(skillSubjectsService.patch).toHaveBeenCalledWith(
+        1,
+        patchSkillSubjectDto,
+      );
+      expect(result).toEqual({ ...skillSubject, ...patchSkillSubjectDto });
     });
   });
 });

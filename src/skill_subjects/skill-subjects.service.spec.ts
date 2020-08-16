@@ -4,8 +4,8 @@ import { SkillSubjectsService } from './skill-subjects.service';
 import { SkillSubjectRepository } from './skill-subject.repository';
 import { NotFoundException } from '@nestjs/common';
 import { CreateSkillSubjectDto } from './dto/create-skill-subject.dto';
-import { UpdateSkillSubjectDto } from './dto/update-skill-subject.dto';
 import { SkillSubject } from './skill-subject.entity';
+import { PatchSkillSubjectDto } from './dto/patch-skill-subject.dto';
 
 const mockSkillSubjectRepository = () => ({
   find: jest.fn(),
@@ -123,39 +123,36 @@ describe('SkillSubjectsService', () => {
     });
   });
 
-  describe('update', () => {
-    it('calls skillSubjectRepository.findOne(id) and skillSubjectRepository.save(skillSubject) successfully retrieves and return skillSubject', async () => {
-      const updateSkillSubjectDto: UpdateSkillSubjectDto = { name: 'Vue' };
-      const skillSubject = await factory(SkillSubject)().make();
+  describe('patch', () => {
+    it('finds skillSubject by id and updates it', async () => {
+      const skillSubject = await factory(SkillSubject)().make({ id: 1 });
+      const patchSkillSubjectDto: PatchSkillSubjectDto = { name: 'Vue' };
+
       skillSubjectRepository.findOne.mockResolvedValue(skillSubject);
       skillSubjectRepository.save.mockResolvedValue({
         ...skillSubject,
-        name: 'Vue',
+        ...patchSkillSubjectDto,
       });
 
       expect(skillSubjectRepository.findOne).not.toHaveBeenCalled();
       expect(skillSubjectRepository.save).not.toHaveBeenCalled();
-      const result = await skillSubjectsService.update(
-        1,
-        updateSkillSubjectDto,
-      );
-      expect(result).toEqual({ ...skillSubject, name: 'Vue' });
+      const result = await skillSubjectsService.patch(1, patchSkillSubjectDto);
+      expect(result).toEqual({ ...skillSubject, ...patchSkillSubjectDto });
       expect(skillSubjectRepository.findOne).toHaveBeenCalledWith(1, {
         relations: ['skillGroup'],
       });
       expect(skillSubjectRepository.save).toHaveBeenCalledWith({
         ...skillSubject,
-        name: 'Vue',
+        ...patchSkillSubjectDto,
       });
     });
 
-    it('throws an error as skillSubject is not found', async () => {
-      const updateSkillSubjectDto: UpdateSkillSubjectDto = { name: 'Vue' };
+    it('throws an error as school is not found', async () => {
       skillSubjectRepository.findOne.mockResolvedValue(null);
 
-      await expect(
-        skillSubjectsService.update(1, updateSkillSubjectDto),
-      ).rejects.toThrow(NotFoundException);
+      await expect(skillSubjectsService.patch(1, {})).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });
