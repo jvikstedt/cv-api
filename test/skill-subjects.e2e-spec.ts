@@ -6,6 +6,7 @@ import { SkillGroup } from '../src/skill_groups/skill-group.entity';
 import { TestHelper } from './test-helper';
 import { User } from '../src/users/user.entity';
 import { CV } from '../src/cv/cv.entity';
+import { PatchSkillSubjectDto } from '../src/skill_subjects/dto/patch-skill-subject.dto';
 
 describe('SkillSubjectsController (e2e)', () => {
   const testHelper: TestHelper = new TestHelper();
@@ -128,32 +129,27 @@ describe('SkillSubjectsController (e2e)', () => {
       .expect(400);
   });
 
-  it('/skill_subjects/:id (PUT)', async () => {
-    const skillGroup = await factory(SkillGroup)().create();
-    const skillSubject = await factory(SkillSubject)().create({
-      skillGroupId: skillGroup.id,
+  describe('/skill_subjects/:skillSubjectId (PATCH)', () => {
+    it('updates skillSubject', async () => {
+      const skillGroup = await factory(SkillGroup)().create();
+      const skillSubject = await factory(SkillSubject)().create({
+        skillGroupId: skillGroup.id,
+      });
+
+      const patchSkillSubjectDto: PatchSkillSubjectDto = {
+        name: 'vue',
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(`/skill_subjects/${skillSubject.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(patchSkillSubjectDto)
+        .expect(200);
+
+      expect(response.body).toMatchObject({
+        id: skillSubject.id,
+        name: patchSkillSubjectDto.name,
+      });
     });
-
-    let changes = await factory(SkillSubject)().make({ name: 'Vue.js' });
-    const response = await request(app.getHttpServer())
-      .put(`/skill_subjects/${skillSubject.id}`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send(changes)
-      .expect(200);
-
-    expect(response.body).toMatchObject({ ...changes, id: 1 });
-
-    await request(app.getHttpServer())
-      .post('/skill_subjects/2')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send(changes)
-      .expect(404);
-
-    changes = await factory(SkillSubject)().make({ name: '' });
-    await request(app.getHttpServer())
-      .put(`/skill_subjects/${skillSubject.id}`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send(changes)
-      .expect(400);
   });
 });
