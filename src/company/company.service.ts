@@ -27,7 +27,9 @@ export class CompanyService {
       .getMany();
 
     if (companies.length > 0) {
-      throw new UnprocessableEntityException();
+      throw new UnprocessableEntityException(
+        `Company '${createCompanyDto.name}' already exists`,
+      );
     }
 
     const company = await this.companyRepository.createCompany(

@@ -26,7 +26,9 @@ export class SkillGroupsService {
       .getMany();
 
     if (skillGroups.length > 0) {
-      throw new UnprocessableEntityException();
+      throw new UnprocessableEntityException(
+        `Skill group '${createSkillGroupDto.name}' already exists`,
+      );
     }
 
     const skillGroup = await this.skillGroupRepository.createSkillGroup(
