@@ -27,7 +27,9 @@ export class SchoolsService {
       .getMany();
 
     if (schools.length > 0) {
-      throw new UnprocessableEntityException();
+      throw new UnprocessableEntityException(
+        `School '${createSchoolDto.name}' already exists`,
+      );
     }
 
     const school = await this.schoolRepository.createSchool(createSchoolDto);

@@ -29,7 +29,9 @@ export class SkillSubjectsService {
       .getMany();
 
     if (skillSubjects.length > 0) {
-      throw new UnprocessableEntityException();
+      throw new UnprocessableEntityException(
+        `Skill subject '${createSkillSubjectDto.name}' already exists`,
+      );
     }
 
     const skillSubject = await this.skillSubjectRepository.createSkillSubject(

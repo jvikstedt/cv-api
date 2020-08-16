@@ -19,15 +19,17 @@ export class ProjectService {
   ) {}
 
   async create(createProjectDto: CreateProjectDto): Promise<Project> {
-    const companies = await this.projectRepository
+    const projects = await this.projectRepository
       .createQueryBuilder()
       .where('LOWER(name) = LOWER(:name)', {
         name: createProjectDto.name,
       })
       .getMany();
 
-    if (companies.length > 0) {
-      throw new UnprocessableEntityException();
+    if (projects.length > 0) {
+      throw new UnprocessableEntityException(
+        `Project '${createProjectDto.name}' already exists`,
+      );
     }
 
     const project = await this.projectRepository.createProject(
