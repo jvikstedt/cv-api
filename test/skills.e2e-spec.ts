@@ -54,6 +54,7 @@ describe('SkillsController (e2e)', () => {
         .send({
           skillSubjectId: skillSubject.id,
           experienceInYears: 2,
+          interestLevel: 1,
           highlight: false,
         })
         .expect(201);
@@ -63,6 +64,7 @@ describe('SkillsController (e2e)', () => {
         cvId: cv.id,
         skillSubjectId: skillSubject.id,
         experienceInYears: 2,
+        interestLevel: 1,
         highlight: false,
       });
     });
@@ -85,6 +87,7 @@ describe('SkillsController (e2e)', () => {
         cvId: cv.id,
         skillSubjectId: skillSubject.id,
         experienceInYears: 1,
+        interestLevel: 1,
       });
 
       patchSkillDto = {
@@ -104,6 +107,7 @@ describe('SkillsController (e2e)', () => {
         cvId: cv.id,
         skillSubjectId: skillSubject.id,
         experienceInYears: 6,
+        interestLevel: 1,
       });
     });
 
@@ -181,6 +185,7 @@ describe('SkillsController (e2e)', () => {
 
       expect(response.body).toMatchObject({
         experienceInYears: skill.experienceInYears,
+        interestLevel: skill.interestLevel,
       });
 
       await request(app.getHttpServer())

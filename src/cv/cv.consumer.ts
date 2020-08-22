@@ -61,6 +61,7 @@ export class CVConsumer {
               type: 'nested',
               properties: {
                 experienceInYears: { type: 'float' },
+                interestLevel: { type: 'integer' },
                 skillSubjectId: { type: 'integer' },
                 name: { type: 'text' },
               },
@@ -199,6 +200,7 @@ export class CVConsumer {
           skills: R.map(
             (skill) => ({
               experienceInYears: skill.experienceInYears,
+              interestLevel: skill.interestLevel,
               skillSubjectId: skill.skillSubject.id,
               name: skill.skillSubject.name,
             }),
