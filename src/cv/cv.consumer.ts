@@ -62,6 +62,7 @@ export class CVConsumer {
               properties: {
                 experienceInYears: { type: 'float' },
                 interestLevel: { type: 'integer' },
+                highlight: { type: 'boolean' },
                 skillSubjectId: { type: 'integer' },
                 name: { type: 'text' },
               },
@@ -201,6 +202,7 @@ export class CVConsumer {
             (skill) => ({
               experienceInYears: skill.experienceInYears,
               interestLevel: skill.interestLevel,
+              highlight: skill.highlight,
               skillSubjectId: skill.skillSubject.id,
               name: skill.skillSubject.name,
             }),
