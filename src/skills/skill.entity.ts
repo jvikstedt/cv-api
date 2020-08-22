@@ -20,6 +20,9 @@ export class Skill extends BaseEntity {
   @Column({ type: 'real' })
   experienceInYears: number;
 
+  @Column()
+  interestLevel: number;
+
   @Column({ default: false })
   highlight: boolean;
 

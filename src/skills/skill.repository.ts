@@ -11,6 +11,7 @@ export class SkillRepository extends Repository<Skill> {
     const skill = this.create({
       skillSubjectId: createSkillDto.skillSubjectId,
       experienceInYears: createSkillDto.experienceInYears,
+      interestLevel: createSkillDto.interestLevel,
       highlight: createSkillDto.highlight,
       cvId: cvId,
     });

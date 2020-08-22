@@ -32,6 +32,7 @@ describe('SkillRepository', () => {
       const createSkillDto: CreateSkillDto = {
         skillSubjectId: 1,
         experienceInYears: 2,
+        interestLevel: 1,
         highlight: false,
       };
       const skill = await factory(Skill)().make({ ...createSkillDto, cvId });
