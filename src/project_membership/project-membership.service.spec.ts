@@ -1,5 +1,4 @@
 import { Test } from '@nestjs/testing';
-import { getQueueToken } from '@nestjs/bull';
 import { useSeeding, factory } from 'typeorm-seeding';
 import { ProjectMembershipService } from './project-membership.service';
 import { ProjectMembershipRepository } from './project-membership.repository';
@@ -7,7 +6,7 @@ import { NotFoundException } from '@nestjs/common';
 import { CreateProjectMembershipDto } from './dto/create-project-membership.dto';
 import { ProjectMembership } from './project-membership.entity';
 import { PatchProjectMembershipDto } from './dto/patch-project-membership.dto';
-import { QUEUE_NAME_CV } from '../constants';
+import { CVService } from '../cv/cv.service';
 
 const mockProjectMembershipRepository = () => ({
   find: jest.fn(),
@@ -17,8 +16,8 @@ const mockProjectMembershipRepository = () => ({
   save: jest.fn(),
 });
 
-const mockQueue = () => ({
-  add: jest.fn(),
+const mockCVService = () => ({
+  reload: jest.fn(),
 });
 
 describe('ProjectMembershipService', () => {
@@ -37,7 +36,7 @@ describe('ProjectMembershipService', () => {
           provide: ProjectMembershipRepository,
           useFactory: mockProjectMembershipRepository,
         },
-        { provide: getQueueToken(QUEUE_NAME_CV), useFactory: mockQueue },
+        { provide: CVService, useFactory: mockCVService },
       ],
     }).compile();
 

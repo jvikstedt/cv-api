@@ -1,22 +1,11 @@
 import * as R from 'ramda';
-import * as config from 'config';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Skill } from './skill.entity';
 import { SkillRepository } from './skill.repository';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { PatchSkillDto } from './dto/patch-skill.dto';
-import {
-  QUEUE_NAME_CV,
-  CONFIG_QUEUE,
-  CONFIG_QUEUE_CV_RELOAD,
-  EventType,
-} from '../constants';
-
-const queueConfig = config.get(CONFIG_QUEUE);
-const cvReloadDelay = queueConfig[CONFIG_QUEUE_CV_RELOAD];
+import { CVService } from '../cv/cv.service';
 
 @Injectable()
 export class SkillsService {
@@ -24,23 +13,13 @@ export class SkillsService {
     @InjectRepository(SkillRepository)
     private readonly skillRepository: SkillRepository,
 
-    @InjectQueue(QUEUE_NAME_CV)
-    private cvQueue: Queue,
+    private readonly cvService: CVService,
   ) {}
 
   async create(cvId: number, createSkillDto: CreateSkillDto): Promise<Skill> {
     const skill = await this.skillRepository.createSkill(cvId, createSkillDto);
 
-    await this.cvQueue.add(
-      EventType.Reload,
-      {
-        id: cvId,
-        updateTimestamp: true,
-      },
-      {
-        delay: cvReloadDelay,
-      },
-    );
+    await this.cvService.reload(cvId);
 
     return this.findOne(cvId, skill.id);
   }
@@ -56,16 +35,7 @@ export class SkillsService {
       R.merge(oldSkill, patchSkillDto),
     );
 
-    await this.cvQueue.add(
-      EventType.Reload,
-      {
-        id: cvId,
-        updateTimestamp: true,
-      },
-      {
-        delay: cvReloadDelay,
-      },
-    );
+    await this.cvService.reload(cvId);
 
     return newSkill;
   }
@@ -95,16 +65,7 @@ export class SkillsService {
 
     await this.skillRepository.delete({ cvId, id: skillId });
 
-    await this.cvQueue.add(
-      EventType.Reload,
-      {
-        id: cvId,
-        updateTimestamp: true,
-      },
-      {
-        delay: cvReloadDelay,
-      },
-    );
+    await this.cvService.reload(cvId);
 
     return skill;
   }

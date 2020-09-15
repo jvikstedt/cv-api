@@ -1,20 +1,19 @@
 import { Test } from '@nestjs/testing';
-import { getQueueToken } from '@nestjs/bull';
 import { useSeeding, factory } from 'typeorm-seeding';
 import { UsersService } from './users.service';
 import { UserRepository } from './user.repository';
 import { NotFoundException } from '@nestjs/common';
 import { User } from './user.entity';
 import { PatchUserDto } from './dto/patch-user.dto';
-import { QUEUE_NAME_CV } from '../constants';
+import { CVService } from '../cv/cv.service';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
   save: jest.fn(),
 });
 
-const mockQueue = () => ({
-  add: jest.fn(),
+const mockCVService = () => ({
+  reload: jest.fn(),
 });
 
 describe('UsersService', () => {
@@ -30,7 +29,7 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         { provide: UserRepository, useFactory: mockUserRepository },
-        { provide: getQueueToken(QUEUE_NAME_CV), useFactory: mockQueue },
+        { provide: CVService, useFactory: mockCVService },
       ],
     }).compile();
 
