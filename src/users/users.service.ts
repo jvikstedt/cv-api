@@ -1,21 +1,10 @@
 import * as R from 'ramda';
-import * as config from 'config';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRepository } from './user.repository';
 import { PatchUserDto } from './dto/patch-user.dto';
 import { User } from './user.entity';
-import {
-  QUEUE_NAME_CV,
-  CONFIG_QUEUE,
-  CONFIG_QUEUE_CV_RELOAD,
-  EventType,
-} from '../constants';
-
-const queueConfig = config.get(CONFIG_QUEUE);
-const cvReloadDelay = queueConfig[CONFIG_QUEUE_CV_RELOAD];
+import { CVService } from '../cv/cv.service';
 
 @Injectable()
 export class UsersService {
@@ -23,8 +12,7 @@ export class UsersService {
     @InjectRepository(UserRepository)
     private readonly userRepository: UserRepository,
 
-    @InjectQueue(QUEUE_NAME_CV)
-    private cvQueue: Queue,
+    private readonly cvService: CVService,
   ) {}
 
   async findOne(userId: number): Promise<User> {
@@ -50,16 +38,7 @@ export class UsersService {
     );
 
     if (oldUser.cv) {
-      await this.cvQueue.add(
-        EventType.Reload,
-        {
-          id: oldUser.cv.id,
-          updateTimestamp: true,
-        },
-        {
-          delay: cvReloadDelay,
-        },
-      );
+      await this.cvService.reload(oldUser.cv.id);
     }
 
     return newUser;

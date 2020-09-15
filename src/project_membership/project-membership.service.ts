@@ -1,22 +1,11 @@
 import * as R from 'ramda';
-import * as config from 'config';
-import { Queue } from 'bull';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProjectMembership } from './project-membership.entity';
 import { ProjectMembershipRepository } from './project-membership.repository';
 import { CreateProjectMembershipDto } from './dto/create-project-membership.dto';
 import { PatchProjectMembershipDto } from './dto/patch-project-membership.dto';
-import {
-  QUEUE_NAME_CV,
-  CONFIG_QUEUE,
-  CONFIG_QUEUE_CV_RELOAD,
-  EventType,
-} from '../constants';
-import { InjectQueue } from '@nestjs/bull';
-
-const queueConfig = config.get(CONFIG_QUEUE);
-const cvReloadDelay = queueConfig[CONFIG_QUEUE_CV_RELOAD];
+import { CVService } from '../cv/cv.service';
 
 @Injectable()
 export class ProjectMembershipService {
@@ -24,8 +13,7 @@ export class ProjectMembershipService {
     @InjectRepository(ProjectMembershipRepository)
     private readonly projectMembershipRepository: ProjectMembershipRepository,
 
-    @InjectQueue(QUEUE_NAME_CV)
-    private cvQueue: Queue,
+    private readonly cvService: CVService,
   ) {}
 
   async create(
@@ -37,16 +25,7 @@ export class ProjectMembershipService {
       createProjectMembershipDto,
     );
 
-    await this.cvQueue.add(
-      EventType.Reload,
-      {
-        id: cvId,
-        updateTimestamp: true,
-      },
-      {
-        delay: cvReloadDelay,
-      },
-    );
+    await this.cvService.reload(cvId);
 
     return this.findOne(cvId, projectMembership.id);
   }
@@ -62,16 +41,7 @@ export class ProjectMembershipService {
       R.merge(oldProjectMembership, patchProjectMembershipDto),
     );
 
-    await this.cvQueue.add(
-      EventType.Reload,
-      {
-        id: cvId,
-        updateTimestamp: true,
-      },
-      {
-        delay: cvReloadDelay,
-      },
-    );
+    await this.cvService.reload(cvId);
 
     return newProjectMembership;
   }
@@ -110,16 +80,7 @@ export class ProjectMembershipService {
       id: projectMembershipId,
     });
 
-    await this.cvQueue.add(
-      EventType.Reload,
-      {
-        id: cvId,
-        updateTimestamp: true,
-      },
-      {
-        delay: cvReloadDelay,
-      },
-    );
+    await this.cvService.reload(cvId);
 
     return projectMembership;
   }

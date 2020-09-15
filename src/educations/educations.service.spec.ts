@@ -1,5 +1,4 @@
 import { Test } from '@nestjs/testing';
-import { getQueueToken } from '@nestjs/bull';
 import { useSeeding, factory } from 'typeorm-seeding';
 import { EducationsService } from './educations.service';
 import { EducationRepository } from './education.repository';
@@ -7,7 +6,7 @@ import { NotFoundException } from '@nestjs/common';
 import { CreateEducationDto } from './dto/create-education.dto';
 import { Education } from './education.entity';
 import { PatchEducationDto } from './dto/patch-education.dto';
-import { QUEUE_NAME_CV } from '../constants';
+import { CVService } from '../cv/cv.service';
 
 const mockEducationRepository = () => ({
   find: jest.fn(),
@@ -17,8 +16,8 @@ const mockEducationRepository = () => ({
   save: jest.fn(),
 });
 
-const mockQueue = () => ({
-  add: jest.fn(),
+const mockCVService = () => ({
+  reload: jest.fn(),
 });
 
 describe('EducationsService', () => {
@@ -34,7 +33,7 @@ describe('EducationsService', () => {
       providers: [
         EducationsService,
         { provide: EducationRepository, useFactory: mockEducationRepository },
-        { provide: getQueueToken(QUEUE_NAME_CV), useFactory: mockQueue },
+        { provide: CVService, useFactory: mockCVService },
       ],
     }).compile();
 

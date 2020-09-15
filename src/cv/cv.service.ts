@@ -3,6 +3,7 @@ import * as config from 'config';
 import { Queue } from 'bull';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Logger } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import * as esb from 'elastic-builder';
 import { CV } from './cv.entity';
@@ -23,6 +24,8 @@ const cvReloadDelay = queueConfig[CONFIG_QUEUE_CV_RELOAD];
 
 @Injectable()
 export class CVService {
+  private readonly logger = new Logger(CVService.name);
+
   constructor(
     @InjectRepository(CVRepository)
     private readonly cvRepository: CVRepository,
@@ -38,16 +41,7 @@ export class CVService {
 
     const newCV = await this.cvRepository.save(R.merge(oldCV, patchCVDto));
 
-    await this.cvQueue.add(
-      EventType.Reload,
-      {
-        id: cvId,
-        updateTimestamp: true,
-      },
-      {
-        delay: cvReloadDelay,
-      },
-    );
+    await this.reload(cvId);
 
     return newCV;
   }
@@ -65,6 +59,27 @@ export class CVService {
     }
 
     return entity;
+  }
+
+  async reload(
+    cvId: number,
+    updateTimestamp = true,
+    delay = cvReloadDelay,
+  ): Promise<void> {
+    try {
+      await this.cvQueue.add(
+        EventType.Reload,
+        {
+          id: cvId,
+          updateTimestamp,
+        },
+        {
+          delay,
+        },
+      );
+    } catch (err) {
+      this.logger.error(err);
+    }
   }
 
   async search(searchCVDto: SearchCVDto): Promise<CV[]> {

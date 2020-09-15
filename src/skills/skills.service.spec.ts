@@ -1,5 +1,4 @@
 import { Test } from '@nestjs/testing';
-import { getQueueToken } from '@nestjs/bull';
 import { useSeeding, factory } from 'typeorm-seeding';
 import { SkillsService } from './skills.service';
 import { SkillRepository } from './skill.repository';
@@ -7,7 +6,7 @@ import { NotFoundException } from '@nestjs/common';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { Skill } from './skill.entity';
 import { PatchSkillDto } from './dto/patch-skill.dto';
-import { QUEUE_NAME_CV } from '../constants';
+import { CVService } from '../cv/cv.service';
 
 const mockSkillRepository = () => ({
   find: jest.fn(),
@@ -17,8 +16,8 @@ const mockSkillRepository = () => ({
   save: jest.fn(),
 });
 
-const mockQueue = () => ({
-  add: jest.fn(),
+const mockCVService = () => ({
+  reload: jest.fn(),
 });
 
 describe('SkillsService', () => {
@@ -34,7 +33,7 @@ describe('SkillsService', () => {
       providers: [
         SkillsService,
         { provide: SkillRepository, useFactory: mockSkillRepository },
-        { provide: getQueueToken(QUEUE_NAME_CV), useFactory: mockQueue },
+        { provide: CVService, useFactory: mockCVService },
       ],
     }).compile();
 

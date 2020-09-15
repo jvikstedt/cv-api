@@ -1,5 +1,4 @@
 import { Test } from '@nestjs/testing';
-import { getQueueToken } from '@nestjs/bull';
 import { useSeeding, factory } from 'typeorm-seeding';
 import { WorkExperienceService } from './work-experience.service';
 import { WorkExperienceRepository } from './work-experience.repository';
@@ -7,7 +6,7 @@ import { NotFoundException } from '@nestjs/common';
 import { CreateWorkExperienceDto } from './dto/create-work-experience.dto';
 import { WorkExperience } from './work-experience.entity';
 import { PatchWorkExperienceDto } from './dto/patch-work-experience.dto';
-import { QUEUE_NAME_CV } from '../constants';
+import { CVService } from '../cv/cv.service';
 
 const mockWorkExperienceRepository = () => ({
   find: jest.fn(),
@@ -17,8 +16,8 @@ const mockWorkExperienceRepository = () => ({
   save: jest.fn(),
 });
 
-const mockQueue = () => ({
-  add: jest.fn(),
+const mockCVService = () => ({
+  reload: jest.fn(),
 });
 
 describe('WorkExperienceService', () => {
@@ -37,7 +36,7 @@ describe('WorkExperienceService', () => {
           provide: WorkExperienceRepository,
           useFactory: mockWorkExperienceRepository,
         },
-        { provide: getQueueToken(QUEUE_NAME_CV), useFactory: mockQueue },
+        { provide: CVService, useFactory: mockCVService },
       ],
     }).compile();
 
