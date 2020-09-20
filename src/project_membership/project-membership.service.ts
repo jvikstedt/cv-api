@@ -6,12 +6,17 @@ import { ProjectMembershipRepository } from './project-membership.repository';
 import { CreateProjectMembershipDto } from './dto/create-project-membership.dto';
 import { PatchProjectMembershipDto } from './dto/patch-project-membership.dto';
 import { CVService } from '../cv/cv.service';
+import { SkillRepository } from '../skills/skill.repository';
+import { Skill } from '../skills/skill.entity';
 
 @Injectable()
 export class ProjectMembershipService {
   constructor(
     @InjectRepository(ProjectMembershipRepository)
     private readonly projectMembershipRepository: ProjectMembershipRepository,
+
+    @InjectRepository(SkillRepository)
+    private readonly skillRepository: SkillRepository,
 
     private readonly cvService: CVService,
   ) {}
@@ -20,9 +25,19 @@ export class ProjectMembershipService {
     cvId: number,
     createProjectMembershipDto: CreateProjectMembershipDto,
   ): Promise<ProjectMembership> {
+    let skills: Skill[] = [];
+
+    if (!R.isEmpty(createProjectMembershipDto.skillSubjectIds)) {
+      skills = await this.skillRepository.getOrCreateSkills(
+        cvId,
+        createProjectMembershipDto.skillSubjectIds,
+      );
+    }
+
     const projectMembership = await this.projectMembershipRepository.createProjectMembership(
       cvId,
       createProjectMembershipDto,
+      skills,
     );
 
     await this.cvService.reload(cvId);
@@ -37,19 +52,40 @@ export class ProjectMembershipService {
   ): Promise<ProjectMembership> {
     const oldProjectMembership = await this.findOne(cvId, projectMembershipId);
 
+    let newSkills = oldProjectMembership.skills;
+    if (patchProjectMembershipDto.skillSubjectIds) {
+      newSkills = await this.skillRepository.getOrCreateSkills(
+        cvId,
+        patchProjectMembershipDto.skillSubjectIds,
+      );
+    }
+
     const newProjectMembership = await this.projectMembershipRepository.save(
-      R.merge(oldProjectMembership, patchProjectMembershipDto),
+      R.mergeAll([
+        oldProjectMembership,
+        patchProjectMembershipDto,
+        { skills: newSkills },
+      ]),
     );
 
     await this.cvService.reload(cvId);
 
-    return newProjectMembership;
+    return this.findOne(cvId, newProjectMembership.id);
   }
 
   async findAll(cvId: number): Promise<ProjectMembership[]> {
     return this.projectMembershipRepository.find({
       where: { cvId },
-      relations: ['project', 'project.company'],
+      join: {
+        alias: 'projectMembership',
+        leftJoinAndSelect: {
+          project: 'projectMembership.project',
+          company: 'project.company',
+          skill: 'projectMembership.skills',
+          skillSubject: 'skill.skillSubject',
+          skillGroup: 'skillSubject.skillGroup',
+        },
+      },
     });
   }
 
@@ -59,7 +95,18 @@ export class ProjectMembershipService {
   ): Promise<ProjectMembership> {
     const entity = await this.projectMembershipRepository.findOne(
       { cvId, id: projectMembershipId },
-      { relations: ['project', 'project.company'] },
+      {
+        join: {
+          alias: 'projectMembership',
+          leftJoinAndSelect: {
+            project: 'projectMembership.project',
+            company: 'project.company',
+            skill: 'projectMembership.skills',
+            skillSubject: 'skill.skillSubject',
+            skillGroup: 'skillSubject.skillGroup',
+          },
+        },
+      },
     );
 
     if (!entity) {

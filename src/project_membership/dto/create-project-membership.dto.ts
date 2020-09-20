@@ -1,4 +1,10 @@
-import { IsNumber, IsString, IsOptional, IsBoolean } from 'class-validator';
+import {
+  IsNumber,
+  IsString,
+  IsOptional,
+  IsBoolean,
+  IsArray,
+} from 'class-validator';
 
 export class CreateProjectMembershipDto {
   @IsNumber()
@@ -23,4 +29,7 @@ export class CreateProjectMembershipDto {
 
   @IsBoolean()
   highlight: boolean;
+
+  @IsArray()
+  skillSubjectIds: number[];
 }

@@ -1,4 +1,10 @@
-import { IsOptional, IsNumber, IsString, IsBoolean } from 'class-validator';
+import {
+  IsOptional,
+  IsNumber,
+  IsString,
+  IsBoolean,
+  IsArray,
+} from 'class-validator';
 
 export class PatchProjectMembershipDto {
   @IsOptional()
@@ -24,4 +30,8 @@ export class PatchProjectMembershipDto {
   @IsOptional()
   @IsBoolean()
   highlight?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  skillSubjectIds?: number[];
 }
