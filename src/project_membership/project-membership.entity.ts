@@ -6,9 +6,12 @@ import {
   UpdateDateColumn,
   ManyToOne,
   Column,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { CV } from '../cv/cv.entity';
 import { Project } from '../project/project.entity';
+import { Skill } from '../skills/skill.entity';
 
 @Entity()
 export class ProjectMembership extends BaseEntity {
@@ -45,6 +48,10 @@ export class ProjectMembership extends BaseEntity {
     nullable: false,
   })
   project: Project;
+
+  @ManyToMany(() => Skill)
+  @JoinTable()
+  skills: Skill[];
 
   @Column()
   projectId: number;

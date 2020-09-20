@@ -54,6 +54,7 @@ describe('ProjectMembershipController (e2e)', () => {
           startYear: 2000,
           startMonth: 1,
           highlight: false,
+          skillSubjectIds: [],
         })
         .expect(201);
 

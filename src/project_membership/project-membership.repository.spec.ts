@@ -5,7 +5,7 @@ import { ProjectMembership } from './project-membership.entity';
 import { CreateProjectMembershipDto } from './dto/create-project-membership.dto';
 
 describe('ProjectMembershipRepository', () => {
-  let projectMembershipRepository: any;
+  let projectMembershipRepository: ProjectMembershipRepository;
 
   beforeAll(async () => {
     await useSeeding({ configName: 'src/config/typeorm.config.ts' });
@@ -22,7 +22,7 @@ describe('ProjectMembershipRepository', () => {
   });
 
   describe('createProjectMembership', () => {
-    let save: any;
+    let save: jest.Mock;
 
     beforeEach(async () => {
       save = jest.fn();
@@ -39,6 +39,7 @@ describe('ProjectMembershipRepository', () => {
         endYear: 2004,
         endMonth: 12,
         highlight: false,
+        skillSubjectIds: [],
       };
       const projectMembership = await factory(ProjectMembership)().make({
         ...createProjectMembershipDto,

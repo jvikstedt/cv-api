@@ -7,9 +7,11 @@ import {
   ManyToOne,
   Column,
   Unique,
+  ManyToMany,
 } from 'typeorm';
 import { CV } from '../cv/cv.entity';
 import { SkillSubject } from '../skill_subjects/skill-subject.entity';
+import { ProjectMembership } from '../project_membership/project-membership.entity';
 
 @Entity()
 @Unique('SKILL_UQ_RELATION', ['skillSubject', 'cv'])
@@ -41,6 +43,9 @@ export class Skill extends BaseEntity {
 
   @Column()
   skillSubjectId: number;
+
+  @ManyToMany(() => ProjectMembership)
+  projectMemberships: ProjectMembership[];
 
   @CreateDateColumn()
   createdAt: Date;

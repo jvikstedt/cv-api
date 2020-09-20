@@ -88,6 +88,7 @@ describe('ProjectMembershipController', () => {
         endYear: 2004,
         endMonth: 12,
         highlight: false,
+        skillSubjectIds: [],
       };
       const projectMembership = await factory(ProjectMembership)().make(
         createProjectMembershipDto,
