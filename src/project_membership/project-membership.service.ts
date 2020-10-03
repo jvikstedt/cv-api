@@ -3,11 +3,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProjectMembership } from './project-membership.entity';
 import { ProjectMembershipRepository } from './project-membership.repository';
-import { CreateProjectMembershipDto } from './dto/create-project-membership.dto';
+import {
+  CreateProjectMembershipDto,
+  MembershipSkillDto,
+} from './dto/create-project-membership.dto';
 import { PatchProjectMembershipDto } from './dto/patch-project-membership.dto';
 import { CVService } from '../cv/cv.service';
+import { MembershipSkill } from '../membership_skill/membership-skill.entity';
+import { MembershipSkillRepository } from '../membership_skill/membership-skill.repository';
 import { SkillRepository } from '../skills/skill.repository';
-import { Skill } from '../skills/skill.entity';
 
 @Injectable()
 export class ProjectMembershipService {
@@ -18,28 +22,66 @@ export class ProjectMembershipService {
     @InjectRepository(SkillRepository)
     private readonly skillRepository: SkillRepository,
 
+    @InjectRepository(MembershipSkillRepository)
+    private readonly membershipSkillRepository: MembershipSkillRepository,
+
     private readonly cvService: CVService,
   ) {}
+
+  async updateMembershipSkills(
+    cvId: number,
+    projectMembershipId: number,
+    membershipSkills: MembershipSkillDto[],
+  ): Promise<MembershipSkill[]> {
+    await this.membershipSkillRepository.delete({
+      projectMembershipId,
+    });
+
+    const skills = await this.skillRepository.getOrCreateSkills(
+      cvId,
+      R.map((m) => m.skillSubjectId, membershipSkills),
+    );
+
+    const savedMembershipSkills: MembershipSkill[] = [];
+    for (const skill of skills) {
+      const membershipSkill = R.find(
+        (m) => R.equals(m.skillSubjectId, skill.skillSubjectId),
+        membershipSkills,
+      );
+
+      if (!membershipSkill) {
+        continue;
+      }
+
+      const createdMembershipSkill = await this.membershipSkillRepository
+        .create({
+          skillId: skill.id,
+          projectMembershipId: projectMembershipId,
+          automaticCalculation: membershipSkill.automaticCalculation,
+          experienceInYears: membershipSkill.experienceInYears,
+        })
+        .save();
+
+      savedMembershipSkills.push(createdMembershipSkill);
+    }
+
+    return savedMembershipSkills;
+  }
 
   async create(
     cvId: number,
     createProjectMembershipDto: CreateProjectMembershipDto,
   ): Promise<ProjectMembership> {
-    let skills: Skill[] = [];
-
-    if (!R.isEmpty(createProjectMembershipDto.skillSubjectIds)) {
-      skills = await this.skillRepository.getOrCreateSkills(
-        cvId,
-        createProjectMembershipDto.skillSubjectIds,
-      );
-    }
-
     const projectMembership = await this.projectMembershipRepository.createProjectMembership(
       cvId,
       createProjectMembershipDto,
-      skills,
     );
 
+    await this.updateMembershipSkills(
+      cvId,
+      projectMembership.id,
+      createProjectMembershipDto.membershipSkills,
+    );
     await this.cvService.reload(cvId);
 
     return this.findOne(cvId, projectMembership.id);
@@ -52,22 +94,20 @@ export class ProjectMembershipService {
   ): Promise<ProjectMembership> {
     const oldProjectMembership = await this.findOne(cvId, projectMembershipId);
 
-    let newSkills = oldProjectMembership.skills;
-    if (patchProjectMembershipDto.skillSubjectIds) {
-      newSkills = await this.skillRepository.getOrCreateSkills(
-        cvId,
-        patchProjectMembershipDto.skillSubjectIds,
-      );
-    }
-
     const newProjectMembership = await this.projectMembershipRepository.save(
-      R.mergeAll([
+      R.merge(
         oldProjectMembership,
-        patchProjectMembershipDto,
-        { skills: newSkills },
-      ]),
+        R.omit(['membershipSkills'], patchProjectMembershipDto),
+      ),
     );
 
+    if (patchProjectMembershipDto.membershipSkills) {
+      await this.updateMembershipSkills(
+        cvId,
+        newProjectMembership.id,
+        patchProjectMembershipDto.membershipSkills,
+      );
+    }
     await this.cvService.reload(cvId);
 
     return this.findOne(cvId, newProjectMembership.id);
@@ -81,7 +121,8 @@ export class ProjectMembershipService {
         leftJoinAndSelect: {
           project: 'projectMembership.project',
           company: 'project.company',
-          skill: 'projectMembership.skills',
+          membershipSkills: 'projectMembership.membershipSkills',
+          skill: 'membershipSkills.skill',
           skillSubject: 'skill.skillSubject',
           skillGroup: 'skillSubject.skillGroup',
         },
@@ -101,7 +142,8 @@ export class ProjectMembershipService {
           leftJoinAndSelect: {
             project: 'projectMembership.project',
             company: 'project.company',
-            skill: 'projectMembership.skills',
+            membershipSkills: 'projectMembership.membershipSkills',
+            skill: 'membershipSkills.skill',
             skillSubject: 'skill.skillSubject',
             skillGroup: 'skillSubject.skillGroup',
           },

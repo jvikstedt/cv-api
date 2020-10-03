@@ -4,7 +4,20 @@ import {
   IsOptional,
   IsBoolean,
   IsArray,
+  Min,
 } from 'class-validator';
+
+export class MembershipSkillDto {
+  @IsNumber()
+  skillSubjectId: number;
+
+  @IsBoolean()
+  automaticCalculation = true;
+
+  @IsNumber()
+  @Min(0)
+  experienceInYears = 0;
+}
 
 export class CreateProjectMembershipDto {
   @IsNumber()
@@ -31,5 +44,5 @@ export class CreateProjectMembershipDto {
   highlight: boolean;
 
   @IsArray()
-  skillSubjectIds: number[];
+  membershipSkills: MembershipSkillDto[];
 }

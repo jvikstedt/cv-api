@@ -5,6 +5,7 @@ import {
   IsBoolean,
   IsArray,
 } from 'class-validator';
+import { MembershipSkillDto } from './create-project-membership.dto';
 
 export class PatchProjectMembershipDto {
   @IsOptional()
@@ -34,4 +35,8 @@ export class PatchProjectMembershipDto {
   @IsOptional()
   @IsArray()
   skillSubjectIds?: number[];
+
+  @IsOptional()
+  @IsArray()
+  membershipSkills?: MembershipSkillDto[];
 }
