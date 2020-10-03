@@ -1,5 +1,6 @@
 import * as config from 'config';
 import * as R from 'ramda';
+import { DateTime } from 'luxon';
 import { Job, Queue } from 'bull';
 import { Process, Processor, InjectQueue } from '@nestjs/bull';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,9 +14,16 @@ import {
   CONFIG_QUEUE_CV_RELOAD,
 } from '../constants';
 import { CVRepository } from './cv.repository';
+import { CV } from './cv.entity';
+import { Skill } from '../skills/skill.entity';
 
 const queueConfig = config.get(CONFIG_QUEUE);
 const cvReloadDelay = queueConfig[CONFIG_QUEUE_CV_RELOAD];
+
+interface UpdateSkillExperiencesReturnType {
+  skills: Skill[];
+  changed: boolean;
+}
 
 @Processor(QUEUE_NAME_CV)
 export class CVConsumer {
@@ -131,6 +139,59 @@ export class CVConsumer {
     }
   }
 
+  async updateSkillExperiences(
+    cv: CV,
+  ): Promise<UpdateSkillExperiencesReturnType> {
+    const skills: Skill[] = [];
+    let changed = false;
+
+    for (const skill of cv.skills) {
+      const experience = R.reduce(
+        (sum: number, membershipSkill) => {
+          const projectMembership = membershipSkill.projectMembership;
+
+          if (!membershipSkill.automaticCalculation) {
+            return sum + membershipSkill.experienceInYears;
+          }
+
+          const diff = DateTime.utc(
+            projectMembership.endYear || DateTime.utc().year,
+            projectMembership.endMonth || DateTime.utc().month,
+          ).diff(
+            DateTime.utc(
+              projectMembership.startYear,
+              projectMembership.startMonth,
+            ),
+            ['years'],
+          );
+
+          if (R.isNil(diff['values']) || R.isNil(diff['values'].years)) {
+            return sum;
+          }
+
+          return sum + diff['values'].years;
+        },
+        0,
+        skill.membershipSkills,
+      );
+
+      const roundedExperience = Math.round(experience * 100) / 100;
+
+      if (!R.equals(skill.projectExperienceInYears, roundedExperience)) {
+        skill.projectExperienceInYears = roundedExperience;
+        await skill.save();
+        changed = true;
+      }
+
+      skills.push(skill);
+    }
+
+    return {
+      skills,
+      changed,
+    };
+  }
+
   @Process(EventType.Reload)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async reload(job: Job<any>): Promise<void> {
@@ -161,6 +222,8 @@ export class CVConsumer {
           'user',
           'skills',
           'skills.skillSubject',
+          'skills.membershipSkills',
+          'skills.membershipSkills.projectMembership',
           'educations',
           'educations.school',
           'workExperiences',
@@ -177,7 +240,12 @@ export class CVConsumer {
         });
         return;
       } else {
-        if (job.data.updateTimestamp) {
+        const response = await this.updateSkillExperiences(cv);
+        if (response.changed) {
+          cv.skills = response.skills;
+        }
+
+        if (job.data.updateTimestamp || response.changed) {
           cv.updatedAt = new Date();
           cv = await cv.save();
         }
@@ -200,7 +268,7 @@ export class CVConsumer {
           email: cv.user.email,
           skills: R.map(
             (skill) => ({
-              experienceInYears: skill.experienceInYears,
+              experienceInYears: skill.totalExperienceInYears,
               interestLevel: skill.interestLevel,
               highlight: skill.highlight,
               skillSubjectId: skill.skillSubject.id,
