@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 import { Test } from '@nestjs/testing';
 import { useSeeding, factory } from 'typeorm-seeding';
 import { ProjectMembershipService } from './project-membership.service';
@@ -9,6 +10,7 @@ import { PatchProjectMembershipDto } from './dto/patch-project-membership.dto';
 import { CVService } from '../cv/cv.service';
 import { SkillRepository } from '../skills/skill.repository';
 import { Skill } from '../skills/skill.entity';
+import { MembershipSkillRepository } from '../membership_skill/membership-skill.repository';
 
 const mockProjectMembershipRepository = (): unknown => ({
   find: jest.fn(),
@@ -24,6 +26,15 @@ const mockCVService = (): unknown => ({
 
 const mockSkillRepository = (): unknown => ({
   getOrCreateSkills: jest.fn(),
+  recalculateSkillsByIDs: jest.fn(),
+});
+
+const mockMembershipSkillRepositorySave = jest.fn();
+const mockMembershipSkillRepository = (): unknown => ({
+  delete: jest.fn(),
+  create: jest
+    .fn()
+    .mockReturnValue({ save: mockMembershipSkillRepositorySave }),
 });
 
 describe('ProjectMembershipService', () => {
@@ -33,6 +44,8 @@ describe('ProjectMembershipService', () => {
   let projectMembershipRepository: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let skillRepository: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let membershipSkillRepository: any;
 
   beforeAll(async () => {
     await useSeeding({ configName: 'src/config/typeorm.config.ts' });
@@ -50,6 +63,10 @@ describe('ProjectMembershipService', () => {
           provide: SkillRepository,
           useFactory: mockSkillRepository,
         },
+        {
+          provide: MembershipSkillRepository,
+          useFactory: mockMembershipSkillRepository,
+        },
         { provide: CVService, useFactory: mockCVService },
       ],
     }).compile();
@@ -62,6 +79,9 @@ describe('ProjectMembershipService', () => {
       ProjectMembershipRepository,
     );
     skillRepository = module.get<SkillRepository>(SkillRepository);
+    membershipSkillRepository = module.get<MembershipSkillRepository>(
+      MembershipSkillRepository,
+    );
   });
 
   describe('create', () => {
@@ -78,11 +98,11 @@ describe('ProjectMembershipService', () => {
           endYear: 2004,
           endMonth: 12,
           highlight: false,
-          skillSubjectIds: [],
+          membershipSkills: [],
         };
         const projectMembership = await factory(ProjectMembership)().make({
           id: projectMembershipId,
-          ...createProjectMembershipDto,
+          ...R.omit(['membershipSkills'], createProjectMembershipDto),
         });
 
         // Setup mock responses
@@ -103,7 +123,7 @@ describe('ProjectMembershipService', () => {
         // Verify mocks were called
         expect(
           projectMembershipRepository.createProjectMembership,
-        ).toHaveBeenCalledWith(cvId, createProjectMembershipDto, []);
+        ).toHaveBeenCalledWith(cvId, createProjectMembershipDto);
         expect(projectMembershipRepository.findOne).toHaveBeenCalledWith(
           { cvId, id: projectMembershipId },
           {
@@ -112,7 +132,8 @@ describe('ProjectMembershipService', () => {
               leftJoinAndSelect: {
                 project: 'projectMembership.project',
                 company: 'project.company',
-                skill: 'projectMembership.skills',
+                membershipSkills: 'projectMembership.membershipSkills',
+                skill: 'membershipSkills.skill',
                 skillSubject: 'skill.skillSubject',
                 skillGroup: 'skillSubject.skillGroup',
               },
@@ -137,22 +158,37 @@ describe('ProjectMembershipService', () => {
           endYear: 2004,
           endMonth: 12,
           highlight: false,
-          skillSubjectIds: [1, 2],
+          membershipSkills: [
+            {
+              skillSubjectId: 1,
+              automaticCalculation: true,
+              experienceInYears: 0,
+            },
+            {
+              skillSubjectId: 2,
+              automaticCalculation: true,
+              experienceInYears: 0,
+            },
+          ],
         };
         const projectMembership = await factory(ProjectMembership)().make({
           id: projectMembershipId,
-          ...createProjectMembershipDto,
+          ...R.omit(['membershipSkills'], createProjectMembershipDto),
         });
 
         const skill1 = await factory(Skill)().make({ skillSubjectId: 1 });
         const skill2 = await factory(Skill)().make({ skillSubjectId: 2 });
 
         // Setup mock responses
-        skillRepository.getOrCreateSkills.mockResolvedValue([skill1, skill2]);
-
         projectMembershipRepository.createProjectMembership.mockResolvedValue(
           projectMembership,
         );
+
+        skillRepository.getOrCreateSkills.mockResolvedValue([skill1, skill2]);
+
+        mockMembershipSkillRepositorySave.mockResolvedValueOnce({ a: 1 });
+        mockMembershipSkillRepositorySave.mockResolvedValueOnce({ a: 2 });
+
         projectMembershipRepository.findOne.mockResolvedValue(
           projectMembership,
         );
@@ -167,10 +203,7 @@ describe('ProjectMembershipService', () => {
         // Verify mocks were called
         expect(
           projectMembershipRepository.createProjectMembership,
-        ).toHaveBeenCalledWith(cvId, createProjectMembershipDto, [
-          skill1,
-          skill2,
-        ]);
+        ).toHaveBeenCalledWith(cvId, createProjectMembershipDto);
         expect(projectMembershipRepository.findOne).toHaveBeenCalledWith(
           { cvId, id: projectMembershipId },
           {
@@ -179,7 +212,8 @@ describe('ProjectMembershipService', () => {
               leftJoinAndSelect: {
                 project: 'projectMembership.project',
                 company: 'project.company',
-                skill: 'projectMembership.skills',
+                membershipSkills: 'projectMembership.membershipSkills',
+                skill: 'membershipSkills.skill',
                 skillSubject: 'skill.skillSubject',
                 skillGroup: 'skillSubject.skillGroup',
               },
@@ -187,10 +221,10 @@ describe('ProjectMembershipService', () => {
           },
         );
         expect(cvService.reload).toHaveBeenCalledWith(cvId);
-        expect(skillRepository.getOrCreateSkills).toHaveBeenCalledWith(
-          cvId,
-          createProjectMembershipDto.skillSubjectIds,
-        );
+        expect(skillRepository.getOrCreateSkills).toHaveBeenCalledWith(cvId, [
+          1,
+          2,
+        ]);
       });
     });
   });
@@ -203,6 +237,7 @@ describe('ProjectMembershipService', () => {
         const projectMembershipId = 1;
         const projectMembership = await factory(ProjectMembership)().make({
           id: projectMembershipId,
+          membershipSkills: [],
         });
         const patchProjectMembershipDto: PatchProjectMembershipDto = {
           endYear: 2020,
@@ -241,7 +276,8 @@ describe('ProjectMembershipService', () => {
               leftJoinAndSelect: {
                 project: 'projectMembership.project',
                 company: 'project.company',
-                skill: 'projectMembership.skills',
+                membershipSkills: 'projectMembership.membershipSkills',
+                skill: 'membershipSkills.skill',
                 skillSubject: 'skill.skillSubject',
                 skillGroup: 'skillSubject.skillGroup',
               },
@@ -266,23 +302,39 @@ describe('ProjectMembershipService', () => {
           id: projectMembershipId,
         });
         const patchProjectMembershipDto: PatchProjectMembershipDto = {
-          skillSubjectIds: [1, 2],
+          membershipSkills: [
+            {
+              skillSubjectId: 1,
+              automaticCalculation: true,
+              experienceInYears: 0,
+            },
+            {
+              skillSubjectId: 2,
+              automaticCalculation: true,
+              experienceInYears: 0,
+            },
+          ],
         };
 
         const skill1 = await factory(Skill)().make({ skillSubjectId: 1 });
         const skill2 = await factory(Skill)().make({ skillSubjectId: 2 });
 
         // Setup mock responses
-        skillRepository.getOrCreateSkills.mockResolvedValue([skill1, skill2]);
-
         projectMembershipRepository.findOne.mockResolvedValueOnce(
           projectMembership,
         );
-        projectMembershipRepository.findOne.mockResolvedValueOnce({
+
+        projectMembershipRepository.save.mockResolvedValue({
           ...projectMembership,
           ...patchProjectMembershipDto,
         });
-        projectMembershipRepository.save.mockResolvedValue({
+
+        skillRepository.getOrCreateSkills.mockResolvedValue([skill1, skill2]);
+
+        mockMembershipSkillRepositorySave.mockResolvedValueOnce({ a: 1 });
+        mockMembershipSkillRepositorySave.mockResolvedValueOnce({ a: 2 });
+
+        projectMembershipRepository.findOne.mockResolvedValueOnce({
           ...projectMembership,
           ...patchProjectMembershipDto,
         });
@@ -307,7 +359,8 @@ describe('ProjectMembershipService', () => {
               leftJoinAndSelect: {
                 project: 'projectMembership.project',
                 company: 'project.company',
-                skill: 'projectMembership.skills',
+                membershipSkills: 'projectMembership.membershipSkills',
+                skill: 'membershipSkills.skill',
                 skillSubject: 'skill.skillSubject',
                 skillGroup: 'skillSubject.skillGroup',
               },
@@ -316,14 +369,12 @@ describe('ProjectMembershipService', () => {
         );
         expect(projectMembershipRepository.save).toHaveBeenCalledWith({
           ...projectMembership,
-          ...patchProjectMembershipDto,
-          skills: [skill1, skill2],
         });
         expect(cvService.reload).toHaveBeenCalledWith(cvId);
-        expect(skillRepository.getOrCreateSkills).toHaveBeenCalledWith(
-          cvId,
-          patchProjectMembershipDto.skillSubjectIds,
-        );
+        expect(skillRepository.getOrCreateSkills).toHaveBeenCalledWith(cvId, [
+          1,
+          2,
+        ]);
       });
     });
   });
@@ -345,7 +396,8 @@ describe('ProjectMembershipService', () => {
           leftJoinAndSelect: {
             project: 'projectMembership.project',
             company: 'project.company',
-            skill: 'projectMembership.skills',
+            membershipSkills: 'projectMembership.membershipSkills',
+            skill: 'membershipSkills.skill',
             skillSubject: 'skill.skillSubject',
             skillGroup: 'skillSubject.skillGroup',
           },
@@ -380,7 +432,8 @@ describe('ProjectMembershipService', () => {
             leftJoinAndSelect: {
               project: 'projectMembership.project',
               company: 'project.company',
-              skill: 'projectMembership.skills',
+              membershipSkills: 'projectMembership.membershipSkills',
+              skill: 'membershipSkills.skill',
               skillSubject: 'skill.skillSubject',
               skillGroup: 'skillSubject.skillGroup',
             },
@@ -406,6 +459,7 @@ describe('ProjectMembershipService', () => {
       const projectMembership = await factory(ProjectMembership)().make({
         cvId,
         id: projectMembershipId,
+        membershipSkills: [],
       });
 
       // Setup mock responses

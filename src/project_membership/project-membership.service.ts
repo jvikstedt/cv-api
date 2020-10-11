@@ -37,6 +37,10 @@ export class ProjectMembershipService {
       projectMembershipId,
     });
 
+    if (R.isEmpty(membershipSkills)) {
+      return [];
+    }
+
     const skills = await this.skillRepository.getOrCreateSkills(
       cvId,
       R.map((m) => m.skillSubjectId, membershipSkills),

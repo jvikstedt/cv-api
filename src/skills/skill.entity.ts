@@ -1,4 +1,3 @@
-import * as R from 'ramda';
 import {
   PrimaryGeneratedColumn,
   BaseEntity,
@@ -8,8 +7,6 @@ import {
   ManyToOne,
   Column,
   Unique,
-  BeforeInsert,
-  BeforeUpdate,
   OneToMany,
 } from 'typeorm';
 import { CV } from '../cv/cv.entity';
@@ -24,12 +21,6 @@ export class Skill extends BaseEntity {
 
   @Column({ type: 'real', default: 0 })
   experienceInYears: number;
-
-  @Column({ type: 'real', default: 0 })
-  projectExperienceInYears: number;
-
-  @Column({ type: 'real', default: 0 })
-  totalExperienceInYears: number;
 
   @Column()
   interestLevel: number;
@@ -61,15 +52,6 @@ export class Skill extends BaseEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  sumExperiences(): void {
-    this.totalExperienceInYears = R.sum([
-      R.defaultTo(0, this.experienceInYears),
-      R.defaultTo(0, this.projectExperienceInYears),
-    ]);
-  }
 
   public constructor(init?: Partial<Skill>) {
     super();
