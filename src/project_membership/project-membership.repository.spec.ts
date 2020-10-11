@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 import { Test } from '@nestjs/testing';
 import { useSeeding, factory } from 'typeorm-seeding';
 import { ProjectMembershipRepository } from './project-membership.repository';
@@ -39,10 +40,10 @@ describe('ProjectMembershipRepository', () => {
         endYear: 2004,
         endMonth: 12,
         highlight: false,
-        skillSubjectIds: [],
+        membershipSkills: [],
       };
       const projectMembership = await factory(ProjectMembership)().make({
-        ...createProjectMembershipDto,
+        ...R.omit(['membershipSkills'], createProjectMembershipDto),
         cvId,
       });
       save.mockResolvedValue(projectMembership);

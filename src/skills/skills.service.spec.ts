@@ -14,6 +14,7 @@ const mockSkillRepository = () => ({
   delete: jest.fn(),
   createSkill: jest.fn(),
   save: jest.fn(),
+  recalculateSkillsByIDs: jest.fn(),
 });
 
 const mockCVService = () => ({
@@ -73,14 +74,19 @@ describe('SkillsService', () => {
       const skill = await factory(Skill)().make({ id: 1 });
       const patchSkillDto: PatchSkillDto = { experienceInYears: 6 };
 
-      skillRepository.findOne.mockResolvedValue(skill);
+      skillRepository.findOne.mockResolvedValueOnce(skill);
       skillRepository.save.mockResolvedValue({ ...skill, ...patchSkillDto });
+      skillRepository.findOne.mockResolvedValueOnce({
+        ...skill,
+        ...patchSkillDto,
+      });
 
       expect(skillRepository.findOne).not.toHaveBeenCalled();
       expect(skillRepository.save).not.toHaveBeenCalled();
       const result = await skillsService.patch(2, 1, patchSkillDto);
       expect(result).toEqual({ ...skill, ...patchSkillDto });
-      expect(skillRepository.findOne).toHaveBeenCalledWith(
+      expect(skillRepository.findOne).toHaveBeenNthCalledWith(
+        1,
         { cvId: 2, id: 1 },
         { relations: ['skillSubject', 'skillSubject.skillGroup'] },
       );

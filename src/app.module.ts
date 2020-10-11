@@ -16,6 +16,7 @@ import { FilesHttpModule } from './files/files-http.module';
 import { SchoolsHttpModule } from './schools/schools-http.module';
 import { CompanyHttpModule } from './company/company-http.module';
 import { ProjectHttpModule } from './project/project-http.module';
+import { SyncModule } from './sync/sync.module';
 import typeOrmConfig = require('./config/typeorm.config');
 
 @Module({
@@ -37,6 +38,7 @@ import typeOrmConfig = require('./config/typeorm.config');
     SchoolsHttpModule,
     CompanyHttpModule,
     ProjectHttpModule,
+    SyncModule,
   ],
 })
 export class AppModule {}

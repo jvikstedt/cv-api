@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 import { Test } from '@nestjs/testing';
 import { useSeeding, factory } from 'typeorm-seeding';
 import { PassportModule } from '@nestjs/passport';
@@ -88,10 +89,10 @@ describe('ProjectMembershipController', () => {
         endYear: 2004,
         endMonth: 12,
         highlight: false,
-        skillSubjectIds: [],
+        membershipSkills: [],
       };
       const projectMembership = await factory(ProjectMembership)().make(
-        createProjectMembershipDto,
+        R.omit(['membershipSkills'], createProjectMembershipDto),
       );
       projectMembershipService.create.mockResolvedValue(projectMembership);
 

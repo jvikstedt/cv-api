@@ -8,7 +8,6 @@ import { CVService } from './cv.service';
 
 import { CONFIG_REDIS, CONFIG_REDIS_PORT, QUEUE_NAME_CV } from '../constants';
 import { ElasticsearchConfigService } from '../config/elasticsearch.config';
-import { CVConsumer } from './cv.consumer';
 
 const redisConfig = config.get(CONFIG_REDIS);
 
@@ -28,7 +27,7 @@ const CVQueue = BullModule.registerQueue({
       useClass: ElasticsearchConfigService,
     }),
   ],
-  providers: [CVService, CVConsumer],
-  exports: [TypeOrmModule, CVService],
+  providers: [CVService],
+  exports: [TypeOrmModule, CVService, CVQueue],
 })
 export class CVModule {}

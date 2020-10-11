@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsNumber,
   IsString,
@@ -5,6 +6,7 @@ import {
   IsBoolean,
   IsArray,
   Min,
+  ValidateNested,
 } from 'class-validator';
 
 export class MembershipSkillDto {
@@ -44,5 +46,7 @@ export class CreateProjectMembershipDto {
   highlight: boolean;
 
   @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => MembershipSkillDto)
   membershipSkills: MembershipSkillDto[];
 }
