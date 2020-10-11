@@ -15,7 +15,11 @@ define(Education, (faker: typeof Faker) => {
   education.degree = faker.lorem.words(2);
   education.fieldOfStudy = faker.lorem.words(2);
   education.description = faker.lorem.words(10);
-  education.highlight = false;
+  education.highlight =
+    faker.random.number({
+      min: 1,
+      max: 10,
+    }) === 1;
 
   return education;
 });

@@ -12,6 +12,7 @@ import { Company } from '../../src/company/company.entity';
 import { WorkExperience } from '../../src/work_experience/work-experience.entity';
 import { Project } from '../../src/project/project.entity';
 import { ProjectMembership } from '../../src/project_membership/project-membership.entity';
+import { MembershipSkill } from '../../src/membership_skill/membership-skill.entity';
 
 const SKILLS = {
   'Build and CI tools': [
@@ -82,7 +83,43 @@ const SKILLS = {
 };
 
 export default class Seed implements Seeder {
-  public async run(factory: Factory, connection: Connection): Promise<any> {
+  private async generateSchools(
+    factory: Factory,
+    times = 10,
+  ): Promise<School[]> {
+    const schools = [];
+    for (let i = 0; i < times; i++) {
+      try {
+        const school = await factory(School)().create();
+        schools.push(school);
+      } catch (err) {
+        console.log(err);
+        i = i - 1;
+        continue;
+      }
+    }
+    return schools;
+  }
+
+  private async generateCompanies(
+    factory: Factory,
+    times = 10,
+  ): Promise<Company[]> {
+    const companies = [];
+    for (let i = 0; i < times; i++) {
+      try {
+        const company = await factory(Company)().create();
+        companies.push(company);
+      } catch (err) {
+        console.log(err);
+        i = i - 1;
+        continue;
+      }
+    }
+    return companies;
+  }
+
+  public async run(factory: Factory, connection: Connection): Promise<void> {
     await connection.synchronize(true);
 
     const skillGroups: SkillGroup[] = [];
@@ -112,10 +149,10 @@ export default class Seed implements Seeder {
     });
 
     // Create schools
-    const schools = await factory(School)().createMany(10);
+    const schools = await this.generateSchools(factory);
 
     // Create companies
-    const companies = await factory(Company)().createMany(10);
+    const companies = await this.generateCompanies(factory);
 
     // Create projects
     const projects: Project[] = await factory(Project)()
@@ -169,6 +206,7 @@ export default class Seed implements Seeder {
       .map(async (cv: CV) => {
         const user: User = await factory(User)().create();
         cv.user = user;
+        cv.skills = [];
 
         return cv;
       })
@@ -176,13 +214,15 @@ export default class Seed implements Seeder {
 
     // Add skills
     for (const cv of cvs) {
-      randomSkills = skillSubjects.sort(() => 0.5 - Math.random()).slice(0, 40);
+      randomSkills = skillSubjects.sort(() => 0.5 - Math.random()).slice(0, 25);
 
       for (const skillSubject of randomSkills) {
-        await factory(Skill)().create({
+        const skill = await factory(Skill)().create({
           cvId: cv.id,
           skillSubjectId: skillSubject.id,
         });
+
+        cv.skills.push(skill);
       }
     }
 
@@ -213,13 +253,24 @@ export default class Seed implements Seeder {
     for (const cv of cvs) {
       const randomProjects = projects
         .sort(() => 0.5 - Math.random())
-        .slice(0, 3);
+        .slice(0, 4);
 
       for (const project of randomProjects) {
-        await factory(ProjectMembership)().create({
+        const projectMembership = await factory(ProjectMembership)().create({
           cvId: cv.id,
           projectId: project.id,
         });
+
+        const randomSkills = cv.skills
+          .sort(() => 0.5 - Math.random())
+          .slice(0, Math.floor(Math.random() * 10 + 3));
+
+        for (const skill of randomSkills) {
+          await factory(MembershipSkill)().create({
+            skillId: skill.id,
+            projectMembershipId: projectMembership.id,
+          });
+        }
       }
     }
   }
