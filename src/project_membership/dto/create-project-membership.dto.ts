@@ -28,6 +28,9 @@ export class CreateProjectMembershipDto {
   @IsString()
   description: string;
 
+  @IsString()
+  role: string;
+
   @IsNumber()
   startYear: number;
 

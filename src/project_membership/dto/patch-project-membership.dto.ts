@@ -9,12 +9,6 @@ import {
   Min,
 } from 'class-validator';
 
-// export enum Operation {
-//   Add = 'ADD',
-//   Remove = 'REMOVE',
-//   Update = 'UPDATE',
-// }
-
 export class MembershipSkillDto {
   @IsNumber()
   skillSubjectId: number;
@@ -25,16 +19,16 @@ export class MembershipSkillDto {
   @IsNumber()
   @Min(0)
   experienceInYears = 0;
-
-  // @IsString()
-  // @IsIn([Operation.Update, Operation.Remove, Operation.Update])
-  // operation: Operation;
 }
 
 export class PatchProjectMembershipDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @IsOptional()
+  @IsString()
+  role?: string;
 
   @IsOptional()
   @IsNumber()

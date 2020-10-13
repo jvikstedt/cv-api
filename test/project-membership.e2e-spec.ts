@@ -51,6 +51,7 @@ describe('ProjectMembershipController (e2e)', () => {
         .send({
           projectId: project.id,
           description: '',
+          role: 'Developer',
           startYear: 2000,
           startMonth: 1,
           highlight: false,

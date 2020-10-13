@@ -20,6 +20,9 @@ export class ProjectMembership extends BaseEntity {
   @Column()
   description: string;
 
+  @Column()
+  role: string;
+
   @Column({ type: 'smallint' })
   startYear: number;
 
