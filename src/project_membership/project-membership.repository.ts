@@ -12,6 +12,7 @@ export class ProjectMembershipRepository extends Repository<ProjectMembership> {
       cvId: cvId,
       projectId: createProjectMembershipDto.projectId,
       description: createProjectMembershipDto.description,
+      role: createProjectMembershipDto.role,
       startYear: createProjectMembershipDto.startYear,
       startMonth: createProjectMembershipDto.startMonth,
       endYear: createProjectMembershipDto.endYear,

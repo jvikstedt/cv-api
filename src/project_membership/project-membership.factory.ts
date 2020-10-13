@@ -36,5 +36,7 @@ define(ProjectMembership, (faker: typeof Faker) => {
       max: 10,
     }) === 1;
 
+  projectMembership.role = faker.name.jobTitle();
+
   return projectMembership;
 });

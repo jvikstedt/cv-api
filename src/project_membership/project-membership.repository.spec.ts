@@ -35,6 +35,7 @@ describe('ProjectMembershipRepository', () => {
       const createProjectMembershipDto: CreateProjectMembershipDto = {
         projectId: 1,
         description: '',
+        role: 'Developer',
         startYear: 2000,
         startMonth: 1,
         endYear: 2004,
