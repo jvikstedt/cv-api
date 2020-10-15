@@ -33,6 +33,9 @@ export class WorkExperience extends BaseEntity {
   @Column({ type: 'smallint', nullable: true })
   endMonth: number;
 
+  @Column({ default: false })
+  highlight: boolean;
+
   @ManyToOne(() => CV, (cv) => cv.workExperiences, {
     nullable: false,
   })

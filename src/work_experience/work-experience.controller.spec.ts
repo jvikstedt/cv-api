@@ -86,6 +86,7 @@ describe('WorkExperienceController', () => {
         startMonth: 1,
         endYear: 2004,
         endMonth: 12,
+        highlight: false,
       };
       const workExperience = await factory(WorkExperience)().make(
         createWorkExperienceDto,

@@ -1,4 +1,4 @@
-import { IsOptional, IsNumber, IsString } from 'class-validator';
+import { IsOptional, IsNumber, IsString, IsBoolean } from 'class-validator';
 
 export class PatchWorkExperienceDto {
   @IsOptional()
@@ -24,4 +24,8 @@ export class PatchWorkExperienceDto {
   @IsOptional()
   @IsNumber()
   endMonth?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  highlight?: boolean;
 }
