@@ -17,6 +17,7 @@ export class WorkExperienceRepository extends Repository<WorkExperience> {
       startMonth: createWorkExperienceDto.startMonth,
       endYear: createWorkExperienceDto.endYear,
       endMonth: createWorkExperienceDto.endMonth,
+      highlight: createWorkExperienceDto.highlight,
     });
     return workExperience.save();
   }

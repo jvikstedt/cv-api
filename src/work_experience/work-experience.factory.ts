@@ -24,5 +24,11 @@ define(WorkExperience, (faker: typeof Faker) => {
   workExperience.description = faker.lorem.words(10);
   workExperience.jobTitle = faker.name.jobTitle();
 
+  workExperience.highlight =
+    faker.random.number({
+      min: 1,
+      max: 10,
+    }) === 1;
+
   return workExperience;
 });

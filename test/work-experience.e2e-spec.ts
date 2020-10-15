@@ -51,6 +51,7 @@ describe('WorkExperienceController (e2e)', () => {
           jobTitle: 'Developer',
           startYear: 2000,
           startMonth: 1,
+          highlight: false,
         })
         .expect(201);
 
@@ -62,6 +63,7 @@ describe('WorkExperienceController (e2e)', () => {
         jobTitle: 'Developer',
         startYear: 2000,
         startMonth: 1,
+        highlight: false,
       });
     });
 
