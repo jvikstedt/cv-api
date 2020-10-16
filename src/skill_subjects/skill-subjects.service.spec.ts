@@ -108,11 +108,13 @@ describe('SkillSubjectsService', () => {
         name: 'Vue',
         skillGroupId: 1,
       };
-      const skillSubject = await factory(SkillSubject)().make(
-        createSkillSubjectDto,
-      );
+      const skillSubject = await factory(SkillSubject)().make({
+        id: 1,
+        ...createSkillSubjectDto,
+      });
       skillSubjectRepository.createSkillSubject.mockResolvedValue(skillSubject);
       getMany.mockResolvedValue([]);
+      skillSubjectRepository.findOne.mockResolvedValue(skillSubject);
 
       expect(skillSubjectRepository.createSkillSubject).not.toHaveBeenCalled();
       const result = await skillSubjectsService.create(createSkillSubjectDto);
@@ -120,6 +122,9 @@ describe('SkillSubjectsService', () => {
       expect(skillSubjectRepository.createSkillSubject).toHaveBeenCalledWith(
         createSkillSubjectDto,
       );
+      expect(skillSubjectRepository.findOne).toHaveBeenCalledWith(1, {
+        relations: ['skillGroup'],
+      });
     });
   });
 

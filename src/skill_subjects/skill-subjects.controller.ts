@@ -89,7 +89,7 @@ export class SkillSubjectsController {
   )
   search(
     @Body() searchSkillSubjectDto: SearchSkillSubjectDto,
-  ): Promise<SkillSubject[]> {
+  ): Promise<{ items: SkillSubject[]; total: number }> {
     return this.skillSubjectsService.search(searchSkillSubjectDto);
   }
 }
