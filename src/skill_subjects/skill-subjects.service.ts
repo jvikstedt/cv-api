@@ -38,7 +38,7 @@ export class SkillSubjectsService {
       createSkillSubjectDto,
     );
 
-    return skillSubject;
+    return this.findOne(skillSubject.id);
   }
 
   async patch(
@@ -76,14 +76,24 @@ export class SkillSubjectsService {
 
   async search(
     searchSkillSubjectDto: SearchSkillSubjectDto,
-  ): Promise<SkillSubject[]> {
-    return this.skillSubjectRepository
+  ): Promise<{ items: SkillSubject[]; total: number }> {
+    const [items, total] = await this.skillSubjectRepository
       .createQueryBuilder('skillSubject')
+      .leftJoinAndSelect('skillSubject.skillGroup', 'skillGroup')
       .where('skillSubject.name ilike :name', {
         name: `%${searchSkillSubjectDto.name}%`,
       })
-      .leftJoinAndSelect('skillSubject.skillGroup', 'skillGroup')
-      .limit(searchSkillSubjectDto.limit)
-      .getMany();
+      .orderBy(
+        searchSkillSubjectDto.orderColumnName,
+        searchSkillSubjectDto.orderSort,
+      )
+      .skip(searchSkillSubjectDto.skip)
+      .take(searchSkillSubjectDto.take)
+      .getManyAndCount();
+
+    return {
+      items,
+      total,
+    };
   }
 }
