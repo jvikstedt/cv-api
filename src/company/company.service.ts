@@ -70,11 +70,22 @@ export class CompanyService {
     }
   }
 
-  async search(searchCompanyDto: SearchCompanyDto): Promise<Company[]> {
-    return this.companyRepository
+  async search(
+    searchCompanyDto: SearchCompanyDto,
+  ): Promise<{ items: Company[]; total: number }> {
+    const [items, total] = await this.companyRepository
       .createQueryBuilder('company')
-      .where('company.name ilike :name', { name: `%${searchCompanyDto.name}%` })
-      .limit(searchCompanyDto.limit)
-      .getMany();
+      .where('company.name ilike :name', {
+        name: `%${searchCompanyDto.name}%`,
+      })
+      .orderBy(searchCompanyDto.orderColumnName, searchCompanyDto.orderSort)
+      .skip(searchCompanyDto.skip)
+      .take(searchCompanyDto.take)
+      .getManyAndCount();
+
+    return {
+      items,
+      total,
+    };
   }
 }
