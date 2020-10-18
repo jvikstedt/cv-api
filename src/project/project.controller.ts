@@ -82,7 +82,9 @@ export class ProjectController {
         new BadRequestException(errors),
     }),
   )
-  search(@Body() searchProjectDto: SearchProjectDto): Promise<Project[]> {
+  search(
+    @Body() searchProjectDto: SearchProjectDto,
+  ): Promise<{ items: Project[]; total: number }> {
     return this.projectService.search(searchProjectDto);
   }
 }

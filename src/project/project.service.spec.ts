@@ -99,9 +99,13 @@ describe('ProjectService', () => {
         companyId: 1,
         name: 'Metropolia',
       };
-      const project = await factory(Project)().make(createProjectDto);
+      const project = await factory(Project)().make({
+        id: 1,
+        ...createProjectDto,
+      });
       projectRepository.createProject.mockResolvedValue(project);
       getMany.mockResolvedValue([]);
+      projectRepository.findOne.mockResolvedValue(project);
 
       expect(projectRepository.createProject).not.toHaveBeenCalled();
       const result = await projectService.create(createProjectDto);
@@ -109,6 +113,9 @@ describe('ProjectService', () => {
       expect(projectRepository.createProject).toHaveBeenCalledWith(
         createProjectDto,
       );
+      expect(projectRepository.findOne).toHaveBeenCalledWith(1, {
+        relations: ['company'],
+      });
     });
   });
 
