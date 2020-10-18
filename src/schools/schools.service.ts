@@ -68,11 +68,22 @@ export class SchoolsService {
     }
   }
 
-  async search(searchSchoolDto: SearchSchoolDto): Promise<School[]> {
-    return this.schoolRepository
+  async search(
+    searchSchoolDto: SearchSchoolDto,
+  ): Promise<{ items: School[]; total: number }> {
+    const [items, total] = await this.schoolRepository
       .createQueryBuilder('school')
-      .where('school.name ilike :name', { name: `%${searchSchoolDto.name}%` })
-      .limit(searchSchoolDto.limit)
-      .getMany();
+      .where('school.name ilike :name', {
+        name: `%${searchSchoolDto.name}%`,
+      })
+      .orderBy(searchSchoolDto.orderColumnName, searchSchoolDto.orderSort)
+      .skip(searchSchoolDto.skip)
+      .take(searchSchoolDto.take)
+      .getManyAndCount();
+
+    return {
+      items,
+      total,
+    };
   }
 }

@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Put,
   Body,
   Delete,
   Param,
@@ -13,14 +12,15 @@ import {
   BadRequestException,
   ValidationError,
   HttpException,
+  Patch,
 } from '@nestjs/common';
 import { SkillGroupsService } from './skill-groups.service';
 import { SkillGroup } from './skill-group.entity';
 import { CreateSkillGroupDto } from './dto/create-skill-group.dto';
-import { UpdateSkillGroupDto } from './dto/update-skill-group.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchSkillGroupDto } from './dto/search-skill-group.dto';
+import { PatchSkillGroupDto } from './dto/patch-skill-group-dto';
 
 @ApiBearerAuth()
 @ApiTags('skill_groups')
@@ -44,7 +44,7 @@ export class SkillGroupsController {
     return this.skillGroupsService.create(createSkillGroupDto);
   }
 
-  @Put('/:id')
+  @Patch('/:skillGroupId')
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -53,11 +53,11 @@ export class SkillGroupsController {
         new BadRequestException(errors),
     }),
   )
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateSkillGroupDto: UpdateSkillGroupDto,
+  patch(
+    @Param('skillGroupId', ParseIntPipe) skillGroupId: number,
+    @Body() patchSkillGroupDto: PatchSkillGroupDto,
   ): Promise<SkillGroup> {
-    return this.skillGroupsService.update(id, updateSkillGroupDto);
+    return this.skillGroupsService.patch(skillGroupId, patchSkillGroupDto);
   }
 
   @Get()
@@ -65,14 +65,18 @@ export class SkillGroupsController {
     return this.skillGroupsService.findAll();
   }
 
-  @Get('/:id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<SkillGroup> {
-    return this.skillGroupsService.findOne(id);
+  @Get('/:skillGroupId')
+  findOne(
+    @Param('skillGroupId', ParseIntPipe) skillGroupId: number,
+  ): Promise<SkillGroup> {
+    return this.skillGroupsService.findOne(skillGroupId);
   }
 
-  @Delete('/:id')
-  delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.skillGroupsService.delete(id);
+  @Delete('/:skillGroupId')
+  delete(
+    @Param('skillGroupId', ParseIntPipe) skillGroupId: number,
+  ): Promise<void> {
+    return this.skillGroupsService.delete(skillGroupId);
   }
 
   @Post('/search')
@@ -86,7 +90,7 @@ export class SkillGroupsController {
   )
   search(
     @Body() searchSkillGroupDto: SearchSkillGroupDto,
-  ): Promise<SkillGroup[]> {
+  ): Promise<{ items: SkillGroup[]; total: number }> {
     return this.skillGroupsService.search(searchSkillGroupDto);
   }
 }

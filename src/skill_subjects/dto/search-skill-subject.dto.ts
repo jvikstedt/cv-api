@@ -15,7 +15,7 @@ export class SearchSkillSubjectDto {
 
   @IsOptional()
   @IsString()
-  orderColumnName?: string = 'skillGroup.name';
+  orderColumnName?: string = 'skillSubject.name';
 
   @IsOptional()
   @IsString()

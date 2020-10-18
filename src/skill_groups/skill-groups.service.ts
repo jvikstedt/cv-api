@@ -1,3 +1,4 @@
+import * as R from 'ramda';
 import {
   Injectable,
   NotFoundException,
@@ -7,8 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { SkillGroup } from './skill-group.entity';
 import { SkillGroupRepository } from './skill-group.repository';
 import { CreateSkillGroupDto } from './dto/create-skill-group.dto';
-import { UpdateSkillGroupDto } from './dto/update-skill-group.dto';
 import { SearchSkillGroupDto } from './dto/search-skill-group.dto';
+import { PatchSkillGroupDto } from './dto/patch-skill-group-dto';
 
 @Injectable()
 export class SkillGroupsService {
@@ -38,23 +39,23 @@ export class SkillGroupsService {
     return skillGroup;
   }
 
-  async update(
-    id: number,
-    updateSkillGroupDto: UpdateSkillGroupDto,
+  async patch(
+    skillGroupId: number,
+    patchSkillGroupDto: PatchSkillGroupDto,
   ): Promise<SkillGroup> {
-    const skillGroup = await this.findOne(id);
+    const oldSkillGroup = await this.findOne(skillGroupId);
 
-    skillGroup.name = updateSkillGroupDto.name;
+    const newSkillGroup = R.merge(oldSkillGroup, patchSkillGroupDto);
 
-    return await this.skillGroupRepository.save(skillGroup);
+    return this.skillGroupRepository.save(newSkillGroup);
   }
 
   async findAll(): Promise<SkillGroup[]> {
     return this.skillGroupRepository.find();
   }
 
-  async findOne(id: number): Promise<SkillGroup> {
-    const entity = await this.skillGroupRepository.findOne(id);
+  async findOne(skillGroupId: number): Promise<SkillGroup> {
+    const entity = await this.skillGroupRepository.findOne(skillGroupId);
     if (!entity) {
       throw new NotFoundException();
     }
@@ -62,8 +63,8 @@ export class SkillGroupsService {
     return entity;
   }
 
-  async delete(id: number): Promise<void> {
-    const result = await this.skillGroupRepository.delete(id);
+  async delete(skillGroupId: number): Promise<void> {
+    const result = await this.skillGroupRepository.delete(skillGroupId);
     if (result.affected === 0) {
       throw new NotFoundException();
     }
@@ -71,11 +72,23 @@ export class SkillGroupsService {
 
   async search(
     searchSkillGroupDto: SearchSkillGroupDto,
-  ): Promise<SkillGroup[]> {
-    return this.skillGroupRepository
-      .createQueryBuilder()
-      .where('name ilike :name', { name: `%${searchSkillGroupDto.name}%` })
-      .limit(searchSkillGroupDto.limit)
-      .getMany();
+  ): Promise<{ items: SkillGroup[]; total: number }> {
+    const [items, total] = await this.skillGroupRepository
+      .createQueryBuilder('skillGroup')
+      .where('skillGroup.name ilike :name', {
+        name: `%${searchSkillGroupDto.name}%`,
+      })
+      .orderBy(
+        searchSkillGroupDto.orderColumnName,
+        searchSkillGroupDto.orderSort,
+      )
+      .skip(searchSkillGroupDto.skip)
+      .take(searchSkillGroupDto.take)
+      .getManyAndCount();
+
+    return {
+      items,
+      total,
+    };
   }
 }

@@ -82,7 +82,9 @@ export class SchoolsController {
         new BadRequestException(errors),
     }),
   )
-  search(@Body() searchSchoolDto: SearchSchoolDto): Promise<School[]> {
+  search(
+    @Body() searchSchoolDto: SearchSchoolDto,
+  ): Promise<{ items: School[]; total: number }> {
     return this.schoolsService.search(searchSchoolDto);
   }
 }
