@@ -6,7 +6,7 @@ define(Skill, (faker: typeof Faker) => {
   const skill = new Skill();
 
   skill.experienceInYears = faker.random.number({
-    min: 0,
+    min: 1,
     max: 3,
   });
 
