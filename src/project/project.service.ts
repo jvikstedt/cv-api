@@ -36,7 +36,7 @@ export class ProjectService {
       createProjectDto,
     );
 
-    return project;
+    return this.findOne(project.id);
   }
 
   async patch(
@@ -72,12 +72,24 @@ export class ProjectService {
     }
   }
 
-  async search(searchProjectDto: SearchProjectDto): Promise<Project[]> {
-    return this.projectRepository
+  async search(
+    searchProjectDto: SearchProjectDto,
+  ): Promise<{ items: Project[]; total: number }> {
+    const [items, total] = await this.projectRepository
       .createQueryBuilder('project')
-      .where('project.name ilike :name', { name: `%${searchProjectDto.name}%` })
       .leftJoinAndSelect('project.company', 'company')
-      .limit(searchProjectDto.limit)
-      .getMany();
+      .leftJoinAndSelect('project.projectMemberships', 'projectMemberships')
+      .where('project.name ilike :name', {
+        name: `%${searchProjectDto.name}%`,
+      })
+      .orderBy(searchProjectDto.orderColumnName, searchProjectDto.orderSort)
+      .skip(searchProjectDto.skip)
+      .take(searchProjectDto.take)
+      .getManyAndCount();
+
+    return {
+      items,
+      total,
+    };
   }
 }
