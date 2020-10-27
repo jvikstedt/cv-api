@@ -13,7 +13,7 @@ import { ProjectMembership } from '../project_membership/project-membership.enti
 import { Company } from '../company/company.entity';
 
 @Entity()
-@Unique(['name'])
+@Unique(['name', 'company'])
 export class Project extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
