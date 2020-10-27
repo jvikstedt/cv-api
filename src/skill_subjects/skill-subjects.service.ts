@@ -22,10 +22,14 @@ export class SkillSubjectsService {
     createSkillSubjectDto: CreateSkillSubjectDto,
   ): Promise<SkillSubject> {
     const skillSubjects = await this.skillSubjectRepository
-      .createQueryBuilder()
-      .where('LOWER(name) = LOWER(:name)', {
-        name: createSkillSubjectDto.name,
-      })
+      .createQueryBuilder('skillSubject')
+      .where(
+        'LOWER(name) = LOWER(:name) AND skillSubject.skillGroupId = :skillGroupId',
+        {
+          name: createSkillSubjectDto.name,
+          skillGroupId: createSkillSubjectDto.skillGroupId,
+        },
+      )
       .getMany();
 
     if (skillSubjects.length > 0) {

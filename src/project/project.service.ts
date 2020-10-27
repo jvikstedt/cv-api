@@ -20,9 +20,10 @@ export class ProjectService {
 
   async create(createProjectDto: CreateProjectDto): Promise<Project> {
     const projects = await this.projectRepository
-      .createQueryBuilder()
-      .where('LOWER(name) = LOWER(:name)', {
+      .createQueryBuilder('project')
+      .where('LOWER(name) = LOWER(:name) AND project.companyId = :companyId', {
         name: createProjectDto.name,
+        companyId: createProjectDto.companyId,
       })
       .getMany();
 

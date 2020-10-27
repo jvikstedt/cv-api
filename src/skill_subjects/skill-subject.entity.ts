@@ -13,7 +13,7 @@ import { Skill } from '../skills/skill.entity';
 import { SkillGroup } from '../skill_groups/skill-group.entity';
 
 @Entity()
-@Unique(['name'])
+@Unique(['name', 'skillGroup'])
 export class SkillSubject extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
