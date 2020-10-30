@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   ParseIntPipe,
-  UseGuards,
   Patch,
   UsePipes,
   ValidationPipe,
@@ -17,20 +16,18 @@ import {
 import { EducationsService } from './educations.service';
 import { Education } from './education.entity';
 import { CreateEducationDto } from './dto/create-education.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PatchEducationDto } from './dto/patch-education.dto';
-import { CVGuard } from '../cv/cv.guard';
+import { AllowAuthenticated, AllowCVOwner } from '../roles/roles.decorator';
 
 @ApiBearerAuth()
 @ApiTags('educations')
 @Controller('cv/:cvId/educations')
-@UseGuards(AuthGuard())
 export class EducationsController {
   constructor(private readonly educationsService: EducationsService) {}
 
   @Post()
-  @UseGuards(CVGuard)
+  @AllowCVOwner()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -47,7 +44,7 @@ export class EducationsController {
   }
 
   @Patch('/:educationId')
-  @UseGuards(CVGuard)
+  @AllowCVOwner()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -65,11 +62,13 @@ export class EducationsController {
   }
 
   @Get()
+  @AllowAuthenticated()
   findAll(@Param('cvId', ParseIntPipe) cvId: number): Promise<Education[]> {
     return this.educationsService.findAll(cvId);
   }
 
   @Get('/:educationId')
+  @AllowAuthenticated()
   findOne(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('educationId', ParseIntPipe) educationId: number,
@@ -78,7 +77,7 @@ export class EducationsController {
   }
 
   @Delete('/:educationId')
-  @UseGuards(CVGuard)
+  @AllowCVOwner()
   remove(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('educationId', ParseIntPipe) educationId: number,

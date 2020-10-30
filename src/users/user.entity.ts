@@ -10,8 +10,11 @@ import {
   OneToOne,
   OneToMany,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
 } from 'typeorm';
 import { CV } from '../cv/cv.entity';
+import { Role } from '../roles/role.entity';
 import { Template } from '../templates/template.entity';
 import { File } from '../files/file.entity';
 
@@ -63,6 +66,10 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true })
   avatarId: string;
+
+  @ManyToMany(() => Role)
+  @JoinTable()
+  roles: Role[];
 
   @CreateDateColumn()
   createdAt: Date;

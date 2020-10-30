@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   ParseIntPipe,
-  UseGuards,
   UsePipes,
   ValidationPipe,
   BadRequestException,
@@ -17,19 +16,19 @@ import {
 import { SkillGroupsService } from './skill-groups.service';
 import { SkillGroup } from './skill-group.entity';
 import { CreateSkillGroupDto } from './dto/create-skill-group.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchSkillGroupDto } from './dto/search-skill-group.dto';
 import { PatchSkillGroupDto } from './dto/patch-skill-group-dto';
+import { AllowAuthenticated } from '../roles/roles.decorator';
 
 @ApiBearerAuth()
 @ApiTags('skill_groups')
 @Controller('skill_groups')
-@UseGuards(AuthGuard())
 export class SkillGroupsController {
   constructor(private readonly skillGroupsService: SkillGroupsService) {}
 
   @Post()
+  @AllowAuthenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -61,11 +60,13 @@ export class SkillGroupsController {
   }
 
   @Get()
+  @AllowAuthenticated()
   findAll(): Promise<SkillGroup[]> {
     return this.skillGroupsService.findAll();
   }
 
   @Get('/:skillGroupId')
+  @AllowAuthenticated()
   findOne(
     @Param('skillGroupId', ParseIntPipe) skillGroupId: number,
   ): Promise<SkillGroup> {
@@ -80,6 +81,7 @@ export class SkillGroupsController {
   }
 
   @Post('/search')
+  @AllowAuthenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

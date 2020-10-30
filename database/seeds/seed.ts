@@ -13,6 +13,7 @@ import { WorkExperience } from '../../src/work_experience/work-experience.entity
 import { Project } from '../../src/project/project.entity';
 import { ProjectMembership } from '../../src/project_membership/project-membership.entity';
 import { MembershipSkill } from '../../src/membership_skill/membership-skill.entity';
+import { Role } from '../../src/roles/role.entity';
 
 const SKILLS = {
   'Build and CI tools': [
@@ -122,6 +123,10 @@ export default class Seed implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<void> {
     await connection.synchronize(true);
 
+    const adminRole = await factory(Role)().create({
+      name: 'ADMIN',
+    });
+
     const skillGroups: SkillGroup[] = [];
     const skillSubjects: SkillSubject[] = [];
 
@@ -171,6 +176,7 @@ export default class Seed implements Seeder {
       firstName: 'John',
       lastName: 'Doe',
       username: 'admin',
+      roles: [adminRole],
     });
     admin.password = await bcrypt.hash('Admin123', admin.salt);
     await admin.save();

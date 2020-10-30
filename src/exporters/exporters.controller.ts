@@ -4,7 +4,6 @@ import {
   Body,
   Res,
   Header,
-  UseGuards,
   UsePipes,
   ValidationPipe,
   BadRequestException,
@@ -14,19 +13,19 @@ import {
 import { Response } from 'express';
 import * as stream from 'stream';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { ExportersService } from './exporters.service';
 import { ExportPdfDto } from './dto/export-pdf.dto';
 import { ExportDocxDto } from './dto/export-docx.dto';
+import { AllowAuthenticated } from '../roles/roles.decorator';
 
 @ApiBearerAuth()
 @ApiTags('exporters')
 @Controller('exporters')
-@UseGuards(AuthGuard())
 export class ExportersController {
   constructor(private readonly exportersService: ExportersService) {}
 
   @Post('/pdf/export')
+  @AllowAuthenticated()
   @Header('Content-Type', 'application/pdf')
   @UsePipes(
     new ValidationPipe({
@@ -45,6 +44,7 @@ export class ExportersController {
   }
 
   @Post('/docx/export')
+  @AllowAuthenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

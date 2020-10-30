@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   ParseIntPipe,
-  UseGuards,
   Patch,
   UsePipes,
   ValidationPipe,
@@ -18,18 +17,18 @@ import { CompanyService } from './company.service';
 import { Company } from './company.entity';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { PatchCompanyDto } from './dto/patch-company.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchCompanyDto } from './dto/search-company.dto';
+import { AllowAuthenticated } from '../roles/roles.decorator';
 
 @ApiBearerAuth()
 @ApiTags('company')
 @Controller('company')
-@UseGuards(AuthGuard())
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
   @Post()
+  @AllowAuthenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -59,11 +58,13 @@ export class CompanyController {
   }
 
   @Get()
+  @AllowAuthenticated()
   findAll(): Promise<Company[]> {
     return this.companyService.findAll();
   }
 
   @Get('/:id')
+  @AllowAuthenticated()
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Company> {
     return this.companyService.findOne(id);
   }
@@ -74,6 +75,7 @@ export class CompanyController {
   }
 
   @Post('/search')
+  @AllowAuthenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
