@@ -5,7 +5,6 @@ import {
   Body,
   Param,
   ParseIntPipe,
-  UseGuards,
   Patch,
   UsePipes,
   ValidationPipe,
@@ -13,23 +12,21 @@ import {
   ValidationError,
   HttpException,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CVService } from './cv.service';
 import { CV } from './cv.entity';
 import { PatchCVDto } from './dto/patch-cv.dto';
 import { SearchCVDto } from './dto/search-cv.dto';
-import { CVGuard } from './cv.guard';
+import { AllowAuthenticated, AllowCVOwner } from '../roles/roles.decorator';
 
 @ApiBearerAuth()
 @ApiTags('cv')
 @Controller('cv')
-@UseGuards(AuthGuard())
 export class CVController {
   constructor(private readonly cvService: CVService) {}
 
   @Patch('/:cvId')
-  @UseGuards(CVGuard)
+  @AllowCVOwner()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -46,16 +43,19 @@ export class CVController {
   }
 
   @Get()
+  @AllowAuthenticated()
   findAll(): Promise<CV[]> {
     return this.cvService.findAll();
   }
 
   @Get('/:cvId')
+  @AllowAuthenticated()
   findOne(@Param('cvId', ParseIntPipe) cvId: number): Promise<CV> {
     return this.cvService.findOne(cvId);
   }
 
   @Post('/search')
+  @AllowAuthenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

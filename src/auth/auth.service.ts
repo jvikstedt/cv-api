@@ -54,7 +54,7 @@ export class AuthService {
     }
 
     user = await this.userRepository.findOne(user.id, {
-      relations: ['cv', 'templates'],
+      relations: ['cv', 'templates', 'roles'],
     });
 
     const payload: JwtPayload = {
@@ -64,6 +64,7 @@ export class AuthService {
       lastName: user.lastName,
       cvIds: [user.cv.id],
       templateIds: R.map((t) => t.id, user.templates),
+      roles: R.map((role) => role.name, user.roles),
     };
     const accessToken = this.jwtService.sign(payload);
 
@@ -85,7 +86,7 @@ export class AuthService {
 
     let user = await this.userRepository.findOne(
       { username: email },
-      { relations: ['cv', 'templates'] },
+      { relations: ['cv', 'templates', 'roles'] },
     );
     if (!user) {
       user = this.userRepository.create({
@@ -119,6 +120,7 @@ export class AuthService {
       lastName: user.lastName,
       cvIds: [user.cv.id],
       templateIds: R.map((t) => t.id, user.templates),
+      roles: R.map((role) => role.name, user.roles),
     };
     const accessToken = this.jwtService.sign(payload);
 

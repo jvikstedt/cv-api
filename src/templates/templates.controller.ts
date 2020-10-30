@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   ParseIntPipe,
-  UseGuards,
   Patch,
   UsePipes,
   ValidationPipe,
@@ -16,21 +15,21 @@ import {
 } from '@nestjs/common';
 import { TemplatesService } from './templates.service';
 import { Template } from './template.entity';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetUser } from '../auth/get-user.decorator';
 import { PatchTemplateDto } from './dto/patch-template.dto';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { JwtPayload } from '../auth/jwt-payload.interface';
+import { AllowAuthenticated } from '../roles/roles.decorator';
 
 @ApiBearerAuth()
 @ApiTags('templates')
 @Controller('templates')
-@UseGuards(AuthGuard())
 export class TemplatesController {
   constructor(private readonly templatesService: TemplatesService) {}
 
   @Post()
+  @AllowAuthenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -47,6 +46,7 @@ export class TemplatesController {
   }
 
   @Patch('/:id')
+  @AllowAuthenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -63,11 +63,13 @@ export class TemplatesController {
   }
 
   @Get()
+  @AllowAuthenticated()
   findAll(): Promise<Template[]> {
     return this.templatesService.findAll();
   }
 
   @Get('/:id')
+  @AllowAuthenticated()
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Template> {
     return this.templatesService.findOne(id);
   }

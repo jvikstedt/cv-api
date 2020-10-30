@@ -7,14 +7,19 @@ import { TestHelper } from './test-helper';
 import { User } from '../src/users/user.entity';
 import { CV } from '../src/cv/cv.entity';
 import { Company } from '../src/company/company.entity';
+import { Role } from '../src/roles/role.entity';
+import { ADMIN_ROLE } from '../src/constants';
 
 describe('ProjectController (e2e)', () => {
   const testHelper: TestHelper = new TestHelper();
   let app: INestApplication;
 
   let user: User;
+  let admin: User;
   let cv: CV;
+  let adminCV: CV;
   let accessToken: string;
+  let adminAccessToken: string;
 
   beforeAll(async () => {
     await testHelper.setup();
@@ -29,7 +34,14 @@ describe('ProjectController (e2e)', () => {
     user.cv = cv;
     user.templates = [];
 
+    const adminRole = await factory(Role)().create({ name: ADMIN_ROLE });
+    admin = await factory(User)().create({ roles: [adminRole] });
+    adminCV = await factory(CV)().create({ userId: admin.id });
+    admin.cv = adminCV;
+    admin.templates = [];
+
     accessToken = testHelper.sign(user);
+    adminAccessToken = testHelper.sign(admin);
   });
 
   afterAll(async (done) => {
@@ -105,9 +117,14 @@ describe('ProjectController (e2e)', () => {
       const project = await factory(Project)().create({
         companyId: company.id,
       });
-      const response = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .delete(`/project/${project.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
+        .expect(403);
+
+      const response = await request(app.getHttpServer())
+        .delete(`/project/${project.id}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
         .expect(200);
 
       expect(response.body).toEqual({});
@@ -158,9 +175,15 @@ describe('ProjectController (e2e)', () => {
         name: 'Project A',
       };
 
-      const response = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .patch(`/project/${project.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
+        .send(patchProjectDto)
+        .expect(403);
+
+      const response = await request(app.getHttpServer())
+        .patch(`/project/${project.id}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
         .send(patchProjectDto)
         .expect(200);
 

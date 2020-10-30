@@ -26,6 +26,7 @@ describe('JwtStrategy', () => {
         lastName: 'Doe',
         cvIds: [1],
         templateIds: [],
+        roles: [],
       };
 
       const result = await jwtStrategy.validate(jwtPayload);

@@ -1,15 +1,21 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as config from 'config';
 import { CONFIG_SERVER, CONFIG_SERVER_PORT } from './constants';
+import { MyAuthGuard } from './auth/auth.guard';
+import { RolesGuard } from './roles/roles.guard';
 
 async function bootstrap(): Promise<void> {
   const serverConfig = config.get(CONFIG_SERVER);
   const logger = new Logger('bootstrap');
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
+
+  const reflector = app.get(Reflector);
+  app.useGlobalGuards(new MyAuthGuard(reflector));
+  app.useGlobalGuards(new RolesGuard(reflector));
 
   const options = new DocumentBuilder()
     .setTitle('CV')

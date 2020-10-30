@@ -4,12 +4,15 @@ import { Connection } from 'typeorm';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
+import { Reflector } from '@nestjs/core';
 import { Queue } from 'bull';
 import { getQueueToken } from '@nestjs/bull';
 import { User } from '../src/users/user.entity';
 import { JwtPayload } from '../src/auth/jwt-payload.interface';
 import { AppModule } from '../src/app.module';
 import { QUEUE_NAME_CV } from '../src/constants';
+import { MyAuthGuard } from '../src/auth/auth.guard';
+import { RolesGuard } from '../src/roles/roles.guard';
 
 export class TestHelper {
   public accessToken = '';
@@ -26,6 +29,10 @@ export class TestHelper {
     }).compile();
 
     this.app = module.createNestApplication();
+
+    const reflector = this.app.get(Reflector);
+    this.app.useGlobalGuards(new MyAuthGuard(reflector));
+    this.app.useGlobalGuards(new RolesGuard(reflector));
     await this.app.init();
 
     this.connection = module.get<Connection>(Connection);
@@ -42,7 +49,8 @@ export class TestHelper {
       firstName: user.firstName,
       lastName: user.lastName,
       cvIds: [user.cv.id],
-      templateIds: R.map((t) => t.id, user.templates),
+      templateIds: R.map((t) => t.id, user.templates || []),
+      roles: R.map((r) => r.name, user.roles || []),
     };
     this.accessToken = this.jwtService.sign(payload);
     return this.accessToken;

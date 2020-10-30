@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   ParseIntPipe,
-  UseGuards,
   Patch,
   UsePipes,
   ValidationPipe,
@@ -17,22 +16,20 @@ import {
 import { ProjectMembershipService } from './project-membership.service';
 import { ProjectMembership } from './project-membership.entity';
 import { CreateProjectMembershipDto } from './dto/create-project-membership.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PatchProjectMembershipDto } from './dto/patch-project-membership.dto';
-import { CVGuard } from '../cv/cv.guard';
+import { AllowAuthenticated, AllowCVOwner } from '../roles/roles.decorator';
 
 @ApiBearerAuth()
 @ApiTags('project_membership')
 @Controller('cv/:cvId/project_membership')
-@UseGuards(AuthGuard())
 export class ProjectMembershipController {
   constructor(
     private readonly projectMembershipService: ProjectMembershipService,
   ) {}
 
   @Post()
-  @UseGuards(CVGuard)
+  @AllowCVOwner()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -52,7 +49,7 @@ export class ProjectMembershipController {
   }
 
   @Patch('/:projectMembershipId')
-  @UseGuards(CVGuard)
+  @AllowCVOwner()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -74,6 +71,7 @@ export class ProjectMembershipController {
   }
 
   @Get()
+  @AllowAuthenticated()
   findAll(
     @Param('cvId', ParseIntPipe) cvId: number,
   ): Promise<ProjectMembership[]> {
@@ -81,6 +79,7 @@ export class ProjectMembershipController {
   }
 
   @Get('/:projectMembershipId')
+  @AllowAuthenticated()
   findOne(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('projectMembershipId', ParseIntPipe) projectMembershipId: number,
@@ -89,7 +88,7 @@ export class ProjectMembershipController {
   }
 
   @Delete('/:projectMembershipId')
-  @UseGuards(CVGuard)
+  @AllowCVOwner()
   remove(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('projectMembershipId', ParseIntPipe) projectMembershipId: number,
