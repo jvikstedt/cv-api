@@ -6,14 +6,19 @@ import { PatchSchoolDto } from '../src/schools/dto/patch-school.dto';
 import { TestHelper } from './test-helper';
 import { User } from '../src/users/user.entity';
 import { CV } from '../src/cv/cv.entity';
+import { Role } from '../src/roles/role.entity';
+import { ADMIN_ROLE } from '../src/constants';
 
 describe('SchoolsController (e2e)', () => {
   const testHelper: TestHelper = new TestHelper();
   let app: INestApplication;
 
   let user: User;
+  let admin: User;
   let cv: CV;
+  let adminCV: CV;
   let accessToken: string;
+  let adminAccessToken: string;
 
   beforeAll(async () => {
     await testHelper.setup();
@@ -28,7 +33,14 @@ describe('SchoolsController (e2e)', () => {
     user.cv = cv;
     user.templates = [];
 
+    const adminRole = await factory(Role)().create({ name: ADMIN_ROLE });
+    admin = await factory(User)().create({ roles: [adminRole] });
+    adminCV = await factory(CV)().create({ userId: admin.id });
+    admin.cv = adminCV;
+    admin.templates = [];
+
     accessToken = testHelper.sign(user);
+    adminAccessToken = testHelper.sign(admin);
   });
 
   afterAll(async (done) => {
@@ -85,9 +97,14 @@ describe('SchoolsController (e2e)', () => {
   describe('/schools/:id (DELETE)', () => {
     it('deletes school', async () => {
       const school = await factory(School)().create();
-      const response = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .delete(`/schools/${school.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
+        .expect(403);
+
+      const response = await request(app.getHttpServer())
+        .delete(`/schools/${school.id}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
         .expect(200);
 
       expect(response.body).toEqual({});
@@ -132,9 +149,15 @@ describe('SchoolsController (e2e)', () => {
         name: 'Metropolia',
       };
 
-      const response = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .patch(`/schools/${school.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
+        .send(patchSchoolDto)
+        .expect(403);
+
+      const response = await request(app.getHttpServer())
+        .patch(`/schools/${school.id}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
         .send(patchSchoolDto)
         .expect(200);
 

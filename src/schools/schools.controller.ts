@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   ParseIntPipe,
-  UseGuards,
   Patch,
   UsePipes,
   ValidationPipe,
@@ -18,18 +17,18 @@ import { SchoolsService } from './schools.service';
 import { School } from './school.entity';
 import { CreateSchoolDto } from './dto/create-school.dto';
 import { PatchSchoolDto } from './dto/patch-school.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchSchoolDto } from './dto/search-school.dto';
+import { AllowAuthenticated } from '../roles/roles.decorator';
 
 @ApiBearerAuth()
 @ApiTags('schools')
 @Controller('schools')
-@UseGuards(AuthGuard())
 export class SchoolsController {
   constructor(private readonly schoolsService: SchoolsService) {}
 
   @Post()
+  @AllowAuthenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -59,11 +58,13 @@ export class SchoolsController {
   }
 
   @Get()
+  @AllowAuthenticated()
   findAll(): Promise<School[]> {
     return this.schoolsService.findAll();
   }
 
   @Get('/:id')
+  @AllowAuthenticated()
   findOne(@Param('id', ParseIntPipe) id: number): Promise<School> {
     return this.schoolsService.findOne(id);
   }
@@ -74,6 +75,7 @@ export class SchoolsController {
   }
 
   @Post('/search')
+  @AllowAuthenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

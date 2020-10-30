@@ -6,14 +6,19 @@ import { PatchCompanyDto } from '../src/company/dto/patch-company.dto';
 import { TestHelper } from './test-helper';
 import { User } from '../src/users/user.entity';
 import { CV } from '../src/cv/cv.entity';
+import { Role } from '../src/roles/role.entity';
+import { ADMIN_ROLE } from '../src/constants';
 
 describe('CompanyController (e2e)', () => {
   const testHelper: TestHelper = new TestHelper();
   let app: INestApplication;
 
   let user: User;
+  let admin: User;
   let cv: CV;
+  let adminCV: CV;
   let accessToken: string;
+  let adminAccessToken: string;
 
   beforeAll(async () => {
     await testHelper.setup();
@@ -28,7 +33,14 @@ describe('CompanyController (e2e)', () => {
     user.cv = cv;
     user.templates = [];
 
+    const adminRole = await factory(Role)().create({ name: ADMIN_ROLE });
+    admin = await factory(User)().create({ roles: [adminRole] });
+    adminCV = await factory(CV)().create({ userId: admin.id });
+    admin.cv = adminCV;
+    admin.templates = [];
+
     accessToken = testHelper.sign(user);
+    adminAccessToken = testHelper.sign(admin);
   });
 
   afterAll(async (done) => {
@@ -85,9 +97,14 @@ describe('CompanyController (e2e)', () => {
   describe('/company/:id (DELETE)', () => {
     it('deletes company', async () => {
       const company = await factory(Company)().create();
-      const response = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .delete(`/company/${company.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
+        .expect(403);
+
+      const response = await request(app.getHttpServer())
+        .delete(`/company/${company.id}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
         .expect(200);
 
       expect(response.body).toEqual({});
@@ -132,9 +149,15 @@ describe('CompanyController (e2e)', () => {
         name: 'Company A',
       };
 
-      const response = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .patch(`/company/${company.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
+        .send(patchCompanyDto)
+        .expect(403);
+
+      const response = await request(app.getHttpServer())
+        .patch(`/company/${company.id}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
         .send(patchCompanyDto)
         .expect(200);
 

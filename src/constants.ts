@@ -34,6 +34,14 @@ export const ELASTIC_INDEX_CV = 'cv';
 
 export const EXPORTER_PDF = 'pdf';
 
+export const ROUTE_METADATA_IS_PUBLIC = 'IS_PUBLIC';
+export const ROUTE_METADATA_ALLOW_CV_OWNER = 'ALLOW_CV_OWNER';
+export const ROUTE_METADATA_ALLOW_USER_OWNER = 'ALLOW_USER_OWNER';
+export const ROUTE_METADATA_ALLOWED_ROLES = 'ALLOWED_ROLES';
+export const ROUTE_METADATA_ALLOW_AUTHENTICATED = 'ALLOW_AUTHENTICATED';
+
+export const ADMIN_ROLE = 'ADMIN';
+
 export enum EventType {
   Insert = 'insert',
   Update = 'update',

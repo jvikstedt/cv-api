@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   ParseIntPipe,
-  UseGuards,
   Patch,
   UsePipes,
   ValidationPipe,
@@ -17,20 +16,18 @@ import {
 import { SkillsService } from './skills.service';
 import { Skill } from './skill.entity';
 import { CreateSkillDto } from './dto/create-skill.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PatchSkillDto } from './dto/patch-skill.dto';
-import { CVGuard } from '../cv/cv.guard';
+import { AllowAuthenticated, AllowCVOwner } from '../roles/roles.decorator';
 
 @ApiBearerAuth()
 @ApiTags('skills')
 @Controller('cv/:cvId/skills')
-@UseGuards(AuthGuard())
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
   @Post()
-  @UseGuards(CVGuard)
+  @AllowCVOwner()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -47,7 +44,7 @@ export class SkillsController {
   }
 
   @Patch('/:skillId')
-  @UseGuards(CVGuard)
+  @AllowCVOwner()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -65,11 +62,13 @@ export class SkillsController {
   }
 
   @Get()
+  @AllowAuthenticated()
   findAll(@Param('cvId', ParseIntPipe) cvId: number): Promise<Skill[]> {
     return this.skillsService.findAll(cvId);
   }
 
   @Get('/:skillId')
+  @AllowAuthenticated()
   findOne(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('skillId', ParseIntPipe) skillId: number,
@@ -78,7 +77,7 @@ export class SkillsController {
   }
 
   @Delete('/:skillId')
-  @UseGuards(CVGuard)
+  @AllowCVOwner()
   remove(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('skillId', ParseIntPipe) skillId: number,

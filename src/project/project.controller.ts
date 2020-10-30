@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   ParseIntPipe,
-  UseGuards,
   Patch,
   UsePipes,
   ValidationPipe,
@@ -18,18 +17,18 @@ import { ProjectService } from './project.service';
 import { Project } from './project.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { PatchProjectDto } from './dto/patch-project.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchProjectDto } from './dto/search-project.dto';
+import { AllowAuthenticated } from '../roles/roles.decorator';
 
 @ApiBearerAuth()
 @ApiTags('project')
 @Controller('project')
-@UseGuards(AuthGuard())
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post()
+  @AllowAuthenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -59,11 +58,13 @@ export class ProjectController {
   }
 
   @Get()
+  @AllowAuthenticated()
   findAll(): Promise<Project[]> {
     return this.projectService.findAll();
   }
 
   @Get('/:id')
+  @AllowAuthenticated()
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Project> {
     return this.projectService.findOne(id);
   }
@@ -74,6 +75,7 @@ export class ProjectController {
   }
 
   @Post('/search')
+  @AllowAuthenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

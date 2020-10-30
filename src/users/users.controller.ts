@@ -1,27 +1,18 @@
-import {
-  Controller,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Patch,
-  Body,
-} from '@nestjs/common';
+import { Controller, Param, ParseIntPipe, Patch, Body } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
-import { AuthGuard } from '@nestjs/passport';
 import { PatchUserDto } from './dto/patch-user.dto';
-import { UserGuard } from './user.guard';
+import { AllowUserOwner } from '../roles/roles.decorator';
 
 @ApiBearerAuth()
 @ApiTags('users')
 @Controller('users')
-@UseGuards(AuthGuard())
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Patch('/:userId')
-  @UseGuards(UserGuard)
+  @AllowUserOwner()
   patch(
     @Param('userId', ParseIntPipe) userId: number,
     @Body() patchUserDto: PatchUserDto,

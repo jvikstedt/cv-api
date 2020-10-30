@@ -7,14 +7,19 @@ import { TestHelper } from './test-helper';
 import { User } from '../src/users/user.entity';
 import { CV } from '../src/cv/cv.entity';
 import { PatchSkillSubjectDto } from '../src/skill_subjects/dto/patch-skill-subject.dto';
+import { Role } from '../src/roles/role.entity';
+import { ADMIN_ROLE } from '../src/constants';
 
 describe('SkillSubjectsController (e2e)', () => {
   const testHelper: TestHelper = new TestHelper();
   let app: INestApplication;
 
   let user: User;
+  let admin: User;
   let cv: CV;
+  let adminCV: CV;
   let accessToken: string;
+  let adminAccessToken: string;
 
   beforeAll(async () => {
     await testHelper.setup();
@@ -29,7 +34,14 @@ describe('SkillSubjectsController (e2e)', () => {
     user.cv = cv;
     user.templates = [];
 
+    const adminRole = await factory(Role)().create({ name: ADMIN_ROLE });
+    admin = await factory(User)().create({ roles: [adminRole] });
+    adminCV = await factory(CV)().create({ userId: admin.id });
+    admin.cv = adminCV;
+    admin.templates = [];
+
     accessToken = testHelper.sign(user);
+    adminAccessToken = testHelper.sign(admin);
   });
 
   afterAll(async (done) => {
@@ -94,9 +106,14 @@ describe('SkillSubjectsController (e2e)', () => {
     const skillSubject = await factory(SkillSubject)().create({
       skillGroupId: skillGroup.id,
     });
-    const response = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .delete(`/skill_subjects/${skillSubject.id}`)
       .set('Authorization', `Bearer ${accessToken}`)
+      .expect(403);
+
+    const response = await request(app.getHttpServer())
+      .delete(`/skill_subjects/${skillSubject.id}`)
+      .set('Authorization', `Bearer ${adminAccessToken}`)
       .expect(200);
 
     expect(response.body).toEqual({});
@@ -140,9 +157,15 @@ describe('SkillSubjectsController (e2e)', () => {
         name: 'vue',
       };
 
-      const response = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .patch(`/skill_subjects/${skillSubject.id}`)
         .set('Authorization', `Bearer ${accessToken}`)
+        .send(patchSkillSubjectDto)
+        .expect(403);
+
+      const response = await request(app.getHttpServer())
+        .patch(`/skill_subjects/${skillSubject.id}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
         .send(patchSkillSubjectDto)
         .expect(200);
 

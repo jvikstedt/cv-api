@@ -7,6 +7,7 @@ import {
   HealthCheckResult,
 } from '@nestjs/terminus';
 import { ApiTags } from '@nestjs/swagger';
+import { Public } from '../auth/auth.guard';
 
 @ApiTags('health')
 @Controller('health')
@@ -17,6 +18,7 @@ export class HealthController {
   ) {}
 
   @Get()
+  @Public()
   @HealthCheck()
   readiness(): Promise<HealthCheckResult> {
     return this.health.check([

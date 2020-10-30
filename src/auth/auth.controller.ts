@@ -9,12 +9,14 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { GoogleAuthDto } from './dto/google-auth.dto';
 import { AuthService } from './auth.service';
+import { Public } from './auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('/signup')
   @UsePipes(
     new ValidationPipe({
@@ -27,6 +29,7 @@ export class AuthController {
     return this.authService.signUp(authCredentialsDto);
   }
 
+  @Public()
   @Post('/signin')
   @UsePipes(
     new ValidationPipe({
@@ -41,6 +44,7 @@ export class AuthController {
     return this.authService.signIn(authCredentialsDto);
   }
 
+  @Public()
   @Post('/google/signin')
   @UsePipes(
     new ValidationPipe({
