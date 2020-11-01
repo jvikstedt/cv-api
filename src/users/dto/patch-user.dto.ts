@@ -27,7 +27,7 @@ export class PatchUserDto {
 
   @IsOptional()
   @IsNumber()
-  experienceInYears?: number;
+  workExperienceInYears?: number;
 
   @IsOptional()
   @IsString()

@@ -9,10 +9,36 @@ import {
 import { User } from './user.entity';
 import { AuthCredentialsDto } from '../auth/dto/auth-credentials.dto';
 import { UNIQUENESS_VIOLATION } from '../constants';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
   private readonly logger = new Logger(UserRepository.name);
+
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const {
+      firstName,
+      lastName,
+      jobTitle,
+      phone,
+      location,
+      workExperienceInYears,
+      email,
+    } = createUserDto;
+
+    const user = this.create({
+      username: email,
+      firstName,
+      lastName,
+      jobTitle,
+      phone,
+      location,
+      workExperienceInYears,
+      email,
+    });
+
+    return user.save();
+  }
 
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<User> {
     const { username, password } = authCredentialsDto;

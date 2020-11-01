@@ -9,6 +9,7 @@ import { PatchUserDto } from './dto/patch-user.dto';
 const mockUsersService = () => ({
   findOne: jest.fn(),
   patch: jest.fn(),
+  create: jest.fn(),
 });
 
 describe('UsersController', () => {
@@ -28,6 +29,22 @@ describe('UsersController', () => {
 
     usersController = module.get<UsersController>(UsersController);
     usersService = module.get<UsersService>(UsersService);
+  });
+
+  describe('create', () => {
+    it('calls service create with passed data', async () => {
+      const user = await factory(User)().make();
+      usersService.create.mockResolvedValue(user);
+
+      expect(usersService.create).not.toHaveBeenCalled();
+      const result = await usersController.create({
+        email: user.email,
+      });
+      expect(usersService.create).toHaveBeenCalledWith({
+        email: user.email,
+      });
+      expect(result).toEqual(user);
+    });
   });
 
   describe('patch', () => {

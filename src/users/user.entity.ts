@@ -18,7 +18,7 @@ import { Role } from '../roles/role.entity';
 import { Template } from '../templates/template.entity';
 import { File } from '../files/file.entity';
 
-@Entity()
+@Entity({ name: 'users' })
 @Unique(['username'])
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
