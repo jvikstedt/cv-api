@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/ban-ts-ignore */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Test } from '@nestjs/testing';
+import { useSeeding, factory } from 'typeorm-seeding';
 import { UserRepository } from './user.repository';
 import { UNIQUENESS_VIOLATION } from '../constants';
 import {
@@ -8,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from './dto/create-user.dto';
 
 const mockCredentialsDto = {
   username: 'john.doe@gmail.com',
@@ -17,12 +19,44 @@ const mockCredentialsDto = {
 describe('UserRepository', () => {
   let userRepository: any;
 
+  beforeAll(async () => {
+    await useSeeding({ configName: 'src/config/typeorm.config.ts' });
+  });
+
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [UserRepository],
     }).compile();
 
     userRepository = module.get<UserRepository>(UserRepository);
+  });
+
+  describe('createUser', () => {
+    let save: any;
+
+    beforeEach(async () => {
+      save = jest.fn();
+      userRepository.create = jest.fn().mockReturnValue({ save });
+    });
+
+    it('returns created user', async () => {
+      const mockCreateUserDto: CreateUserDto = {
+        firstName: 'John',
+        lastName: 'Doe',
+        jobTitle: 'Developer',
+        phone: '0501234567',
+        location: 'Helsinki',
+        workExperienceInYears: 5,
+        email: 'john.doe@test.test',
+      };
+      const user = await factory(User)().make();
+      save.mockResolvedValue(user);
+
+      expect(save).not.toHaveBeenCalled();
+      const result = await userRepository.createUser(mockCreateUserDto);
+      expect(save).toHaveBeenCalled();
+      expect(result).toEqual(user);
+    });
   });
 
   describe('signUp', () => {
