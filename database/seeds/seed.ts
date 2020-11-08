@@ -153,6 +153,10 @@ export default class Seed implements Seeder {
       company: testCompany,
     });
 
+    await factory(School)().create({
+      name: 'Test school',
+    });
+
     // Create schools
     const schools = await this.generateSchools(factory);
 
