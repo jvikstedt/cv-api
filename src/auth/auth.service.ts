@@ -109,6 +109,7 @@ export class AuthService {
         .save();
       user.cv = cv;
       user.templates = [];
+      user.roles = [];
 
       await this.cvService.reload(cv.id);
     }
