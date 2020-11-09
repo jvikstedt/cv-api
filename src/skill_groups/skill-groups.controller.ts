@@ -18,7 +18,7 @@ import { SkillGroup } from './skill-group.entity';
 import { CreateSkillGroupDto } from './dto/create-skill-group.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchSkillGroupDto } from './dto/search-skill-group.dto';
-import { PatchSkillGroupDto } from './dto/patch-skill-group-dto';
+import { PatchSkillGroupDto } from './dto/patch-skill-group.dto';
 import { AllowAuthenticated } from '../roles/roles.decorator';
 
 @ApiBearerAuth()

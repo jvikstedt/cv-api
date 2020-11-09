@@ -9,7 +9,7 @@ import { SkillGroup } from './skill-group.entity';
 import { SkillGroupRepository } from './skill-group.repository';
 import { CreateSkillGroupDto } from './dto/create-skill-group.dto';
 import { SearchSkillGroupDto } from './dto/search-skill-group.dto';
-import { PatchSkillGroupDto } from './dto/patch-skill-group-dto';
+import { PatchSkillGroupDto } from './dto/patch-skill-group.dto';
 
 @Injectable()
 export class SkillGroupsService {
