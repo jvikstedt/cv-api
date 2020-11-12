@@ -1,0 +1,8 @@
+node_modules
+npm-debug.log
+files
+doc
+config/*
+!config/default.yml
+test
+database

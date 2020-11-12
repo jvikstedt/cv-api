@@ -22,9 +22,11 @@ export const CONFIG_DB_LOGGING = 'logging';
 
 export const CONFIG_ELASTICSEARCH = 'elasticsearch';
 export const CONFIG_ELASTICSEARCH_PORT = 'port';
+export const CONFIG_ELASTICSEARCH_HOST = 'host';
 
 export const CONFIG_REDIS = 'redis';
 export const CONFIG_REDIS_PORT = 'port';
+export const CONFIG_REDIS_HOST = 'host';
 
 export const CONFIG_QUEUE = 'queue';
 export const CONFIG_QUEUE_CV_RELOAD = 'cvReloadDelay';
