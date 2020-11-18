@@ -1,10 +1,16 @@
 import * as R from 'ramda';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Template } from './template.entity';
 import { TemplateRepository } from './template.repository';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { PatchTemplateDto } from './dto/patch-template.dto';
+import { JwtPayload } from '../auth/jwt-payload.interface';
+import { ADMIN_ROLE } from '../constants';
 
 @Injectable()
 export class TemplatesService {
@@ -14,11 +20,17 @@ export class TemplatesService {
   ) {}
 
   async create(
-    userId: number,
+    user: JwtPayload,
     createTemplateDto: CreateTemplateDto,
   ): Promise<Template> {
+    if (createTemplateDto.global && R.not(R.includes(ADMIN_ROLE, user.roles))) {
+      throw new UnprocessableEntityException(
+        "Can't set template as global without admin privileges",
+      );
+    }
+
     const template = await this.templateRepository.createTemplate(
-      userId,
+      user.userId,
       createTemplateDto,
     );
 
@@ -26,18 +38,30 @@ export class TemplatesService {
   }
 
   async patchTemplate(
+    user: JwtPayload,
     id: number,
     patchTemplateDto: PatchTemplateDto,
   ): Promise<Template> {
     const oldTemplate = await this.findOne(id);
+
+    if (patchTemplateDto.global && R.not(R.includes(ADMIN_ROLE, user.roles))) {
+      throw new UnprocessableEntityException(
+        "Can't set template as global without admin privileges",
+      );
+    }
 
     const newTemplate = R.merge(oldTemplate, patchTemplateDto);
 
     return this.templateRepository.save(newTemplate);
   }
 
-  async findAll(): Promise<Template[]> {
-    return this.templateRepository.find();
+  async findAll(userId: number): Promise<Template[]> {
+    return this.templateRepository
+      .createQueryBuilder('template')
+      .where('template.userId = :userId OR global', {
+        userId,
+      })
+      .getMany();
   }
 
   async findOne(id: number): Promise<Template> {

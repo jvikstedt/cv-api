@@ -11,7 +11,7 @@ services:
       - POSTGRES_PASSWORD=cv_password
       - POSTGRES_DB=cv_db
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.1
     container_name: elasticsearch_test
     environment:
       - ELASIC_PASSWORD=password

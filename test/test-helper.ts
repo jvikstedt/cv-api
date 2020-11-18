@@ -49,7 +49,6 @@ export class TestHelper {
       firstName: user.firstName,
       lastName: user.lastName,
       cvIds: [user.cv.id],
-      templateIds: R.map((t) => t.id, user.templates || []),
       roles: R.map((r) => r.name, user.roles || []),
     };
     this.accessToken = this.jwtService.sign(payload);

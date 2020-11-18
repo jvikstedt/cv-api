@@ -25,7 +25,6 @@ describe('JwtStrategy', () => {
         firstName: 'John',
         lastName: 'Doe',
         cvIds: [1],
-        templateIds: [],
         roles: [],
       };
 

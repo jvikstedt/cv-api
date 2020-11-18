@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsIn, IsString } from 'class-validator';
+import { IsNotEmpty, IsIn, IsString, IsBoolean } from 'class-validator';
 
 export class CreateTemplateDto {
   @IsNotEmpty()
@@ -8,6 +8,10 @@ export class CreateTemplateDto {
   @IsNotEmpty()
   @IsIn(['pdf', 'docx'])
   exporter: 'pdf' | 'docx';
+
+  @IsNotEmpty()
+  @IsBoolean()
+  global = false;
 
   @IsNotEmpty()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
