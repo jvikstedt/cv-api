@@ -8,12 +8,13 @@ export class TemplateRepository extends Repository<Template> {
     userId: number,
     createTemplateDto: CreateTemplateDto,
   ): Promise<Template> {
-    const { name, exporter, data } = createTemplateDto;
+    const { name, exporter, global, data } = createTemplateDto;
 
     const template = this.create({
       name,
       exporter,
       userId,
+      global,
       data,
     });
     return template.save();

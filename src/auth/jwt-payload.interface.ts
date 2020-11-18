@@ -4,6 +4,5 @@ export interface JwtPayload {
   firstName: string;
   lastName: string;
   cvIds: number[];
-  templateIds: number[];
   roles: string[];
 }

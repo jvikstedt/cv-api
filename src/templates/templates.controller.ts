@@ -12,6 +12,7 @@ import {
   BadRequestException,
   ValidationError,
   HttpException,
+  UseGuards,
 } from '@nestjs/common';
 import { TemplatesService } from './templates.service';
 import { Template } from './template.entity';
@@ -21,7 +22,9 @@ import { PatchTemplateDto } from './dto/patch-template.dto';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { JwtPayload } from '../auth/jwt-payload.interface';
 import { AllowAuthenticated } from '../roles/roles.decorator';
+import { TemplatesGuard } from './templates.guard';
 
+@UseGuards(TemplatesGuard)
 @ApiBearerAuth()
 @ApiTags('templates')
 @Controller('templates')
@@ -42,10 +45,10 @@ export class TemplatesController {
     @GetUser() user: JwtPayload,
     @Body() createTemplateDto: CreateTemplateDto,
   ): Promise<Template> {
-    return this.templatesService.create(user.userId, createTemplateDto);
+    return this.templatesService.create(user, createTemplateDto);
   }
 
-  @Patch('/:id')
+  @Patch('/:templateId')
   @AllowAuthenticated()
   @UsePipes(
     new ValidationPipe({
@@ -56,26 +59,33 @@ export class TemplatesController {
     }),
   )
   patchTemplate(
-    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: JwtPayload,
+    @Param('templateId', ParseIntPipe) templateId: number,
     @Body() patchTemplateDto: PatchTemplateDto,
   ): Promise<Template> {
-    return this.templatesService.patchTemplate(id, patchTemplateDto);
+    return this.templatesService.patchTemplate(
+      user,
+      templateId,
+      patchTemplateDto,
+    );
   }
 
   @Get()
   @AllowAuthenticated()
-  findAll(): Promise<Template[]> {
-    return this.templatesService.findAll();
+  findAll(@GetUser() user: JwtPayload): Promise<Template[]> {
+    return this.templatesService.findAll(user.userId);
   }
 
-  @Get('/:id')
+  @Get('/:templateId')
   @AllowAuthenticated()
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Template> {
-    return this.templatesService.findOne(id);
+  findOne(
+    @Param('templateId', ParseIntPipe) templateId: number,
+  ): Promise<Template> {
+    return this.templatesService.findOne(templateId);
   }
 
-  @Delete('/:id')
-  delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.templatesService.delete(id);
+  @Delete('/:templateId')
+  delete(@Param('templateId', ParseIntPipe) templateId: number): Promise<void> {
+    return this.templatesService.delete(templateId);
   }
 }

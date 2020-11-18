@@ -28,6 +28,9 @@ export class Template extends BaseEntity {
   @Column()
   userId: number;
 
+  @Column({ default: false })
+  global: boolean;
+
   @Column('json')
   data: string;
 

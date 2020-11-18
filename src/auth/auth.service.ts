@@ -63,7 +63,6 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       cvIds: [user.cv.id],
-      templateIds: R.map((t) => t.id, user.templates),
       roles: R.map((role) => role.name, user.roles),
     };
     const accessToken = this.jwtService.sign(payload);
@@ -120,7 +119,6 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       cvIds: [user.cv.id],
-      templateIds: R.map((t) => t.id, user.templates),
       roles: R.map((role) => role.name, user.roles),
     };
     const accessToken = this.jwtService.sign(payload);
