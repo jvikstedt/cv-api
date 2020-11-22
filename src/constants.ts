@@ -23,6 +23,8 @@ export const CONFIG_DB_LOGGING = 'logging';
 export const CONFIG_ELASTICSEARCH = 'elasticsearch';
 export const CONFIG_ELASTICSEARCH_PORT = 'port';
 export const CONFIG_ELASTICSEARCH_HOST = 'host';
+export const CONFIG_ELASTICSEARCH_USERNAME = 'username';
+export const CONFIG_ELASTICSEARCH_PASSWORD = 'password';
 
 export const CONFIG_REDIS = 'redis';
 export const CONFIG_REDIS_PORT = 'port';

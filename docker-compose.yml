@@ -16,7 +16,7 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.9.1
     container_name: elasticsearch
     environment:
-      - ELASIC_PASSWORD=password
+      - ELASTIC_PASSWORD=changeme
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms256m -Xmx256m
     ports:

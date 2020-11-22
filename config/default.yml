@@ -14,6 +14,8 @@ redis:
 elasticsearch:
   host: 'http://localhost'
   port: 9200
+  username: 'elastic'
+  password: 'changeme'
 
 jwt:
   expiresIn: 43200
