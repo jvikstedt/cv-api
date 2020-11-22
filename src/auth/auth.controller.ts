@@ -16,18 +16,19 @@ import { Public } from './auth.guard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Public()
-  @Post('/signup')
-  @UsePipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      disableErrorMessages: true,
-    }),
-  )
-  signUp(@Body() authCredentialsDto: AuthCredentialsDto): Promise<void> {
-    return this.authService.signUp(authCredentialsDto);
-  }
+  // TODO Signup disabled for now
+  // @Public()
+  // @Post('/signup')
+  // @UsePipes(
+  //   new ValidationPipe({
+  //     transform: true,
+  //     whitelist: true,
+  //     disableErrorMessages: true,
+  //   }),
+  // )
+  // signUp(@Body() authCredentialsDto: AuthCredentialsDto): Promise<void> {
+  //   return this.authService.signUp(authCredentialsDto);
+  // }
 
   @Public()
   @Post('/signin')
