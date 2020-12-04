@@ -9,6 +9,7 @@ import {
   CONFIG_DB_DATABASE,
   CONFIG_DB_SYNCHRONIZE,
   CONFIG_DB_LOGGING,
+  CONFIG_DB_MIGRATIONS_RUN,
 } from '../constants';
 
 const dbConfig = config.get(CONFIG_DB);
@@ -24,7 +25,13 @@ export = {
   factories: [__dirname + '/../**/*.factory.{js,ts}'],
   migrations: [__dirname + '/../../database/migrations/**/*.{js,ts}'],
   seeds: [__dirname + '/../../database/seeds/**/*.{js,ts}'],
+  migrationsTableName: 'migrations_typeorm',
+  migrationsRun:
+    process.env.TYPEORM_MIGRATIONS_RUN || dbConfig[CONFIG_DB_MIGRATIONS_RUN],
   subscribers: [__dirname + '/../**/*.subscriber.{js,ts}'],
   synchronize: process.env.TYPEORM_SYNC || dbConfig[CONFIG_DB_SYNCHRONIZE],
   logging: process.env.DB_LOGGING || dbConfig[CONFIG_DB_LOGGING],
+  cli: {
+    migrationsDir: './database/migrations',
+  },
 };

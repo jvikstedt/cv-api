@@ -18,6 +18,7 @@ export const CONFIG_DB_USERNAME = 'username';
 export const CONFIG_DB_PASSWORD = 'password';
 export const CONFIG_DB_DATABASE = 'database';
 export const CONFIG_DB_SYNCHRONIZE = 'synchronize';
+export const CONFIG_DB_MIGRATIONS_RUN = 'migrationsRun';
 export const CONFIG_DB_LOGGING = 'logging';
 
 export const CONFIG_ELASTICSEARCH = 'elasticsearch';
