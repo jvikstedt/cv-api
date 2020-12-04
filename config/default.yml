@@ -6,6 +6,8 @@ db:
   port: 5432
   database: 'cv_db'
   logging: false
+  synchronize: false
+  migrationsRun: true
 
 redis:
   host: 'localhost'
