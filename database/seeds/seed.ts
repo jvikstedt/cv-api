@@ -120,9 +120,7 @@ export default class Seed implements Seeder {
     return companies;
   }
 
-  public async run(factory: Factory, connection: Connection): Promise<void> {
-    await connection.synchronize(true);
-
+  public async run(factory: Factory): Promise<void> {
     const adminRole = await factory(Role)().create({
       name: 'ADMIN',
     });
