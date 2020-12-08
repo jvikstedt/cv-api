@@ -9,7 +9,6 @@ import {
 } from './dto/create-project-membership.dto';
 import { PatchProjectMembershipDto } from './dto/patch-project-membership.dto';
 import { CVService } from '../cv/cv.service';
-import { MembershipSkill } from '../membership_skill/membership-skill.entity';
 import { MembershipSkillRepository } from '../membership_skill/membership-skill.repository';
 import { SkillRepository } from '../skills/skill.repository';
 
@@ -32,13 +31,13 @@ export class ProjectMembershipService {
     cvId: number,
     projectMembershipId: number,
     membershipSkills: MembershipSkillDto[],
-  ): Promise<MembershipSkill[]> {
-    await this.membershipSkillRepository.delete({
-      projectMembershipId,
+  ): Promise<void> {
+    const existingMembershipSkills = await this.membershipSkillRepository.find({
+      where: { projectMembershipId },
     });
 
-    if (R.isEmpty(membershipSkills)) {
-      return [];
+    if (R.isEmpty(membershipSkills) && R.isEmpty(existingMembershipSkills)) {
+      return;
     }
 
     const skills = await this.skillRepository.getOrCreateSkills(
@@ -46,30 +45,73 @@ export class ProjectMembershipService {
       R.map((m) => m.skillSubjectId, membershipSkills),
     );
 
-    const savedMembershipSkills: MembershipSkill[] = [];
-    for (const skill of skills) {
-      const membershipSkill = R.find(
-        (m) => R.equals(m.skillSubjectId, skill.skillSubjectId),
-        membershipSkills,
+    for (const membershipSkill of existingMembershipSkills) {
+      const foundSkill = R.find(
+        (s) => R.equals(s.id, membershipSkill.skillId),
+        skills,
       );
 
-      if (!membershipSkill) {
+      if (!foundSkill) {
+        await this.membershipSkillRepository.delete(membershipSkill.id);
+
         continue;
       }
 
-      const createdMembershipSkill = await this.membershipSkillRepository
+      const newSettings = R.find(
+        (ms) => R.equals(ms.skillSubjectId, foundSkill.skillSubjectId),
+        membershipSkills,
+      );
+
+      if (!newSettings) {
+        await this.membershipSkillRepository.delete(membershipSkill.id);
+
+        continue;
+      }
+
+      if (
+        !R.equals(
+          newSettings.automaticCalculation,
+          membershipSkill.automaticCalculation,
+        ) ||
+        !R.equals(
+          newSettings.experienceInYears,
+          membershipSkill.experienceInYears,
+        )
+      ) {
+        membershipSkill.experienceInYears = newSettings.experienceInYears;
+        membershipSkill.automaticCalculation = newSettings.automaticCalculation;
+        await membershipSkill.save();
+      }
+    }
+
+    for (const membershipSkill of membershipSkills) {
+      const foundSkill = R.find(
+        (s) => R.equals(s.skillSubjectId, membershipSkill.skillSubjectId),
+        skills,
+      );
+
+      if (!foundSkill) {
+        continue;
+      }
+
+      const foundExistingMembershipSkill = R.find(
+        (s) => R.equals(s.skillId, foundSkill.id),
+        existingMembershipSkills,
+      );
+
+      if (foundExistingMembershipSkill) {
+        continue;
+      }
+
+      await this.membershipSkillRepository
         .create({
-          skillId: skill.id,
+          skillId: foundSkill.id,
           projectMembershipId: projectMembershipId,
           automaticCalculation: membershipSkill.automaticCalculation,
           experienceInYears: membershipSkill.experienceInYears,
         })
         .save();
-
-      savedMembershipSkills.push(createdMembershipSkill);
     }
-
-    return savedMembershipSkills;
   }
 
   async create(

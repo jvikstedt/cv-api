@@ -31,6 +31,7 @@ const mockSkillRepository = (): unknown => ({
 
 const mockMembershipSkillRepositorySave = jest.fn();
 const mockMembershipSkillRepository = (): unknown => ({
+  find: jest.fn(),
   delete: jest.fn(),
   create: jest
     .fn()
@@ -113,6 +114,7 @@ describe('ProjectMembershipService', () => {
         projectMembershipRepository.findOne.mockResolvedValue(
           projectMembership,
         );
+        membershipSkillRepository.find.mockResolvedValue([]);
 
         // Run the code and verify response
         const result = await projectMembershipsService.create(
@@ -142,6 +144,9 @@ describe('ProjectMembershipService', () => {
           },
         );
         expect(cvService.reload).toHaveBeenCalledWith(cvId);
+        expect(membershipSkillRepository.find).toHaveBeenCalledWith({
+          where: { projectMembershipId: projectMembershipId },
+        });
         expect(skillRepository.getOrCreateSkills).not.toHaveBeenCalled();
       });
     });
@@ -186,6 +191,7 @@ describe('ProjectMembershipService', () => {
           projectMembership,
         );
 
+        membershipSkillRepository.find.mockResolvedValue([]);
         skillRepository.getOrCreateSkills.mockResolvedValue([skill1, skill2]);
 
         mockMembershipSkillRepositorySave.mockResolvedValueOnce({ a: 1 });
@@ -223,6 +229,9 @@ describe('ProjectMembershipService', () => {
           },
         );
         expect(cvService.reload).toHaveBeenCalledWith(cvId);
+        expect(membershipSkillRepository.find).toHaveBeenCalledWith({
+          where: { projectMembershipId: projectMembershipId },
+        });
         expect(skillRepository.getOrCreateSkills).toHaveBeenCalledWith(cvId, [
           1,
           2,
@@ -331,6 +340,7 @@ describe('ProjectMembershipService', () => {
           ...patchProjectMembershipDto,
         });
 
+        membershipSkillRepository.find.mockResolvedValue([]);
         skillRepository.getOrCreateSkills.mockResolvedValue([skill1, skill2]);
 
         mockMembershipSkillRepositorySave.mockResolvedValueOnce({ a: 1 });
@@ -373,6 +383,9 @@ describe('ProjectMembershipService', () => {
           ...projectMembership,
         });
         expect(cvService.reload).toHaveBeenCalledWith(cvId);
+        expect(membershipSkillRepository.find).toHaveBeenCalledWith({
+          where: { projectMembershipId: projectMembershipId },
+        });
         expect(skillRepository.getOrCreateSkills).toHaveBeenCalledWith(cvId, [
           1,
           2,
