@@ -37,13 +37,13 @@ export class WorkExperienceService {
   ): Promise<WorkExperience> {
     const oldWorkExperience = await this.findOne(cvId, workExperienceId);
 
-    const newWorkExperience = await this.workExperienceRepository.save(
-      R.merge(oldWorkExperience, patchWorkExperienceDto),
+    await this.workExperienceRepository.save(
+      R.omit(['company'], R.merge(oldWorkExperience, patchWorkExperienceDto)),
     );
 
     await this.cvService.reload(cvId);
 
-    return newWorkExperience;
+    return this.findOne(cvId, workExperienceId);
   }
 
   async findAll(cvId: number): Promise<WorkExperience[]> {

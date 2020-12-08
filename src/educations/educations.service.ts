@@ -37,13 +37,13 @@ export class EducationsService {
   ): Promise<Education> {
     const oldEducation = await this.findOne(cvId, educationId);
 
-    const newEducation = await this.educationRepository.save(
-      R.merge(oldEducation, patchEducationDto),
+    await this.educationRepository.save(
+      R.omit(['school'], R.merge(oldEducation, patchEducationDto)),
     );
 
     await this.cvService.reload(cvId);
 
-    return newEducation;
+    return this.findOne(cvId, educationId);
   }
 
   async findAll(cvId: number): Promise<Education[]> {

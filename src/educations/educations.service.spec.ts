@@ -84,7 +84,8 @@ describe('EducationsService', () => {
       const patchEducationDto: PatchEducationDto = { endYear: 2020 };
 
       educationRepository.findOne.mockResolvedValue(education);
-      educationRepository.save.mockResolvedValue({
+      educationRepository.save.mockResolvedValue();
+      educationRepository.findOne.mockResolvedValue({
         ...education,
         ...patchEducationDto,
       });
@@ -101,6 +102,7 @@ describe('EducationsService', () => {
         { cvId, id: educationId },
         { relations: ['school'] },
       );
+      expect(educationRepository.findOne).toHaveBeenCalledTimes(2);
       expect(educationRepository.save).toHaveBeenCalledWith({
         ...education,
         ...patchEducationDto,

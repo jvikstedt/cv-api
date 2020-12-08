@@ -99,8 +99,9 @@ describe('WorkExperienceService', () => {
       });
       const patchWorkExperienceDto: PatchWorkExperienceDto = { endYear: 2020 };
 
-      workExperienceRepository.findOne.mockResolvedValue(workExperience);
-      workExperienceRepository.save.mockResolvedValue({
+      workExperienceRepository.findOne.mockResolvedValueOnce(workExperience);
+      workExperienceRepository.save.mockResolvedValue();
+      workExperienceRepository.findOne.mockResolvedValueOnce({
         ...workExperience,
         ...patchWorkExperienceDto,
       });
@@ -117,6 +118,7 @@ describe('WorkExperienceService', () => {
         { cvId, id: workExperienceId },
         { relations: ['company'] },
       );
+      expect(workExperienceRepository.findOne).toHaveBeenCalledTimes(2);
       expect(workExperienceRepository.save).toHaveBeenCalledWith({
         ...workExperience,
         ...patchWorkExperienceDto,

@@ -99,9 +99,12 @@ export class ProjectMembershipService {
     const oldProjectMembership = await this.findOne(cvId, projectMembershipId);
 
     const newProjectMembership = await this.projectMembershipRepository.save(
-      R.merge(
-        oldProjectMembership,
-        R.omit(['membershipSkills'], patchProjectMembershipDto),
+      R.omit(
+        ['project'],
+        R.merge(
+          oldProjectMembership,
+          R.omit(['membershipSkills'], patchProjectMembershipDto),
+        ),
       ),
     );
 
