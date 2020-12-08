@@ -23,6 +23,10 @@ export class MembershipSkillDto {
 
 export class PatchProjectMembershipDto {
   @IsOptional()
+  @IsNumber()
+  projectId?: number;
+
+  @IsOptional()
   @IsString()
   description?: string;
 

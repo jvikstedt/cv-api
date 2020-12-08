@@ -2,6 +2,10 @@ import { IsOptional, IsNumber, IsString, IsBoolean } from 'class-validator';
 
 export class PatchWorkExperienceDto {
   @IsOptional()
+  @IsNumber()
+  companyId?: number;
+
+  @IsOptional()
   @IsString()
   description?: string;
 

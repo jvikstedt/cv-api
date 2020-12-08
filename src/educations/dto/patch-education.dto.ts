@@ -2,6 +2,10 @@ import { IsOptional, IsNumber, IsString, IsBoolean } from 'class-validator';
 
 export class PatchEducationDto {
   @IsOptional()
+  @IsNumber()
+  schoolId?: number;
+
+  @IsOptional()
   @IsString()
   degree?: string;
 
