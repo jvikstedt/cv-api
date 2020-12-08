@@ -78,15 +78,19 @@ export class ExportersService {
             height: number,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ): Promise<any> => {
+            let extension: string;
+            let file: Buffer;
             if (!id) {
-              return null;
+              extension = '.jpg';
+              file = fs.readFileSync(`./static/no-image.jpg`);
+            } else {
+              const entity = await this.fileRepository.findOne(id);
+              if (!entity) {
+                return null;
+              }
+              extension = path.extname(entity.originalname);
+              file = fs.readFileSync(`./files/${id}`);
             }
-            const entity = await this.fileRepository.findOne(id);
-            if (!entity) {
-              return null;
-            }
-            const extension = path.extname(entity.originalname);
-            const file = fs.readFileSync(`./files/${id}`);
 
             return { width, height, data: file, extension };
           },
