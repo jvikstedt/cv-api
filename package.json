@@ -57,7 +57,7 @@
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
     "config": "^3.3.2",
-    "docx-templates": "^4.5.0",
+    "docx-templates": "^4.5.2",
     "elastic-builder": "^2.7.1",
     "eslint": "^7.10.0",
     "eslint-config-prettier": "^6.12.0",
