@@ -70,6 +70,7 @@ export class ExportersService {
         template,
         data: exportDocxDto.data,
         cmdDelimiter: ['{{', '}}'],
+        processLineBreaks: false,
         additionalJsContext: {
           R,
           image: async (
