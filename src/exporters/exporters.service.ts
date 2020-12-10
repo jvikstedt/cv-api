@@ -25,7 +25,13 @@ export class ExportersService {
         exportPdfDto.data,
       );
 
-      const browser = await puppeteer.launch({ headless: true });
+      // FIXME
+      // --no-sandbox is security risk
+      // https://stackoverflow.com/a/53975412
+      const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox'],
+      });
       const page = await browser.newPage();
       await page.setContent(content);
       const buffer = await page.pdf({
