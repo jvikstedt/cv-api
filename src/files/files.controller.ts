@@ -15,7 +15,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateFileDto } from './dto/create-file.dto';
 import { Public } from '../auth/auth.guard';
-import { AllowAuthenticated } from '../roles/roles.decorator';
+import { Authenticated } from '../authorization/authorization.decorator';
 
 @ApiBearerAuth()
 @ApiTags('files')
@@ -24,7 +24,7 @@ export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post()
-  @AllowAuthenticated()
+  @Authenticated()
   @UseInterceptors(FileInterceptor('file', { dest: './files' }))
   async uploadedFile(@UploadedFile() file: File): Promise<File> {
     const createFileDto: CreateFileDto = {
@@ -41,14 +41,17 @@ export class FilesController {
 
   // FIXME consider removing public and figuring out proper way to access this
   @Public()
-  @Get('/:id')
-  async download(@Param('id') id: string, @Res() res: Response): Promise<void> {
+  @Get('/:fileId')
+  async download(
+    @Param('fileId') id: string,
+    @Res() res: Response,
+  ): Promise<void> {
     const file = await this.filesService.findOne(id);
     res.download(file.path, file.originalname);
   }
 
-  @Delete('/:id')
-  delete(@Param('id') id: string): Promise<void> {
+  @Delete('/:fileId')
+  delete(@Param('fileId') id: string): Promise<void> {
     return this.filesService.delete(id);
   }
 }

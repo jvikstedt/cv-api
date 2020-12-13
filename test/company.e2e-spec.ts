@@ -18,7 +18,6 @@ describe('CompanyController (e2e)', () => {
   let cv: CV;
   let adminCV: CV;
   let accessToken: string;
-  let adminAccessToken: string;
 
   beforeAll(async () => {
     await testHelper.setup();
@@ -40,7 +39,6 @@ describe('CompanyController (e2e)', () => {
     admin.templates = [];
 
     accessToken = testHelper.sign(user);
-    adminAccessToken = testHelper.sign(admin);
   });
 
   afterAll(async (done) => {
@@ -97,14 +95,9 @@ describe('CompanyController (e2e)', () => {
   describe('/company/:id (DELETE)', () => {
     it('deletes company', async () => {
       const company = await factory(Company)().create();
-      await request(app.getHttpServer())
-        .delete(`/company/${company.id}`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .expect(403);
-
       const response = await request(app.getHttpServer())
         .delete(`/company/${company.id}`)
-        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
       expect(response.body).toEqual({});
@@ -149,15 +142,9 @@ describe('CompanyController (e2e)', () => {
         name: 'Company A',
       };
 
-      await request(app.getHttpServer())
-        .patch(`/company/${company.id}`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .send(patchCompanyDto)
-        .expect(403);
-
       const response = await request(app.getHttpServer())
         .patch(`/company/${company.id}`)
-        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(patchCompanyDto)
         .expect(200);
 

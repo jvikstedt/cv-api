@@ -18,7 +18,11 @@ import { ProjectMembership } from './project-membership.entity';
 import { CreateProjectMembershipDto } from './dto/create-project-membership.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PatchProjectMembershipDto } from './dto/patch-project-membership.dto';
-import { AllowAuthenticated, AllowCVOwner } from '../roles/roles.decorator';
+import {
+  Authenticated,
+  CheckPolicies,
+} from '../authorization/authorization.decorator';
+import { CVOwnerPolicy } from '../cv/policies';
 
 @ApiBearerAuth()
 @ApiTags('project_membership')
@@ -29,7 +33,7 @@ export class ProjectMembershipController {
   ) {}
 
   @Post()
-  @AllowCVOwner()
+  @CheckPolicies(CVOwnerPolicy)
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -49,7 +53,7 @@ export class ProjectMembershipController {
   }
 
   @Patch('/:projectMembershipId')
-  @AllowCVOwner()
+  @CheckPolicies(CVOwnerPolicy)
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -71,7 +75,7 @@ export class ProjectMembershipController {
   }
 
   @Get()
-  @AllowAuthenticated()
+  @Authenticated()
   findAll(
     @Param('cvId', ParseIntPipe) cvId: number,
   ): Promise<ProjectMembership[]> {
@@ -79,7 +83,7 @@ export class ProjectMembershipController {
   }
 
   @Get('/:projectMembershipId')
-  @AllowAuthenticated()
+  @Authenticated()
   findOne(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('projectMembershipId', ParseIntPipe) projectMembershipId: number,
@@ -88,7 +92,7 @@ export class ProjectMembershipController {
   }
 
   @Delete('/:projectMembershipId')
-  @AllowCVOwner()
+  @CheckPolicies(CVOwnerPolicy)
   remove(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('projectMembershipId', ParseIntPipe) projectMembershipId: number,

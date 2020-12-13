@@ -17,7 +17,11 @@ import { CVService } from './cv.service';
 import { CV } from './cv.entity';
 import { PatchCVDto } from './dto/patch-cv.dto';
 import { SearchCVDto } from './dto/search-cv.dto';
-import { AllowAuthenticated, AllowCVOwner } from '../roles/roles.decorator';
+import { CVOwnerPolicy } from './policies';
+import {
+  Authenticated,
+  CheckPolicies,
+} from '../authorization/authorization.decorator';
 
 @ApiBearerAuth()
 @ApiTags('cv')
@@ -26,7 +30,7 @@ export class CVController {
   constructor(private readonly cvService: CVService) {}
 
   @Patch('/:cvId')
-  @AllowCVOwner()
+  @CheckPolicies(CVOwnerPolicy)
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -43,19 +47,19 @@ export class CVController {
   }
 
   @Get()
-  @AllowAuthenticated()
+  @Authenticated()
   findAll(): Promise<CV[]> {
     return this.cvService.findAll();
   }
 
   @Get('/:cvId')
-  @AllowAuthenticated()
+  @Authenticated()
   findOne(@Param('cvId', ParseIntPipe) cvId: number): Promise<CV> {
     return this.cvService.findOne(cvId);
   }
 
   @Post('/search')
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

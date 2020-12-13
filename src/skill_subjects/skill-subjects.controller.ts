@@ -19,7 +19,11 @@ import { CreateSkillSubjectDto } from './dto/create-skill-subject.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchSkillSubjectDto } from './dto/search-skill-subject.dto';
 import { PatchSkillSubjectDto } from './dto/patch-skill-subject.dto';
-import { AllowAuthenticated } from '../roles/roles.decorator';
+import {
+  Authenticated,
+  CheckPolicies,
+} from '../authorization/authorization.decorator';
+import { DeleteSkillSubjectPolicy, UpdateSkillSubjectPolicy } from './policies';
 
 @ApiBearerAuth()
 @ApiTags('skill_subjects')
@@ -28,7 +32,7 @@ export class SkillSubjectsController {
   constructor(private readonly skillSubjectsService: SkillSubjectsService) {}
 
   @Post()
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -44,6 +48,7 @@ export class SkillSubjectsController {
   }
 
   @Patch('/:skillSubjectId')
+  @CheckPolicies(UpdateSkillSubjectPolicy)
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -63,24 +68,27 @@ export class SkillSubjectsController {
   }
 
   @Get()
-  @AllowAuthenticated()
+  @Authenticated()
   findAll(): Promise<SkillSubject[]> {
     return this.skillSubjectsService.findAll();
   }
 
-  @Get('/:id')
-  @AllowAuthenticated()
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<SkillSubject> {
+  @Get('/:skillSubjectId')
+  @Authenticated()
+  findOne(
+    @Param('skillSubjectId', ParseIntPipe) id: number,
+  ): Promise<SkillSubject> {
     return this.skillSubjectsService.findOne(id);
   }
 
-  @Delete('/:id')
-  delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  @Delete('/:skillSubjectId')
+  @CheckPolicies(DeleteSkillSubjectPolicy)
+  delete(@Param('skillSubjectId', ParseIntPipe) id: number): Promise<void> {
     return this.skillSubjectsService.delete(id);
   }
 
   @Post('/search')
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

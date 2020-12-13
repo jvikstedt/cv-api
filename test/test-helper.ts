@@ -4,7 +4,7 @@ import { Connection } from 'typeorm';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
-import { Reflector } from '@nestjs/core';
+import { ModuleRef, Reflector } from '@nestjs/core';
 import { Queue } from 'bull';
 import { getQueueToken } from '@nestjs/bull';
 import { User } from '../src/users/user.entity';
@@ -12,7 +12,7 @@ import { JwtPayload } from '../src/auth/jwt-payload.interface';
 import { AppModule } from '../src/app.module';
 import { QUEUE_NAME_CV } from '../src/constants';
 import { MyAuthGuard } from '../src/auth/auth.guard';
-import { RolesGuard } from '../src/roles/roles.guard';
+import { AuthorizationGuard } from '../src/authorization/authorization.guard';
 
 export class TestHelper {
   public accessToken = '';
@@ -31,8 +31,9 @@ export class TestHelper {
     this.app = module.createNestApplication();
 
     const reflector = this.app.get(Reflector);
+    const moduleRef = this.app.get(ModuleRef);
     this.app.useGlobalGuards(new MyAuthGuard(reflector));
-    this.app.useGlobalGuards(new RolesGuard(reflector));
+    this.app.useGlobalGuards(new AuthorizationGuard(reflector, moduleRef));
     await this.app.init();
 
     this.connection = module.get<Connection>(Connection);

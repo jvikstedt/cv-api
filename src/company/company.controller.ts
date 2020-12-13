@@ -19,7 +19,11 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { PatchCompanyDto } from './dto/patch-company.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchCompanyDto } from './dto/search-company.dto';
-import { AllowAuthenticated } from '../roles/roles.decorator';
+import {
+  Authenticated,
+  CheckPolicies,
+} from '../authorization/authorization.decorator';
+import { DeleteCompanyPolicy, UpdateCompanyPolicy } from './policies';
 
 @ApiBearerAuth()
 @ApiTags('company')
@@ -28,7 +32,7 @@ export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
   @Post()
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -42,6 +46,7 @@ export class CompanyController {
   }
 
   @Patch('/:companyId')
+  @CheckPolicies(UpdateCompanyPolicy)
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -58,24 +63,25 @@ export class CompanyController {
   }
 
   @Get()
-  @AllowAuthenticated()
+  @Authenticated()
   findAll(): Promise<Company[]> {
     return this.companyService.findAll();
   }
 
-  @Get('/:id')
-  @AllowAuthenticated()
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Company> {
+  @Get('/:companyId')
+  @Authenticated()
+  findOne(@Param('companyId', ParseIntPipe) id: number): Promise<Company> {
     return this.companyService.findOne(id);
   }
 
-  @Delete('/:id')
-  delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  @Delete('/:companyId')
+  @CheckPolicies(DeleteCompanyPolicy)
+  delete(@Param('companyId', ParseIntPipe) id: number): Promise<void> {
     return this.companyService.delete(id);
   }
 
   @Post('/search')
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

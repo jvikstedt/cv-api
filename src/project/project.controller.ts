@@ -19,7 +19,11 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { PatchProjectDto } from './dto/patch-project.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchProjectDto } from './dto/search-project.dto';
-import { AllowAuthenticated } from '../roles/roles.decorator';
+import {
+  Authenticated,
+  CheckPolicies,
+} from '../authorization/authorization.decorator';
+import { DeleteProjectPolicy, UpdateProjectPolicy } from './policies';
 
 @ApiBearerAuth()
 @ApiTags('project')
@@ -28,7 +32,7 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post()
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -42,6 +46,7 @@ export class ProjectController {
   }
 
   @Patch('/:projectId')
+  @CheckPolicies(UpdateProjectPolicy)
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -58,24 +63,25 @@ export class ProjectController {
   }
 
   @Get()
-  @AllowAuthenticated()
+  @Authenticated()
   findAll(): Promise<Project[]> {
     return this.projectService.findAll();
   }
 
-  @Get('/:id')
-  @AllowAuthenticated()
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Project> {
+  @Get('/:projectId')
+  @Authenticated()
+  findOne(@Param('projectId', ParseIntPipe) id: number): Promise<Project> {
     return this.projectService.findOne(id);
   }
 
-  @Delete('/:id')
-  delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  @Delete('/:projectId')
+  @CheckPolicies(DeleteProjectPolicy)
+  delete(@Param('projectId', ParseIntPipe) id: number): Promise<void> {
     return this.projectService.delete(id);
   }
 
   @Post('/search')
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

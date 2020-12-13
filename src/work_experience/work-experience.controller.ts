@@ -18,7 +18,11 @@ import { WorkExperience } from './work-experience.entity';
 import { CreateWorkExperienceDto } from './dto/create-work-experience.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PatchWorkExperienceDto } from './dto/patch-work-experience.dto';
-import { AllowAuthenticated, AllowCVOwner } from '../roles/roles.decorator';
+import {
+  Authenticated,
+  CheckPolicies,
+} from '../authorization/authorization.decorator';
+import { CVOwnerPolicy } from '../cv/policies';
 
 @ApiBearerAuth()
 @ApiTags('work_experience')
@@ -27,7 +31,7 @@ export class WorkExperienceController {
   constructor(private readonly workExperienceService: WorkExperienceService) {}
 
   @Post()
-  @AllowCVOwner()
+  @CheckPolicies(CVOwnerPolicy)
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -44,7 +48,7 @@ export class WorkExperienceController {
   }
 
   @Patch('/:workExperienceId')
-  @AllowCVOwner()
+  @CheckPolicies(CVOwnerPolicy)
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -66,7 +70,7 @@ export class WorkExperienceController {
   }
 
   @Get()
-  @AllowAuthenticated()
+  @Authenticated()
   findAll(
     @Param('cvId', ParseIntPipe) cvId: number,
   ): Promise<WorkExperience[]> {
@@ -74,7 +78,7 @@ export class WorkExperienceController {
   }
 
   @Get('/:workExperienceId')
-  @AllowAuthenticated()
+  @Authenticated()
   findOne(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('workExperienceId', ParseIntPipe) workExperienceId: number,
@@ -83,7 +87,7 @@ export class WorkExperienceController {
   }
 
   @Delete('/:workExperienceId')
-  @AllowCVOwner()
+  @CheckPolicies(CVOwnerPolicy)
   remove(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('workExperienceId', ParseIntPipe) workExperienceId: number,
