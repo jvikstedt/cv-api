@@ -1,26 +1,34 @@
 import { ModuleRef, NestFactory, Reflector } from '@nestjs/core';
-import { Logger } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  Logger,
+  NestInterceptor,
+} from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { Observable } from 'rxjs';
 import { AppModule } from './app.module';
 import { CONFIG_SERVER, CONFIG_SERVER_PORT } from './constants';
 import { MyAuthGuard } from './auth/auth.guard';
 import { AuthorizationGuard } from './authorization/authorization.guard';
 import * as config from 'config';
 
-const dryRunMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): void => {
-  const dry = req.query.dry === 'true';
+@Injectable()
+export class DryRunInterceptor implements NestInterceptor {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const request = context.switchToHttp().getRequest();
 
-  if (dry) {
-    res.sendStatus(200);
-    return;
+    const dry = request.query.dry === 'true';
+
+    if (dry) {
+      return;
+    }
+
+    return next.handle();
   }
-  next();
-};
+}
 
 async function bootstrap(): Promise<void> {
   const serverConfig = config.get(CONFIG_SERVER);
@@ -32,7 +40,7 @@ async function bootstrap(): Promise<void> {
   const moduleRef = app.get(ModuleRef);
   app.useGlobalGuards(new MyAuthGuard(reflector));
   app.useGlobalGuards(new AuthorizationGuard(reflector, moduleRef));
-  app.use(dryRunMiddleware);
+  app.useGlobalInterceptors(new DryRunInterceptor());
 
   const options = new DocumentBuilder()
     .setTitle('CV')
