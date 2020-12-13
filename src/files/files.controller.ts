@@ -15,7 +15,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateFileDto } from './dto/create-file.dto';
 import { Public } from '../auth/auth.guard';
-import { AllowAuthenticated } from '../roles/roles.decorator';
+import { Authenticated } from '../authorization/authorization.decorator';
 
 @ApiBearerAuth()
 @ApiTags('files')
@@ -24,7 +24,7 @@ export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post()
-  @AllowAuthenticated()
+  @Authenticated()
   @UseInterceptors(FileInterceptor('file', { dest: './files' }))
   async uploadedFile(@UploadedFile() file: File): Promise<File> {
     const createFileDto: CreateFileDto = {

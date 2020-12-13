@@ -1,11 +1,26 @@
-import { NestFactory, Reflector } from '@nestjs/core';
+import { ModuleRef, NestFactory, Reflector } from '@nestjs/core';
 import { Logger } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import * as config from 'config';
 import { CONFIG_SERVER, CONFIG_SERVER_PORT } from './constants';
 import { MyAuthGuard } from './auth/auth.guard';
-import { RolesGuard } from './roles/roles.guard';
+import { AuthorizationGuard } from './authorization/authorization.guard';
+import * as config from 'config';
+
+const dryRunMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void => {
+  const dry = req.query.dry === 'true';
+
+  if (dry) {
+    res.sendStatus(200);
+    return;
+  }
+  next();
+};
 
 async function bootstrap(): Promise<void> {
   const serverConfig = config.get(CONFIG_SERVER);
@@ -14,8 +29,10 @@ async function bootstrap(): Promise<void> {
   app.setGlobalPrefix('api');
 
   const reflector = app.get(Reflector);
+  const moduleRef = app.get(ModuleRef);
   app.useGlobalGuards(new MyAuthGuard(reflector));
-  app.useGlobalGuards(new RolesGuard(reflector));
+  app.useGlobalGuards(new AuthorizationGuard(reflector, moduleRef));
+  app.use(dryRunMiddleware);
 
   const options = new DocumentBuilder()
     .setTitle('CV')

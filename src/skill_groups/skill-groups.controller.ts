@@ -19,7 +19,7 @@ import { CreateSkillGroupDto } from './dto/create-skill-group.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchSkillGroupDto } from './dto/search-skill-group.dto';
 import { PatchSkillGroupDto } from './dto/patch-skill-group.dto';
-import { AllowAuthenticated } from '../roles/roles.decorator';
+import { Authenticated } from '../authorization/authorization.decorator';
 
 @ApiBearerAuth()
 @ApiTags('skill_groups')
@@ -28,7 +28,7 @@ export class SkillGroupsController {
   constructor(private readonly skillGroupsService: SkillGroupsService) {}
 
   @Post()
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -60,13 +60,13 @@ export class SkillGroupsController {
   }
 
   @Get()
-  @AllowAuthenticated()
+  @Authenticated()
   findAll(): Promise<SkillGroup[]> {
     return this.skillGroupsService.findAll();
   }
 
   @Get('/:skillGroupId')
-  @AllowAuthenticated()
+  @Authenticated()
   findOne(
     @Param('skillGroupId', ParseIntPipe) skillGroupId: number,
   ): Promise<SkillGroup> {
@@ -81,7 +81,7 @@ export class SkillGroupsController {
   }
 
   @Post('/search')
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

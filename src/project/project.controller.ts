@@ -19,7 +19,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { PatchProjectDto } from './dto/patch-project.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchProjectDto } from './dto/search-project.dto';
-import { AllowAuthenticated } from '../roles/roles.decorator';
+import { Authenticated } from '../authorization/authorization.decorator';
 
 @ApiBearerAuth()
 @ApiTags('project')
@@ -28,7 +28,7 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post()
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -58,13 +58,13 @@ export class ProjectController {
   }
 
   @Get()
-  @AllowAuthenticated()
+  @Authenticated()
   findAll(): Promise<Project[]> {
     return this.projectService.findAll();
   }
 
   @Get('/:id')
-  @AllowAuthenticated()
+  @Authenticated()
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Project> {
     return this.projectService.findOne(id);
   }
@@ -75,7 +75,7 @@ export class ProjectController {
   }
 
   @Post('/search')
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

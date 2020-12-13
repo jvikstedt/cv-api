@@ -19,7 +19,7 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { PatchCompanyDto } from './dto/patch-company.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchCompanyDto } from './dto/search-company.dto';
-import { AllowAuthenticated } from '../roles/roles.decorator';
+import { Authenticated } from '../authorization/authorization.decorator';
 
 @ApiBearerAuth()
 @ApiTags('company')
@@ -28,7 +28,7 @@ export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
   @Post()
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -58,13 +58,13 @@ export class CompanyController {
   }
 
   @Get()
-  @AllowAuthenticated()
+  @Authenticated()
   findAll(): Promise<Company[]> {
     return this.companyService.findAll();
   }
 
   @Get('/:id')
-  @AllowAuthenticated()
+  @Authenticated()
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Company> {
     return this.companyService.findOne(id);
   }
@@ -75,7 +75,7 @@ export class CompanyController {
   }
 
   @Post('/search')
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

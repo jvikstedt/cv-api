@@ -15,9 +15,13 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { PatchUserDto } from './dto/patch-user.dto';
-import { AllowAuthenticated, AllowUserOwner } from '../roles/roles.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
+import {
+  Authenticated,
+  CheckPolicies,
+} from '../authorization/authorization.decorator';
+import { UserOwnerPolicy } from './policies';
 
 @ApiBearerAuth()
 @ApiTags('users')
@@ -39,7 +43,7 @@ export class UsersController {
   }
 
   @Patch('/:userId')
-  @AllowUserOwner()
+  @CheckPolicies(UserOwnerPolicy)
   patch(
     @Param('userId', ParseIntPipe) userId: number,
     @Body() patchUserDto: PatchUserDto,
@@ -48,7 +52,7 @@ export class UsersController {
   }
 
   @Post('/search')
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

@@ -19,7 +19,7 @@ import { CreateSkillSubjectDto } from './dto/create-skill-subject.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchSkillSubjectDto } from './dto/search-skill-subject.dto';
 import { PatchSkillSubjectDto } from './dto/patch-skill-subject.dto';
-import { AllowAuthenticated } from '../roles/roles.decorator';
+import { Authenticated } from '../authorization/authorization.decorator';
 
 @ApiBearerAuth()
 @ApiTags('skill_subjects')
@@ -28,7 +28,7 @@ export class SkillSubjectsController {
   constructor(private readonly skillSubjectsService: SkillSubjectsService) {}
 
   @Post()
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -63,13 +63,13 @@ export class SkillSubjectsController {
   }
 
   @Get()
-  @AllowAuthenticated()
+  @Authenticated()
   findAll(): Promise<SkillSubject[]> {
     return this.skillSubjectsService.findAll();
   }
 
   @Get('/:id')
-  @AllowAuthenticated()
+  @Authenticated()
   findOne(@Param('id', ParseIntPipe) id: number): Promise<SkillSubject> {
     return this.skillSubjectsService.findOne(id);
   }
@@ -80,7 +80,7 @@ export class SkillSubjectsController {
   }
 
   @Post('/search')
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
