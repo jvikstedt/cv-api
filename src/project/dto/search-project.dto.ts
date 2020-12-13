@@ -7,6 +7,10 @@ export class SearchProjectDto {
 
   @IsOptional()
   @IsNumber()
+  companyId?: number;
+
+  @IsOptional()
+  @IsNumber()
   take?: number = 10;
 
   @IsOptional()

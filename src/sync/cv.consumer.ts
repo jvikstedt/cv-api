@@ -14,7 +14,7 @@ import {
   CONFIG_QUEUE_CV_RELOAD,
 } from '../constants';
 import { CVRepository } from '../cv/cv.repository';
-import { Skill } from 'src/skills/skill.entity';
+import { Skill } from '../skills/skill.entity';
 
 const queueConfig = config.get(CONFIG_QUEUE);
 const cvReloadDelay = queueConfig[CONFIG_QUEUE_CV_RELOAD];

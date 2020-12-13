@@ -19,7 +19,11 @@ import { CreateSchoolDto } from './dto/create-school.dto';
 import { PatchSchoolDto } from './dto/patch-school.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchSchoolDto } from './dto/search-school.dto';
-import { AllowAuthenticated } from '../roles/roles.decorator';
+import {
+  Authenticated,
+  CheckPolicies,
+} from '../authorization/authorization.decorator';
+import { DeleteSchoolPolicy, UpdateSchoolPolicy } from './policies';
 
 @ApiBearerAuth()
 @ApiTags('schools')
@@ -28,7 +32,7 @@ export class SchoolsController {
   constructor(private readonly schoolsService: SchoolsService) {}
 
   @Post()
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -42,6 +46,7 @@ export class SchoolsController {
   }
 
   @Patch('/:schoolId')
+  @CheckPolicies(UpdateSchoolPolicy)
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -58,24 +63,25 @@ export class SchoolsController {
   }
 
   @Get()
-  @AllowAuthenticated()
+  @Authenticated()
   findAll(): Promise<School[]> {
     return this.schoolsService.findAll();
   }
 
-  @Get('/:id')
-  @AllowAuthenticated()
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<School> {
+  @Get('/:schoolId')
+  @Authenticated()
+  findOne(@Param('schoolId', ParseIntPipe) id: number): Promise<School> {
     return this.schoolsService.findOne(id);
   }
 
-  @Delete('/:id')
-  delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  @Delete('/:schoolId')
+  @CheckPolicies(DeleteSchoolPolicy)
+  delete(@Param('schoolId', ParseIntPipe) id: number): Promise<void> {
     return this.schoolsService.delete(id);
   }
 
   @Post('/search')
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

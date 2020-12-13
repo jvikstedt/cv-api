@@ -16,7 +16,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ExportersService } from './exporters.service';
 import { ExportPdfDto } from './dto/export-pdf.dto';
 import { ExportDocxDto } from './dto/export-docx.dto';
-import { AllowAuthenticated } from '../roles/roles.decorator';
+import { Authenticated } from '../authorization/authorization.decorator';
 
 @ApiBearerAuth()
 @ApiTags('exporters')
@@ -25,7 +25,7 @@ export class ExportersController {
   constructor(private readonly exportersService: ExportersService) {}
 
   @Post('/pdf/export')
-  @AllowAuthenticated()
+  @Authenticated()
   @Header('Content-Type', 'application/pdf')
   @UsePipes(
     new ValidationPipe({
@@ -44,7 +44,7 @@ export class ExportersController {
   }
 
   @Post('/docx/export')
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,

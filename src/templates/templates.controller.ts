@@ -12,7 +12,6 @@ import {
   BadRequestException,
   ValidationError,
   HttpException,
-  UseGuards,
 } from '@nestjs/common';
 import { TemplatesService } from './templates.service';
 import { Template } from './template.entity';
@@ -21,10 +20,12 @@ import { GetUser } from '../auth/get-user.decorator';
 import { PatchTemplateDto } from './dto/patch-template.dto';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { JwtPayload } from '../auth/jwt-payload.interface';
-import { AllowAuthenticated } from '../roles/roles.decorator';
-import { TemplatesGuard } from './templates.guard';
+import {
+  Authenticated,
+  CheckPolicies,
+} from '../authorization/authorization.decorator';
+import { TemplateOwnerPolicy } from './policies';
 
-@UseGuards(TemplatesGuard)
 @ApiBearerAuth()
 @ApiTags('templates')
 @Controller('templates')
@@ -32,7 +33,7 @@ export class TemplatesController {
   constructor(private readonly templatesService: TemplatesService) {}
 
   @Post()
-  @AllowAuthenticated()
+  @Authenticated()
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -49,7 +50,7 @@ export class TemplatesController {
   }
 
   @Patch('/:templateId')
-  @AllowAuthenticated()
+  @CheckPolicies(TemplateOwnerPolicy)
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -71,13 +72,13 @@ export class TemplatesController {
   }
 
   @Get()
-  @AllowAuthenticated()
+  @Authenticated()
   findAll(@GetUser() user: JwtPayload): Promise<Template[]> {
     return this.templatesService.findAll(user.userId);
   }
 
   @Get('/:templateId')
-  @AllowAuthenticated()
+  @CheckPolicies(TemplateOwnerPolicy)
   findOne(
     @Param('templateId', ParseIntPipe) templateId: number,
   ): Promise<Template> {
@@ -85,6 +86,7 @@ export class TemplatesController {
   }
 
   @Delete('/:templateId')
+  @CheckPolicies(TemplateOwnerPolicy)
   delete(@Param('templateId', ParseIntPipe) templateId: number): Promise<void> {
     return this.templatesService.delete(templateId);
   }

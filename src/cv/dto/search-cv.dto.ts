@@ -14,6 +14,30 @@ export class SkillSearch {
   skillSubjectId: number;
 }
 
+export class WorkExperienceSearch {
+  @IsBoolean()
+  required? = false;
+
+  @IsNumber()
+  companyId: number;
+}
+
+export class EducationSearch {
+  @IsBoolean()
+  required? = false;
+
+  @IsNumber()
+  schoolId: number;
+}
+
+export class ProjectMembershipSearch {
+  @IsBoolean()
+  required? = false;
+
+  @IsNumber()
+  projectId: number;
+}
+
 export class Sort {
   @IsString()
   field: string;
@@ -34,6 +58,15 @@ export class SearchCVDto {
 
   @IsArray()
   skills?: SkillSearch[] = [];
+
+  @IsArray()
+  workExperiences?: WorkExperienceSearch[] = [];
+
+  @IsArray()
+  educations?: EducationSearch[] = [];
+
+  @IsArray()
+  projectMemberships?: ProjectMembershipSearch[] = [];
 
   @IsOptional()
   @IsArray()

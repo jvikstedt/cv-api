@@ -18,7 +18,11 @@ import { Education } from './education.entity';
 import { CreateEducationDto } from './dto/create-education.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PatchEducationDto } from './dto/patch-education.dto';
-import { AllowAuthenticated, AllowCVOwner } from '../roles/roles.decorator';
+import {
+  Authenticated,
+  CheckPolicies,
+} from '../authorization/authorization.decorator';
+import { CVOwnerPolicy } from '../cv/policies';
 
 @ApiBearerAuth()
 @ApiTags('educations')
@@ -27,7 +31,7 @@ export class EducationsController {
   constructor(private readonly educationsService: EducationsService) {}
 
   @Post()
-  @AllowCVOwner()
+  @CheckPolicies(CVOwnerPolicy)
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -44,7 +48,7 @@ export class EducationsController {
   }
 
   @Patch('/:educationId')
-  @AllowCVOwner()
+  @CheckPolicies(CVOwnerPolicy)
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -62,13 +66,13 @@ export class EducationsController {
   }
 
   @Get()
-  @AllowAuthenticated()
+  @Authenticated()
   findAll(@Param('cvId', ParseIntPipe) cvId: number): Promise<Education[]> {
     return this.educationsService.findAll(cvId);
   }
 
   @Get('/:educationId')
-  @AllowAuthenticated()
+  @Authenticated()
   findOne(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('educationId', ParseIntPipe) educationId: number,
@@ -77,7 +81,7 @@ export class EducationsController {
   }
 
   @Delete('/:educationId')
-  @AllowCVOwner()
+  @CheckPolicies(CVOwnerPolicy)
   remove(
     @Param('cvId', ParseIntPipe) cvId: number,
     @Param('educationId', ParseIntPipe) educationId: number,

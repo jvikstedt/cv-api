@@ -18,7 +18,6 @@ describe('SchoolsController (e2e)', () => {
   let cv: CV;
   let adminCV: CV;
   let accessToken: string;
-  let adminAccessToken: string;
 
   beforeAll(async () => {
     await testHelper.setup();
@@ -40,7 +39,6 @@ describe('SchoolsController (e2e)', () => {
     admin.templates = [];
 
     accessToken = testHelper.sign(user);
-    adminAccessToken = testHelper.sign(admin);
   });
 
   afterAll(async (done) => {
@@ -97,14 +95,9 @@ describe('SchoolsController (e2e)', () => {
   describe('/schools/:id (DELETE)', () => {
     it('deletes school', async () => {
       const school = await factory(School)().create();
-      await request(app.getHttpServer())
-        .delete(`/schools/${school.id}`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .expect(403);
-
       const response = await request(app.getHttpServer())
         .delete(`/schools/${school.id}`)
-        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
       expect(response.body).toEqual({});
@@ -149,15 +142,9 @@ describe('SchoolsController (e2e)', () => {
         name: 'Metropolia',
       };
 
-      await request(app.getHttpServer())
-        .patch(`/schools/${school.id}`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .send(patchSchoolDto)
-        .expect(403);
-
       const response = await request(app.getHttpServer())
         .patch(`/schools/${school.id}`)
-        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(patchSchoolDto)
         .expect(200);
 

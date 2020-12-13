@@ -81,19 +81,28 @@ export class SkillSubjectsService {
   async search(
     searchSkillSubjectDto: SearchSkillSubjectDto,
   ): Promise<{ items: SkillSubject[]; total: number }> {
-    const [items, total] = await this.skillSubjectRepository
+    let query = this.skillSubjectRepository
       .createQueryBuilder('skillSubject')
       .leftJoinAndSelect('skillSubject.skillGroup', 'skillGroup')
       .where('skillSubject.name ilike :name', {
         name: `%${searchSkillSubjectDto.name}%`,
-      })
+      });
+
+    if (searchSkillSubjectDto.skillGroupId) {
+      query = query.andWhere('skillSubject.skillGroupId = :skillGroupId', {
+        skillGroupId: searchSkillSubjectDto.skillGroupId,
+      });
+    }
+
+    query = query
       .orderBy(
         searchSkillSubjectDto.orderColumnName,
         searchSkillSubjectDto.orderSort,
       )
       .skip(searchSkillSubjectDto.skip)
-      .take(searchSkillSubjectDto.take)
-      .getManyAndCount();
+      .take(searchSkillSubjectDto.take);
+
+    const [items, total] = await query.getManyAndCount();
 
     return {
       items,

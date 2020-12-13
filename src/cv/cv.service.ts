@@ -10,7 +10,13 @@ import { CV } from './cv.entity';
 import { CVRepository } from './cv.repository';
 import { PatchCVDto } from './dto/patch-cv.dto';
 import { ELASTIC_INDEX_CV } from '../constants';
-import { SearchCVDto, SkillSearch } from './dto/search-cv.dto';
+import {
+  EducationSearch,
+  ProjectMembershipSearch,
+  SearchCVDto,
+  SkillSearch,
+  WorkExperienceSearch,
+} from './dto/search-cv.dto';
 import {
   QUEUE_NAME_CV,
   CONFIG_QUEUE,
@@ -100,6 +106,48 @@ export class CVService {
                 ),
             R.filter((skill) => skill.required, searchCVDto.skills),
           ),
+          ...R.map(
+            (workExperience: WorkExperienceSearch) =>
+              esb
+                .nestedQuery()
+                .path('workExperiences')
+                .query(
+                  esb.termQuery(
+                    'workExperiences.companyId',
+                    workExperience.companyId,
+                  ),
+                ),
+            R.filter(
+              (workExperience) => workExperience.required,
+              searchCVDto.workExperiences,
+            ),
+          ),
+          ...R.map(
+            (education: EducationSearch) =>
+              esb
+                .nestedQuery()
+                .path('educations')
+                .query(
+                  esb.termQuery('educations.schoolId', education.schoolId),
+                ),
+            R.filter((education) => education.required, searchCVDto.educations),
+          ),
+          ...R.map(
+            (projectMembership: ProjectMembershipSearch) =>
+              esb
+                .nestedQuery()
+                .path('projectMemberships')
+                .query(
+                  esb.termQuery(
+                    'projectMemberships.projectId',
+                    projectMembership.projectId,
+                  ),
+                ),
+            R.filter(
+              (projectMembership) => projectMembership.required,
+              searchCVDto.projectMemberships,
+            ),
+          ),
           R.isEmpty(searchCVDto.text)
             ? esb.matchAllQuery()
             : esb.boolQuery().should([
@@ -153,6 +201,48 @@ export class CVService {
                   esb.termQuery('skills.skillSubjectId', skill.skillSubjectId),
                 ),
             R.reject((skill) => skill.required, searchCVDto.skills),
+          ),
+          ...R.map(
+            (workExperience: WorkExperienceSearch) =>
+              esb
+                .nestedQuery()
+                .path('workExperiences')
+                .query(
+                  esb.termQuery(
+                    'workExperiences.companyId',
+                    workExperience.companyId,
+                  ),
+                ),
+            R.reject(
+              (workExperience) => workExperience.required,
+              searchCVDto.workExperiences,
+            ),
+          ),
+          ...R.map(
+            (education: EducationSearch) =>
+              esb
+                .nestedQuery()
+                .path('educations')
+                .query(
+                  esb.termQuery('educations.schoolId', education.schoolId),
+                ),
+            R.reject((education) => education.required, searchCVDto.educations),
+          ),
+          ...R.map(
+            (projectMembership: ProjectMembershipSearch) =>
+              esb
+                .nestedQuery()
+                .path('projectMemberships')
+                .query(
+                  esb.termQuery(
+                    'projectMemberships.projectId',
+                    projectMembership.projectId,
+                  ),
+                ),
+            R.reject(
+              (projectMembership) => projectMembership.required,
+              searchCVDto.projectMemberships,
+            ),
           ),
         ]),
     );
