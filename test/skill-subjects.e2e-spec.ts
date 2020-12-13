@@ -19,7 +19,6 @@ describe('SkillSubjectsController (e2e)', () => {
   let cv: CV;
   let adminCV: CV;
   let accessToken: string;
-  let adminAccessToken: string;
 
   beforeAll(async () => {
     await testHelper.setup();
@@ -41,7 +40,6 @@ describe('SkillSubjectsController (e2e)', () => {
     admin.templates = [];
 
     accessToken = testHelper.sign(user);
-    adminAccessToken = testHelper.sign(admin);
   });
 
   afterAll(async (done) => {
@@ -106,14 +104,9 @@ describe('SkillSubjectsController (e2e)', () => {
     const skillSubject = await factory(SkillSubject)().create({
       skillGroupId: skillGroup.id,
     });
-    await request(app.getHttpServer())
-      .delete(`/skill_subjects/${skillSubject.id}`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .expect(403);
-
     const response = await request(app.getHttpServer())
       .delete(`/skill_subjects/${skillSubject.id}`)
-      .set('Authorization', `Bearer ${adminAccessToken}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
 
     expect(response.body).toEqual({});
@@ -157,15 +150,9 @@ describe('SkillSubjectsController (e2e)', () => {
         name: 'vue',
       };
 
-      await request(app.getHttpServer())
-        .patch(`/skill_subjects/${skillSubject.id}`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .send(patchSkillSubjectDto)
-        .expect(403);
-
       const response = await request(app.getHttpServer())
         .patch(`/skill_subjects/${skillSubject.id}`)
-        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(patchSkillSubjectDto)
         .expect(200);
 

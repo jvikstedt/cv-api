@@ -19,7 +19,6 @@ describe('ProjectController (e2e)', () => {
   let cv: CV;
   let adminCV: CV;
   let accessToken: string;
-  let adminAccessToken: string;
 
   beforeAll(async () => {
     await testHelper.setup();
@@ -41,7 +40,6 @@ describe('ProjectController (e2e)', () => {
     admin.templates = [];
 
     accessToken = testHelper.sign(user);
-    adminAccessToken = testHelper.sign(admin);
   });
 
   afterAll(async (done) => {
@@ -117,14 +115,9 @@ describe('ProjectController (e2e)', () => {
       const project = await factory(Project)().create({
         companyId: company.id,
       });
-      await request(app.getHttpServer())
-        .delete(`/project/${project.id}`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .expect(403);
-
       const response = await request(app.getHttpServer())
         .delete(`/project/${project.id}`)
-        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
       expect(response.body).toEqual({});
@@ -175,15 +168,9 @@ describe('ProjectController (e2e)', () => {
         name: 'Project A',
       };
 
-      await request(app.getHttpServer())
-        .patch(`/project/${project.id}`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .send(patchProjectDto)
-        .expect(403);
-
       const response = await request(app.getHttpServer())
         .patch(`/project/${project.id}`)
-        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(patchProjectDto)
         .expect(200);
 
