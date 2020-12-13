@@ -41,14 +41,17 @@ export class FilesController {
 
   // FIXME consider removing public and figuring out proper way to access this
   @Public()
-  @Get('/:id')
-  async download(@Param('id') id: string, @Res() res: Response): Promise<void> {
+  @Get('/:fileId')
+  async download(
+    @Param('fileId') id: string,
+    @Res() res: Response,
+  ): Promise<void> {
     const file = await this.filesService.findOne(id);
     res.download(file.path, file.originalname);
   }
 
-  @Delete('/:id')
-  delete(@Param('id') id: string): Promise<void> {
+  @Delete('/:fileId')
+  delete(@Param('fileId') id: string): Promise<void> {
     return this.filesService.delete(id);
   }
 }

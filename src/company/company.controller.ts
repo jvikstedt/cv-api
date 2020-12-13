@@ -68,15 +68,15 @@ export class CompanyController {
     return this.companyService.findAll();
   }
 
-  @Get('/:id')
+  @Get('/:companyId')
   @Authenticated()
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Company> {
+  findOne(@Param('companyId', ParseIntPipe) id: number): Promise<Company> {
     return this.companyService.findOne(id);
   }
 
-  @Delete('/:id')
+  @Delete('/:companyId')
   @CheckPolicies(DeleteCompanyPolicy)
-  delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  delete(@Param('companyId', ParseIntPipe) id: number): Promise<void> {
     return this.companyService.delete(id);
   }
 
