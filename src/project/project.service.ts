@@ -76,17 +76,26 @@ export class ProjectService {
   async search(
     searchProjectDto: SearchProjectDto,
   ): Promise<{ items: Project[]; total: number }> {
-    const [items, total] = await this.projectRepository
+    let query = this.projectRepository
       .createQueryBuilder('project')
       .leftJoinAndSelect('project.company', 'company')
       .leftJoinAndSelect('project.projectMemberships', 'projectMemberships')
       .where('project.name ilike :name', {
         name: `%${searchProjectDto.name}%`,
-      })
+      });
+
+    if (searchProjectDto.companyId) {
+      query = query.andWhere('project.companyId = :companyId', {
+        companyId: searchProjectDto.companyId,
+      });
+    }
+
+    query = query
       .orderBy(searchProjectDto.orderColumnName, searchProjectDto.orderSort)
       .skip(searchProjectDto.skip)
-      .take(searchProjectDto.take)
-      .getManyAndCount();
+      .take(searchProjectDto.take);
+
+    const [items, total] = await query.getManyAndCount();
 
     return {
       items,

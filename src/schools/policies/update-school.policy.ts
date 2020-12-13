@@ -18,10 +18,6 @@ export default class UpdateSchoolPolicy implements IPolicyHandler {
       relations: ['educations'],
     });
 
-    if (R.isEmpty(school.educations)) {
-      return true;
-    }
-
     return R.all(
       (education) => R.includes(education.cvId, user.cvIds),
       school.educations,

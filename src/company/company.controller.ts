@@ -19,7 +19,11 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { PatchCompanyDto } from './dto/patch-company.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SearchCompanyDto } from './dto/search-company.dto';
-import { Authenticated } from '../authorization/authorization.decorator';
+import {
+  Authenticated,
+  CheckPolicies,
+} from '../authorization/authorization.decorator';
+import { DeleteCompanyPolicy, UpdateCompanyPolicy } from './policies';
 
 @ApiBearerAuth()
 @ApiTags('company')
@@ -42,6 +46,7 @@ export class CompanyController {
   }
 
   @Patch('/:companyId')
+  @CheckPolicies(UpdateCompanyPolicy)
   @UsePipes(
     new ValidationPipe({
       transform: true,
@@ -70,6 +75,7 @@ export class CompanyController {
   }
 
   @Delete('/:id')
+  @CheckPolicies(DeleteCompanyPolicy)
   delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.companyService.delete(id);
   }

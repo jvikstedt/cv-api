@@ -7,6 +7,10 @@ export class SearchSkillSubjectDto {
 
   @IsOptional()
   @IsNumber()
+  skillGroupId?: number;
+
+  @IsOptional()
+  @IsNumber()
   take?: number = 10;
 
   @IsOptional()
