@@ -16,6 +16,7 @@ import { FilesHttpModule } from './files/files-http.module';
 import { SchoolsHttpModule } from './schools/schools-http.module';
 import { CompanyHttpModule } from './company/company-http.module';
 import { ProjectHttpModule } from './project/project-http.module';
+import { MergeHttpModule } from './merge/merge-http.module';
 import { SyncModule } from './sync/sync.module';
 import typeOrmConfig = require('./config/typeorm.config');
 
@@ -38,6 +39,7 @@ import typeOrmConfig = require('./config/typeorm.config');
     SchoolsHttpModule,
     CompanyHttpModule,
     ProjectHttpModule,
+    MergeHttpModule,
     SyncModule,
   ],
 })
