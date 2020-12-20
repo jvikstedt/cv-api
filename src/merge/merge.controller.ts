@@ -7,6 +7,7 @@ import {
   BadRequestException,
   ValidationError,
   HttpException,
+  HttpCode,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { MergeSkillSubjectsDto } from './dto/merge-skill-subjects.dto';
@@ -19,6 +20,7 @@ export class MergeController {
   constructor(private readonly mergeService: MergeService) {}
 
   @Post('/skill_subjects')
+  @HttpCode(200)
   @UsePipes(
     new ValidationPipe({
       transform: true,
