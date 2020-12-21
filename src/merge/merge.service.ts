@@ -1,6 +1,10 @@
 import * as R from 'ramda';
 import { Connection, QueryRunner } from 'typeorm';
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { MergeSkillSubjectsDto } from './dto/merge-skill-subjects.dto';
 import { SkillSubject } from '../skill_subjects/skill-subject.entity';
 import { Skill } from '../skills/skill.entity';
@@ -8,8 +12,6 @@ import { MembershipSkill } from '../membership_skill/membership-skill.entity';
 
 @Injectable()
 export class MergeService {
-  private readonly logger = new Logger(MergeService.name);
-
   constructor(private connection: Connection) {}
 
   async mergeSkills(
@@ -83,6 +85,10 @@ export class MergeService {
 
       if (!source || !target) {
         throw new NotFoundException();
+      }
+
+      if (R.equals(source.id, target.id)) {
+        throw new BadRequestException();
       }
 
       for (const sourceSkill of source.skills) {
