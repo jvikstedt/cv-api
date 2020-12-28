@@ -71,10 +71,10 @@ export class User extends BaseEntity {
   @JoinTable()
   roles: Role[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   async validatePassword(password: string): Promise<boolean> {

@@ -26,10 +26,10 @@ export class Company extends BaseEntity {
   @OneToMany(() => Project, (project) => project.company)
   projects: Project[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   public constructor(init?: Partial<Company>) {
