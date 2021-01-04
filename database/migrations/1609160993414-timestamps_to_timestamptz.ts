@@ -16,10 +16,6 @@ export class timestampsToTimestamptz1609160993414 implements MigrationInterface 
         await queryRunner.query(`ALTER TABLE "file" ADD "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()`);
         await queryRunner.query(`ALTER TABLE "file" DROP COLUMN "updatedAt"`);
         await queryRunner.query(`ALTER TABLE "file" ADD "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()`);
-        await queryRunner.query(`ALTER TABLE "merge_request" DROP COLUMN "createdAt"`);
-        await queryRunner.query(`ALTER TABLE "merge_request" ADD "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()`);
-        await queryRunner.query(`ALTER TABLE "merge_request" DROP COLUMN "updatedAt"`);
-        await queryRunner.query(`ALTER TABLE "merge_request" ADD "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()`);
         await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "createdAt"`);
         await queryRunner.query(`ALTER TABLE "users" ADD "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()`);
         await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "updatedAt"`);
@@ -119,10 +115,6 @@ export class timestampsToTimestamptz1609160993414 implements MigrationInterface 
         await queryRunner.query(`ALTER TABLE "users" ADD "updatedAt" TIMESTAMP NOT NULL DEFAULT now()`);
         await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "createdAt"`);
         await queryRunner.query(`ALTER TABLE "users" ADD "createdAt" TIMESTAMP NOT NULL DEFAULT now()`);
-        await queryRunner.query(`ALTER TABLE "merge_request" DROP COLUMN "updatedAt"`);
-        await queryRunner.query(`ALTER TABLE "merge_request" ADD "updatedAt" TIMESTAMP NOT NULL DEFAULT now()`);
-        await queryRunner.query(`ALTER TABLE "merge_request" DROP COLUMN "createdAt"`);
-        await queryRunner.query(`ALTER TABLE "merge_request" ADD "createdAt" TIMESTAMP NOT NULL DEFAULT now()`);
         await queryRunner.query(`ALTER TABLE "file" DROP COLUMN "updatedAt"`);
         await queryRunner.query(`ALTER TABLE "file" ADD "updatedAt" TIMESTAMP NOT NULL DEFAULT now()`);
         await queryRunner.query(`ALTER TABLE "file" DROP COLUMN "createdAt"`);

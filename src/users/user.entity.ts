@@ -17,6 +17,7 @@ import { CV } from '../cv/cv.entity';
 import { Role } from '../roles/role.entity';
 import { Template } from '../templates/template.entity';
 import { File } from '../files/file.entity';
+import { MergeRequest } from '../merge_requests/merge-request.entity';
 
 @Entity({ name: 'users' })
 @Unique(['username'])
@@ -59,6 +60,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Template, (template) => template.user)
   templates: Template[];
+
+  @OneToMany(() => MergeRequest, (mergeRequest) => mergeRequest.user)
+  mergeRequests: MergeRequest[];
 
   @OneToOne(() => File)
   @JoinColumn()
