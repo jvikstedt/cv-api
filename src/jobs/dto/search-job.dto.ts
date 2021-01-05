@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsNumber } from 'class-validator';
 
-export class SearchMergeRequestDto {
+export class SearchJobDto {
   @IsOptional()
   @IsNumber()
   take?: number = 10;
@@ -11,7 +11,7 @@ export class SearchMergeRequestDto {
 
   @IsOptional()
   @IsString()
-  orderColumnName?: string = 'mergeRequest.createdAt';
+  orderColumnName?: string = 'job.createdAt';
 
   @IsOptional()
   @IsString()

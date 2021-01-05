@@ -13,32 +13,29 @@ export enum State {
   Pending = 'pending',
   Rejected = 'rejected',
   Cancelled = 'cancelled',
+  Approved = 'approved',
+  Running = 'running',
   Completed = 'completed',
   Failed = 'failed',
 }
 
 @Entity()
-export class MergeRequest extends BaseEntity {
+export class Job extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  sourceId: number;
+  runner: string;
+
+  @Column('json')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any;
+
+  @Column({ default: false })
+  skipApproval: string;
 
   @Column()
-  targetId: number;
-
-  @Column()
-  sourceName: string;
-
-  @Column()
-  targetName: string;
-
-  @Column()
-  entity: string;
-
-  @Column({ default: '' })
-  msg: string;
+  description: string;
 
   @Column({
     type: 'enum',
@@ -47,10 +44,10 @@ export class MergeRequest extends BaseEntity {
   })
   state: State;
 
-  @Column()
-  description: string;
+  @Column({ default: '' })
+  log: string;
 
-  @ManyToOne(() => User, (user) => user.mergeRequests, {
+  @ManyToOne(() => User, (user) => user.jobs, {
     nullable: false,
   })
   user: User;
@@ -64,7 +61,7 @@ export class MergeRequest extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
-  public constructor(init?: Partial<MergeRequest>) {
+  public constructor(init?: Partial<Job>) {
     super();
     Object.assign(this, init);
   }

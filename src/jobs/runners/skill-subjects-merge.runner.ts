@@ -5,80 +5,48 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { SkillSubjectRepository } from '../../skill_subjects/skill-subject.repository';
-import { MergeHelper } from '../../merge_requests/merge-helper';
-import { CreateMergeRequestDto } from '../../merge_requests/dto/create-merge-request.dto';
-import { MergeRequest, State } from '../../merge_requests/merge-request.entity';
-import { JwtPayload } from '../../auth/jwt-payload.interface';
+import { Job } from '../../jobs/job.entity';
 import { SkillSubject } from '../../skill_subjects/skill-subject.entity';
 import { Skill } from '../../skills/skill.entity';
 import { MembershipSkill } from '../../membership_skill/membership-skill.entity';
+import { JobRunner } from '../job-runner';
 
 @Injectable()
-export class SkillSubjectsMergeHelper implements MergeHelper {
-  public static EntityName = 'SkillSubject';
+export class SkillSubjectsMergeJobRunner implements JobRunner {
+  public static RunnerName = 'SkillSubjectMerge';
 
-  constructor(
-    private connection: Connection,
+  constructor(private connection: Connection) {}
 
-    @InjectRepository(SkillSubjectRepository)
-    private readonly skillSubjectRepository: SkillSubjectRepository,
-  ) {}
-
-  public async buildMergeRequest(
-    user: JwtPayload,
-    createMergeRequestDto: CreateMergeRequestDto,
-  ): Promise<MergeRequest> {
-    const { entity, description, sourceId, targetId } = createMergeRequestDto;
-
-    const source = await this.skillSubjectRepository.findOne(sourceId, {
-      relations: ['skillGroup'],
-    });
-    const target = await this.skillSubjectRepository.findOne(targetId, {
-      relations: ['skillGroup'],
-    });
-
-    const mergeRequest = new MergeRequest({
-      state: State.Pending,
-      userId: user.userId,
-      entity,
-      description,
-      sourceId,
-      targetId,
-      sourceName: `${source.skillGroup.name} / ${source.name}`,
-      targetName: `${target.skillGroup.name} / ${target.name}`,
-    });
-    return mergeRequest;
+  public name(): string {
+    return SkillSubjectsMergeJobRunner.RunnerName;
   }
 
-  public async merge(mergeRequest: MergeRequest): Promise<void> {
+  public async run(job: Job): Promise<void> {
+    const { sourceId, targetId } = job.data;
+    return this.merge(sourceId, targetId);
+  }
+
+  public async merge(sourceId: number, targetId: number): Promise<void> {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const source = await queryRunner.manager.findOne(
-        SkillSubject,
-        mergeRequest.sourceId,
-        {
-          relations: ['skills', 'skills.membershipSkills'],
-        },
-      );
-      const target = await queryRunner.manager.findOne(
-        SkillSubject,
-        mergeRequest.targetId,
-        {
-          relations: ['skills', 'skills.membershipSkills'],
-        },
-      );
+      const source = await queryRunner.manager.findOne(SkillSubject, sourceId, {
+        relations: ['skills', 'skills.membershipSkills'],
+      });
+      const target = await queryRunner.manager.findOne(SkillSubject, targetId, {
+        relations: ['skills', 'skills.membershipSkills'],
+      });
 
       if (!source || !target) {
         throw new NotFoundException();
       }
 
       if (R.equals(source.id, target.id)) {
-        throw new BadRequestException();
+        throw new Error(
+          `source (${source.id}) and target (${target.id}) can't be same`,
+        );
       }
 
       for (const sourceSkill of source.skills) {
@@ -106,7 +74,7 @@ export class SkillSubjectsMergeHelper implements MergeHelper {
       // Delete skill subject after all associations has been moves
       await queryRunner.manager
         .createQueryBuilder()
-        .softDelete()
+        .delete()
         .from(SkillSubject)
         .where('id = :id', { id: source.id })
         .execute();

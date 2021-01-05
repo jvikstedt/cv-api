@@ -8,7 +8,6 @@ import {
   OneToMany,
   Unique,
   ManyToOne,
-  DeleteDateColumn,
 } from 'typeorm';
 import { Skill } from '../skills/skill.entity';
 import { SkillGroup } from '../skill_groups/skill-group.entity';
@@ -38,9 +37,6 @@ export class SkillSubject extends BaseEntity {
 
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
-
-  @DeleteDateColumn({ type: 'timestamptz' })
-  deletedAt: Date;
 
   public constructor(init?: Partial<SkillSubject>) {
     super();
