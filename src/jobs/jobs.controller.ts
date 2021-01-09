@@ -11,6 +11,7 @@ import {
   ParseIntPipe,
   Get,
   Delete,
+  HttpCode,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
@@ -78,11 +79,13 @@ export class JobsController {
   }
 
   @Post('/:jobId/approve')
+  @HttpCode(200)
   approve(@Param('jobId', ParseIntPipe) jobId: number): Promise<Job> {
     return this.jobService.approve(jobId);
   }
 
   @Post('/:jobId/reject')
+  @HttpCode(200)
   reject(@Param('jobId', ParseIntPipe) jobId: number): Promise<Job> {
     return this.jobService.reject(jobId);
   }
