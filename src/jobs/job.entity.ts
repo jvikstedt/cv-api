@@ -32,7 +32,7 @@ export class Job extends BaseEntity {
   data: any;
 
   @Column({ default: false })
-  skipApproval: string;
+  skipApproval: boolean;
 
   @Column()
   description: string;

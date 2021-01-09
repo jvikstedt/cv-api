@@ -1,10 +1,6 @@
 import * as R from 'ramda';
 import { Connection, QueryRunner } from 'typeorm';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Job } from '../../jobs/job.entity';
 import { SkillSubject } from '../../skill_subjects/skill-subject.entity';
 import { Skill } from '../../skills/skill.entity';
