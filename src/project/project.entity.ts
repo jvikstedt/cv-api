@@ -35,10 +35,10 @@ export class Project extends BaseEntity {
   @Column()
   companyId: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   public constructor(init?: Partial<Project>) {

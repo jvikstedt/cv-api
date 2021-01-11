@@ -34,10 +34,10 @@ export class Template extends BaseEntity {
   @Column('json')
   data: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   public constructor(init?: Partial<Template>) {

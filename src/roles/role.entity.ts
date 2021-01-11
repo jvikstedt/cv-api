@@ -17,10 +17,10 @@ export class Role extends BaseEntity {
   @Column()
   name: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   public constructor(init?: Partial<Role>) {

@@ -22,10 +22,10 @@ export class School extends BaseEntity {
   @OneToMany(() => Education, (education) => education.school)
   educations: Education[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   public constructor(init?: Partial<School>) {

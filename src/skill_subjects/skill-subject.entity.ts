@@ -32,10 +32,10 @@ export class SkillSubject extends BaseEntity {
   @Column()
   skillGroupId: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   public constructor(init?: Partial<SkillSubject>) {

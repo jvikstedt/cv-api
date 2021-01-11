@@ -47,10 +47,10 @@ export class Skill extends BaseEntity {
   @OneToMany(() => MembershipSkill, (membershipSkill) => membershipSkill.skill)
   membershipSkills!: MembershipSkill[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   public constructor(init?: Partial<Skill>) {

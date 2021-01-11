@@ -34,6 +34,7 @@ export const CONFIG_REDIS_HOST = 'host';
 export const CONFIG_QUEUE = 'queue';
 export const CONFIG_QUEUE_CV_RELOAD = 'cvReloadDelay';
 export const QUEUE_NAME_CV = 'cv';
+export const QUEUE_NAME_JOB = 'job';
 
 export const ELASTIC_INDEX_CV = 'cv';
 
@@ -48,6 +49,10 @@ export const ROUTE_METADATA_POLICIES = 'POLICIES';
 export const ROUTE_METADATA_POLICIES_REQUIRE_ALL = 'POLICIES_REQUIRE_ALL';
 
 export const ADMIN_ROLE = 'ADMIN';
+
+export enum JobEventType {
+  Run = 'run',
+}
 
 export enum EventType {
   Insert = 'insert',

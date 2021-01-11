@@ -17,6 +17,7 @@ import { CV } from '../cv/cv.entity';
 import { Role } from '../roles/role.entity';
 import { Template } from '../templates/template.entity';
 import { File } from '../files/file.entity';
+import { Job } from '../jobs/job.entity';
 
 @Entity({ name: 'users' })
 @Unique(['username'])
@@ -60,6 +61,9 @@ export class User extends BaseEntity {
   @OneToMany(() => Template, (template) => template.user)
   templates: Template[];
 
+  @OneToMany(() => Job, (job) => job.user)
+  jobs: Job[];
+
   @OneToOne(() => File)
   @JoinColumn()
   avatar: File;
@@ -71,10 +75,10 @@ export class User extends BaseEntity {
   @JoinTable()
   roles: Role[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   async validatePassword(password: string): Promise<boolean> {

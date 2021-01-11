@@ -22,10 +22,10 @@ export class SkillGroup extends BaseEntity {
   @OneToMany(() => SkillSubject, (skillSubject) => skillSubject.skillGroup)
   skillSubjects: SkillSubject[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   public constructor(init?: Partial<SkillGroup>) {

@@ -39,10 +39,10 @@ export class MembershipSkill extends BaseEntity {
   @Column()
   skillId!: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   public constructor(init?: Partial<MembershipSkill>) {

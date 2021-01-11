@@ -60,10 +60,10 @@ export class ProjectMembership extends BaseEntity {
   @Column()
   projectId: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   public constructor(init?: Partial<ProjectMembership>) {
